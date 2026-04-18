@@ -1,0 +1,107 @@
+.container {
+  background-color: #f6f6f6;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+.header {
+  background-color: #fff;
+  padding: 40rpx 30rpx;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 30rpx;
+  flex-shrink: 0; /* 防止被压缩 */
+}
+.user-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 0; /* 允许在 flex 中正常收缩 */
+}
+.nickname {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 10rpx;
+  white-space: nowrap; /* 禁止换行，保证横向显示 */
+  color: var(--color-text-main);
+}
+.uid {
+  font-size: 24rpx;
+  color: #999;
+  white-space: nowrap;
+}
+.arrow {
+  color: #ccc;
+  width: auto !important; /* 覆盖全局的 100% 宽度 */
+  flex-shrink: 0;
+}
+.card {
+  background-color: #fff;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+.card-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 30rpx;
+  color: var(--color-text-main);
+}
+.grid-4 {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+.status-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+.icon {
+  width: 60rpx;
+  height: 60rpx;
+  margin-bottom: 10rpx;
+}
+.menu-list {
+  background-color: #fff;
+  width: 100%;
+}
+.menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+  width: 100%;
+  box-sizing: border-box;
+}
+.menu-item:last-child {
+  border-bottom: none;
+}
+.left {
+  display: flex;
+  align-items: center;
+}
+.menu-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 20rpx;
+}
+.logout-btn {
+  margin: 40rpx 0; /* 左右边距设为0，实现铺满 */
+  background-color: #fff;
+  color: #ff4d4f;
+  text-align: center;
+  padding: 30rpx;
+  border-radius: 0; /* 铺满时通常不需要圆角 */
+  width: 100%;
+  box-sizing: border-box;
+  font-weight: bold;
+}

@@ -1,0 +1,150 @@
+/* 全局响应式样式 */
+:root {
+  /* 响应式断点 */
+  --breakpoint-xs: 0px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1400px;
+}
+
+/* 通用响应式工具类 */
+.responsive-container {
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* 响应式字体大小 */
+.responsive-text {
+  font-size: clamp(0.875rem, 2vw, 1rem);
+}
+
+.responsive-heading {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
+
+.responsive-subheading {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+/* 响应式间距 */
+.responsive-padding {
+  padding: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+.responsive-margin {
+  margin: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+/* 响应式网格布局 */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+/* 响应式图片 */
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* 响应式flex布局 */
+.responsive-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+/* 隐藏/显示工具类 */
+.hidden-mobile {
+  display: none;
+}
+
+.hidden-desktop {
+  display: block;
+}
+
+/* 媒体查询 */
+@media (min-width: 576px) {
+  .responsive-container {
+    max-width: 540px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  
+  .hidden-mobile {
+    display: block;
+  }
+  
+  .hidden-desktop {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .responsive-container {
+    max-width: 720px;
+  }
+}
+
+@media (min-width: 992px) {
+  .responsive-container {
+    max-width: 960px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-container {
+    max-width: 1140px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .responsive-container {
+    max-width: 1320px;
+  }
+}
+
+/* 响应式工具类：针对不同设备的特定样式 */
+/* 手机端 */
+@media (max-width: 575.98px) {
+  .mobile-full-width {
+    width: 100% !important;
+  }
+  
+  .mobile-text-center {
+    text-align: center !important;
+  }
+  
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+}
+
+/* 平板端 */
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .tablet-full-width {
+    width: 100% !important;
+  }
+  
+  .tablet-text-center {
+    text-align: center !important;
+  }
+}
+
+/* 桌面端 */
+@media (min-width: 992px) {
+  .desktop-visible {
+    display: block !important;
+  }
+}

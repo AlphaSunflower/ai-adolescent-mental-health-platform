@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: AIAdolescentMentalHealthSystem
+  profiles:
+    active: test
+  datasource:
+    url: jdbc:mysql://localhost:3306/xinyuzhilian?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+mybatis-plus:
+  mapper-locations: "classpath*:/mapper/**/*.xml"
+
+logging:
+  level:
+    com:
+      xinyuzhilian:
+        aiadolescentmentalhealthsystem: debug
+
+wx:
+  appid: wxb5c3ee45467ef38a
+  secret: REPLACE_ME_WX_APP_SECRET
+
+wx-gzh:
+  appid: wx1cdbf73ddc785370
+  secret: REPLACE_ME_WX_GZH_SECRET
+
+send:
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: 771038325@qq.com
+    password: REPLACE_ME_MAIL_PASSWORD
+
+aliyun:
+  oss:
+    endpoint: oss-cn-beijing.aliyuncs.com
+    accessKeyId: REPLACE_ME_OSS_ACCESS_KEY_ID
+    accessKeySecret: REPLACE_ME_OSS_ACCESS_KEY_SECRET
+    bucketName: xinyuzhilian-aiadolescentmentalhealthsystem
+
+jwt:
+  secret: CHANGE_ME_TO_A_LONG_RANDOM_SECRET
+  expiration: 86400000
+dashscope:
+  api-key: REPLACE_ME_DASHSCOPE_API_KEY
+

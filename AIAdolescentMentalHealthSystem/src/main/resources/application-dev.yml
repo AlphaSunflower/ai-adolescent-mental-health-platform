@@ -1,0 +1,16 @@
+db:
+  mysql:
+    host: 127.0.0.1
+    port: 3306
+    username: xinyuzhilian
+    pw: XINYUZHILIAN123
+
+  redis:
+    host: 127.0.0.1
+
+
+oss:
+  endpoint: oss-cn-beijing.aliyuncs.com
+  keyid: REPLACE_ME_OSS_ACCESS_KEY_ID
+  keysecret: REPLACE_ME_OSS_ACCESS_KEY_SECRET
+  bucketname: xinyuzhilian-aiadolescentmentalhealthsystem

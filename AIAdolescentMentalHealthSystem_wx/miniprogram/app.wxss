@@ -1,0 +1,56 @@
+/**app.wxss**/
+:root, page {
+  /* 全局色板 - 心理健康导向 (绿色系) */
+  --color-bg-positive: #E8F5E9;    /* 薄荷绿背景：健康、生机 */
+  --color-text-main: #1B5E20;      /* 深绿色文字：护眼、专业 */
+  --color-text-secondary: #424242; /* 深暖灰 */
+  --color-accent-warm: #2196F3;    /* 蓝色强调色：宁静、理性 */
+  --color-accent-soft: #E8F5E9;    /* 鼓舞语句背景与主背景相同 */
+  --color-disabled: #BDBDBD;       /* 中性灰 */
+  --color-surface: #FFFFFF;        /* 纯白卡片背景 */
+  --color-border: #C8E6C9;         /* 浅绿色边框线 */
+  
+  /* 布局间距 */
+  --spacing-row: 20px;             /* 统一行间距 */
+  
+  background: var(--color-bg-positive);
+  color: var(--color-text-main);
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Segoe UI, Arial, Roboto, 'PingFang SC', 'miui', 'Hiragino Sans GB', 'Microsoft Yahei', sans-serif;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0;
+} 
+
+/* 确保主要布局组件铺满宽度，防止左右留白 */
+.container, .main-card, .header-container, .search-row, .greeting-row, .quotes-swiper, .menu-list, .header, .card, .logout-btn {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+
+/* 默认图片铺满，但允许局部覆盖 */
+image {
+  max-width: 100%;
+}
+
+button {
+  background: initial;
+}
+
+button:focus{
+  outline: 0;
+}
+
+button::after{
+  border: none;
+}

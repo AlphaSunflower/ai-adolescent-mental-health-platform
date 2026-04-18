@@ -1,0 +1,69 @@
+<view class="container">
+  <!-- 第一行：鼓舞语句轮播 -->
+  <swiper class="quotes-swiper" autoplay circular vertical interval="3000">
+    <swiper-item wx:for="{{quotes}}" wx:key="index">
+      <view class="quote-item">{{item.content}}</view>
+    </swiper-item>
+  </swiper>
+
+  <!-- 第二行：搜索组件 -->
+  <view class="search-row">
+    <view class="search-bar">
+      <icon type="search" size="16" color="var(--color-text-main)"></icon>
+      <input placeholder="搜索医院、医生" placeholder-style="color: var(--color-disabled)" />
+    </view>
+  </view>
+
+  <!-- 第三行：招呼/去登录 -->
+  <view class="greeting-row">
+    <block wx:if="{{isLogin}}">
+      <text class="greeting-text">Hi, {{userInfo.nickname || '用户'}} 您好</text>
+    </block>
+    <block wx:else>
+      <navigator url="/pages/login/index" class="login-link">去登陆</navigator>
+    </block>
+  </view>
+
+  <!-- Main Functions 1 -->
+  <view class="main-card">
+    <view class="grid-2">
+      <navigator url="/pages/consultation/index" class="grid-item" open-type="switchTab">
+        <image src="../../images/icons/business.png" class="icon" mode="aspectFit"></image>
+        <text class="item-text">预约挂号</text>
+      </navigator>
+      <navigator url="/pages/consultation/index" class="grid-item" open-type="switchTab">
+        <image src="../../images/icons/customer-service.png" class="icon" mode="aspectFit"></image>
+        <text class="item-text">线上咨询</text>
+      </navigator>
+    </view>
+    <view class="add-patient-row">
+      <navigator url="/pages/patient/index">
+        <text class="add-text">+ 添加就诊人</text>
+      </navigator>
+    </view>
+  </view>
+
+  <!-- Main Functions 2 -->
+  <view class="main-card">
+    <view class="grid-4">
+      <navigator url="/pages/assessment/index" class="grid-item" open-type="switchTab">
+        <image src="../../images/icons/examples.png" class="icon" mode="aspectFit"></image>
+        <text class="item-text">心理测评</text>
+      </navigator>
+      <navigator url="/pages/ai/index" class="grid-item" open-type="switchTab">
+        <image src="../../images/icons/goods.png" class="icon" mode="aspectFit"></image>
+        <text class="item-text">AI问诊</text>
+      </navigator>
+      <navigator url="/pages/my-consultation/index" class="grid-item">
+        <image src="../../images/icons/business.png" class="icon" mode="aspectFit"></image>
+        <text class="item-text">我的咨询</text>
+      </navigator>
+      <navigator url="/pages/encyclopedia/index" class="grid-item">
+        <image src="../../images/database.png" class="icon" mode="aspectFit"></image>
+        <text class="item-text">心理百科</text>
+      </navigator>
+    </view>
+  </view>
+
+  <view class="copyright">CopyRight© 心愈智联团队</view>
+</view>

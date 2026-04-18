@@ -1,0 +1,66 @@
+<view class="container">
+  <view class="header" bindtap="handleProfile">
+    <image class="avatar" src="{{isLogin ? userInfo.headPath || '../../images/icons/avatar.png' : '../../images/icons/avatar.png'}}"></image>
+    <view class="user-info">
+      <block wx:if="{{isLogin}}">
+        <text class="nickname">{{userInfo.nickname}}</text>
+        <text class="uid">ID: {{userInfo.id}}</text>
+      </block>
+      <block wx:else>
+        <text class="nickname">点击登录</text>
+        <text class="uid">登录后享受更多服务</text>
+      </block>
+    </view>
+    <view class="arrow">></view>
+  </view>
+
+  <!-- My Consultation Status -->
+  <view class="card">
+    <view class="card-title">我的咨询</view>
+    <view class="grid-4">
+      <view class="status-item" bindtap="goToMyConsultation" data-status="0">
+        <image src="../../images/icons/goods.png" class="icon"></image>
+        <text>待付款</text>
+      </view>
+      <view class="status-item" bindtap="goToMyConsultation" data-status="1">
+        <image src="../../images/icons/business.png" class="icon"></image>
+        <text>待咨询</text>
+      </view>
+      <view class="status-item" bindtap="goToMyConsultation" data-status="2">
+        <image src="../../images/icons/examples.png" class="icon"></image>
+        <text>已完成</text>
+      </view>
+      <view class="status-item" bindtap="goToMyConsultation" data-status="3">
+        <image src="../../images/icons/close.png" class="icon"></image>
+        <text>已取消</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- Menu List -->
+  <view class="menu-list">
+    <navigator url="/pages/patient/index" class="menu-item">
+      <view class="left">
+        <image src="../../images/icons/usercenter.png" class="menu-icon"></image>
+        <text>就诊人管理</text>
+      </view>
+      <view class="arrow">></view>
+    </navigator>
+    <navigator url="/pages/feedback/index" class="menu-item">
+      <view class="left">
+        <image src="../../images/icons/question.svg" class="menu-icon"></image>
+        <text>意见反馈</text>
+      </view>
+      <view class="arrow">></view>
+    </navigator>
+    <navigator url="/pages/settings/index" class="menu-item">
+      <view class="left">
+        <image src="../../images/icons/setting.svg" class="menu-icon"></image>
+        <text>设置</text>
+      </view>
+      <view class="arrow">></view>
+    </navigator>
+  </view>
+
+  <view class="logout-btn" wx:if="{{isLogin}}" bindtap="handleLogout">退出登录</view>
+</view>
