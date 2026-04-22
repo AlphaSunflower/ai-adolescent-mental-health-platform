@@ -130,7 +130,6 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 ## 分支与协作
 
 - 主干：`main`
-- 当前 monorepo 迁移分支：`chore/monorepo-migration`
 - 提交前建议至少执行：
 
   ```bash
