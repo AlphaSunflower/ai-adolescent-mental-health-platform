@@ -16,9 +16,12 @@ const toolCandidates = {
 };
 
 const candidates = toolCandidates[tool] ?? [tool];
-const executable = candidates.find((candidate) =>
+const localCandidate = candidates.find((candidate) =>
   existsSync(path.resolve(process.cwd(), candidate))
-) ?? tool;
+);
+const executable = localCandidate
+  ? path.resolve(process.cwd(), localCandidate)
+  : tool;
 
 const needsShell = isWindows && /\.(bat|cmd)$/i.test(executable);
 const result = spawnSync(executable, args, {
