@@ -2,15 +2,13 @@
   "name": "@ai-adolescent-mental-health/wechat-functions",
   "private": true,
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Workspace wrapper for WeChat cloud functions",
   "scripts": {
     "build": "node -e \"console.log('No build step required for wechat-functions.')\"",
+    "check": "node -e \"console.log('Function entry: apps/wechat-functions/quickstartFunctions')\"",
     "clean": "node -e \"console.log('No generated artifacts to clean for wechat-functions.')\"",
     "test": "node -e \"console.log('No automated tests configured for wechat-functions.')\""
   },
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "wx-server-sdk": "~2.4.0"
   }

@@ -10,14 +10,17 @@
 - 形态：微信云开发云函数（Serverless）
 - 运行时：Node.js（由微信云开发环境决定版本）
 - 核心依赖：`wx-server-sdk@~2.4.0`
-- 入口：`index.js`（根目录直接暴露 `main` 函数）
+- 云函数根目录：当前工作区根目录
+- 当前函数名：`quickstartFunctions`
+- 入口：`quickstartFunctions/index.js`
 - **无构建步骤**：`pnpm build` / `pnpm test` 均只打印提示
 
 ## 二、关键文件
 
-- `index.js`：云函数入口，导出 `exports.main = async (event, context) => { ... }`
-- `config.json`：云函数权限 / 触发配置（格式见微信官方）
-- `package.json`：依赖声明；`wx-server-sdk` 必须存在
+- `package.json`：workspace 包装层，负责根级脚本和锁定依赖版本
+- `quickstartFunctions/index.js`：云函数入口，导出 `exports.main = async (event, context) => { ... }`
+- `quickstartFunctions/config.json`：云函数权限 / 触发配置（格式见微信官方）
+- `quickstartFunctions/package.json`：函数部署时使用的依赖声明
 
 ## 三、命令
 
@@ -49,7 +52,7 @@ pnpm install   # 根目录
    不要硬编码环境 ID；`DYNAMIC_CURRENT_ENV` 会自动跟随小程序端的环境切换。
 5. **密钥处理**：云函数中访问第三方 API 所需的 key 通过云开发「环境变量」配置，不要写入源码。
 6. **修改后需提示用户上传**：AI 修改完云函数代码，应提醒用户在 miniapp 侧执行 `./uploadCloudFunction.sh` 或在开发者工具中重新上传，否则线上无效。
-7. **新增云函数**：若将来拆出多个云函数目录（如 `functions/login/`、`functions/search/`），需同步更新 `apps/wechat-miniapp/project.config.json` 的 `cloudfunctionRoot` 与上传脚本。
+7. **新增云函数**：新增函数时直接在本目录下创建新的函数子目录，并同步更新 `apps/wechat-miniapp/uploadCloudFunction.sh` 或小程序侧调用名称。
 
 ## 五、与其他工作区的协作
 

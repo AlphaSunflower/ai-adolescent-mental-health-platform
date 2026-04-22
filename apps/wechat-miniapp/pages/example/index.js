@@ -271,7 +271,7 @@ Page({
             showTip: true,
             title: "请上传云函数",
             content:
-              "在'../wechat-functions'目录右键，选择【上传并部署-云端安装依赖】，等待云函数上传完成后重试。",
+              "在'../wechat-functions/quickstartFunctions'目录右键，选择【上传并部署-云端安装依赖】，等待云函数上传完成后重试。",
           });
           return;
         }
@@ -328,7 +328,7 @@ Page({
             showTip: true,
             title: "请上传云函数",
             content:
-              "在'../wechat-functions'目录右键，选择【上传并部署-云端安装依赖】，等待云函数上传完成后重试。",
+              "在'../wechat-functions/quickstartFunctions'目录右键，选择【上传并部署-云端安装依赖】，等待云函数上传完成后重试。",
           });
           return;
         }

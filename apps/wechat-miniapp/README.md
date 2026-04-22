@@ -5,7 +5,8 @@
 相关资源：
 
 - 小程序代码位于当前目录根部
-- 云函数代码位于 `../wechat-functions`
+- 云函数根目录位于 `../wechat-functions`
+- 当前云函数目录位于 `../wechat-functions/quickstartFunctions`
 - 云函数上传脚本位于 `./uploadCloudFunction.sh`
 
 参考文档：

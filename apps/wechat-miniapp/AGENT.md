@@ -9,7 +9,8 @@
 - 包名：`@ai-adolescent-mental-health/wechat-miniapp`
 - 形态：原生微信小程序（非 uni-app / Taro）
 - **无 CLI 构建**：`pnpm build` / `pnpm test` 等脚本只会打印提示信息，真正的构建、预览、上传均通过「微信开发者工具」完成。
-- 云函数代码位于同级目录 `../wechat-functions`
+- 云函数根目录位于同级目录 `../wechat-functions`
+- 当前云函数目录为 `../wechat-functions/quickstartFunctions`
 - 云函数上传脚本：`./uploadCloudFunction.sh`
 
 ## 二、常见目录（微信约定）
@@ -36,7 +37,7 @@
 1. **不要为此工作区编造构建 / 测试命令**：目前不存在 `pnpm build:miniapp`、`vite` 之类的构建链。如被用户要求「加构建」，应先与用户确认是否切换到 uni-app / Taro，而不是擅自搭建。
 2. **`app.json` 修改需谨慎**：`pages` 数组顺序决定首页；`tabBar`、`window`、`usingComponents` 字段有严格格式要求，改动前核对微信官方 schema。
 3. **`project.config.json`**：`miniprogramRoot`、`cloudfunctionRoot` 指向 monorepo 内路径，**不要改成绝对路径**。
-4. **云函数目录联动**：本目录 `project.config.json` 的 `cloudfunctionRoot` 可能指向 `../wechat-functions`；改位置前确认未破坏上传脚本。
+4. **云函数目录联动**：本目录 `project.config.json` 的 `cloudfunctionRoot` 指向 `../wechat-functions`，其下再按函数名拆分子目录；改位置前确认未破坏上传脚本与函数名 `quickstartFunctions`。
 5. **AppID / 云开发环境 ID**：不要写死真实 ID 在代码里，使用 `project.private.config.json`（不入库）或环境切换逻辑。
 6. **不要引入 npm 包构建链**：微信小程序虽支持 `npm`，但本工作区当前未启用。如确需，先向用户说明影响（构建步骤、开发者工具开关）。
 7. **样式单位**：使用 `rpx` 而非 `px`，与既有页面保持一致。
