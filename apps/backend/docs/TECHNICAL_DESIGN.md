@@ -14,7 +14,7 @@
 *   **前端技术**: Vue.3 / UniApp (多端适配)
 
 ### 1.2 系统拓扑
-![1769701951208](E:\Project\AIAdolescentMentalHealthSystem\docs\asset\1769701951208.png)
+![1769701951208](./asset/1769701951208.png)
 
 ---
 

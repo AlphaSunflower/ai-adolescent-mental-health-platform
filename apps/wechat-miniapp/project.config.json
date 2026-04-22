@@ -1,6 +1,6 @@
 {
-  "miniprogramRoot": "miniprogram/",
-  "cloudfunctionRoot": "cloudfunctions/",
+  "miniprogramRoot": "./",
+  "cloudfunctionRoot": "../wechat-functions/",
   "setting": {
     "urlCheck": true,
     "es6": true,
@@ -72,7 +72,7 @@
     }
   },
   "compileType": "miniprogram",
-  "srcMiniprogramRoot": "miniprogram/",
+  "srcMiniprogramRoot": "./",
   "packOptions": {
     "ignore": [],
     "include": []

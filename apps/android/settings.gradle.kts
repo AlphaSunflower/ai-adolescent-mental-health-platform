@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "AIAdolescentMentalHealthAndroid"
+rootProject.name = "ai-adolescent-mental-health-android"
 include(":app")
  

@@ -1,8 +1,6 @@
 spring:
   application:
     name: AIAdolescentMentalHealthSystem
-  profiles:
-    active: test
   datasource:
     url: jdbc:mysql://localhost:3306/xinyuzhilian?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
     driver-class-name: com.mysql.cj.jdbc.Driver

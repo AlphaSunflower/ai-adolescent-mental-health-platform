@@ -1,10 +1,13 @@
 {
-  "name": "quickstartFunctions",
+  "name": "@ai-adolescent-mental-health/wechat-functions",
+  "private": true,
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "node -e \"console.log('No build step required for wechat-functions.')\"",
+    "clean": "node -e \"console.log('No generated artifacts to clean for wechat-functions.')\"",
+    "test": "node -e \"console.log('No automated tests configured for wechat-functions.')\""
   },
   "author": "",
   "license": "ISC",

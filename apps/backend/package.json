@@ -1,0 +1,11 @@
+{
+  "name": "@ai-adolescent-mental-health/backend",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "node ../../scripts/run-workspace-bin.cjs mvnw clean package -DskipTests",
+    "clean": "node ../../scripts/run-workspace-bin.cjs mvnw clean",
+    "dev": "node ../../scripts/run-workspace-bin.cjs mvnw spring-boot:run",
+    "test": "node ../../scripts/run-workspace-bin.cjs mvnw test"
+  }
+}
