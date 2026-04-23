@@ -1,5 +1,5 @@
 const { spawnSync } = require("node:child_process");
-const { existsSync } = require("node:fs");
+const { existsSync, accessSync, constants } = require("node:fs");
 const path = require("node:path");
 
 const [, , tool, ...args] = process.argv;
@@ -19,12 +19,40 @@ const candidates = toolCandidates[tool] ?? [tool];
 const localCandidate = candidates.find((candidate) =>
   existsSync(path.resolve(process.cwd(), candidate))
 );
-const executable = localCandidate
+const localPath = localCandidate
   ? path.resolve(process.cwd(), localCandidate)
-  : tool;
+  : null;
 
-const needsShell = isWindows && /\.(bat|cmd)$/i.test(executable);
-const result = spawnSync(executable, args, {
+let executable;
+let spawnArgs = args;
+let needsShell = false;
+
+if (localPath) {
+  const isBatch = /\.(bat|cmd)$/i.test(localPath);
+  if (isWindows && isBatch) {
+    executable = localPath;
+    needsShell = true;
+  } else if (!isWindows) {
+    let isExecutable = true;
+    try {
+      accessSync(localPath, constants.X_OK);
+    } catch {
+      isExecutable = false;
+    }
+    if (isExecutable) {
+      executable = localPath;
+    } else {
+      executable = "sh";
+      spawnArgs = [localPath, ...args];
+    }
+  } else {
+    executable = localPath;
+  }
+} else {
+  executable = tool;
+}
+
+const result = spawnSync(executable, spawnArgs, {
   cwd: process.cwd(),
   shell: needsShell,
   stdio: "inherit"
