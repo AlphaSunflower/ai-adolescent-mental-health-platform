@@ -560,19 +560,20 @@ interface TimeSlotPeriod {
 
 const timeSlotPeriods = computed((): TimeSlotPeriod[] => {
   const slots = getDaySlots(currentSlotDate.value)
-  const periods: TimeSlotPeriod[] = [
+  const periods: [TimeSlotPeriod, TimeSlotPeriod, TimeSlotPeriod] = [
     { key: 'morning', name: '上午', slots: [] },
     { key: 'afternoon', name: '下午', slots: [] },
     { key: 'evening', name: '晚上', slots: [] }
   ]
 
   slots.forEach(slot => {
+    const [morningPeriod, afternoonPeriod, eveningPeriod] = periods
     if (slot.timeSlot?.toLowerCase().includes('morning')) {
-      periods[0].slots.push(slot)
+      morningPeriod.slots.push(slot)
     } else if (slot.timeSlot?.toLowerCase().includes('afternoon')) {
-      periods[1].slots.push(slot)
+      afternoonPeriod.slots.push(slot)
     } else {
-      periods[2].slots.push(slot)
+      eveningPeriod.slots.push(slot)
     }
   })
 
@@ -732,6 +733,7 @@ const currentMonthLabel = computed(() => {
   if (scheduleDays.value.length === 0) return ''
   const start = scheduleDays.value[0]
   const end = scheduleDays.value[scheduleDays.value.length - 1]
+  if (!start || !end) return ''
   return `${start.getMonth() + 1}月${start.getDate()}日 - ${end.getMonth() + 1}月${end.getDate()}日`
 })
 
@@ -770,7 +772,8 @@ const selectService = (service: any) => {
 }
 
 // 获取某天的排班
-const getDaySlots = (day: Date) => {
+const getDaySlots = (day: Date | null) => {
+  if (!day) return []
   if (!psychologist.value?.schedules || psychologist.value.schedules.length === 0) {
     return []
   }
@@ -795,7 +798,7 @@ const getDaySlots = (day: Date) => {
     
     // 如果是字符串（后端 LocalDate 返回格式，如 "2026-04-15"）
     if (typeof scheduleDate === 'string') {
-      const sdStr = scheduleDate.split('T')[0]
+      const sdStr = scheduleDate.slice(0, 10)
       return sdStr === targetDateStr
     }
     
@@ -872,7 +875,7 @@ const formatSelectedDate = computed(() => {
 
 const selectSlot = (day: Date, slot: any) => {
   selectedSlot.value = {
-    date: day.toISOString().split('T')[0],
+    date: day.toISOString().slice(0, 10),
     timeSlot: slot.timeSlot,
     scheduleId: slot.id || getScheduleId(day, slot.timeSlot)
   }
@@ -902,11 +905,11 @@ const hasAvailableSlot = (day: Date) => {
 }
 
 const getScheduleId = (day: Date, timeSlot: string) => {
-  const dateStr = day.toISOString().split('T')[0]
+  const dateStr = day.toISOString().slice(0, 10)
   const daySchedule = psychologist.value?.schedules?.find((s: any) => {
     const scheduleDate = s.date || s.scheduleDate
     if (scheduleDate instanceof Date) {
-      return scheduleDate.toISOString().split('T')[0] === dateStr
+      return scheduleDate.toISOString().slice(0, 10) === dateStr
     }
     return scheduleDate === dateStr
   })
@@ -1060,7 +1063,12 @@ const fetchDetail = async () => {
   loading.value = true
   const id = route.params.id
   try {
-    const res: any = await getPsychologistDetail(id as string)
+    const psychologistId = Number(Array.isArray(id) ? id[0] : id)
+    if (!Number.isFinite(psychologistId)) {
+      ElMessage.error('心理咨询师ID无效')
+      return
+    }
+    const res: any = await getPsychologistDetail(psychologistId)
     if (res.code === 200) {
       psychologist.value = res.data
       isFavorite.value = res.data.isFavorited || false
@@ -1091,8 +1099,8 @@ const fetchSchedules = async () => {
     const today = new Date()
     const nextMonth = new Date(today)
     nextMonth.setMonth(nextMonth.getMonth() + 1)
-    const startDate = today.toISOString().split('T')[0]
-    const endDate = nextMonth.toISOString().split('T')[0]
+    const startDate = today.toISOString().slice(0, 10)
+    const endDate = nextMonth.toISOString().slice(0, 10)
     
     console.log('获取排班数据:', {
       psychologistId: psychologist.value.id,

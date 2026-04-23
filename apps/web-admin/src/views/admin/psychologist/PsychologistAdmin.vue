@@ -901,8 +901,11 @@ const submitForm = async () => {
 
     let res: any
     if (formDialogType.value === 'add') {
-      data.userId = formData.userId
-      res = await addPsychologist(data)
+      if (formData.userId === null) {
+        ElMessage.warning('请选择关联用户')
+        return
+      }
+      res = await addPsychologist({ ...data, userId: formData.userId })
     } else {
       res = await updatePsychologist(formData.id!, data)
     }

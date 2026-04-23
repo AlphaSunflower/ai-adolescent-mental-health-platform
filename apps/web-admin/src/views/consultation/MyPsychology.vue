@@ -620,6 +620,8 @@ const allPage = ref(1)
 const allSize = ref(10)
 const allTotal = ref(0)
 const allStatusFilter = ref<number | undefined>(undefined)
+const historyPage = ref(1)
+const historySize = ref(10)
 const historyTotal = ref(0)
 
 // 评价

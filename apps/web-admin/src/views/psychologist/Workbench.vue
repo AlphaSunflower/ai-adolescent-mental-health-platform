@@ -325,7 +325,12 @@ const router = useRouter()
 const onlineStatus = ref(OnlineStatus.OFFLINE)
 const statusLoading = ref(false)
 
-const getStatusText = (status: number) => OnlineStatusText[status] || '离线'
+const getStatusText = (status: number) => {
+  if (status === OnlineStatus.ONLINE || status === OnlineStatus.BUSY || status === OnlineStatus.OFFLINE) {
+    return OnlineStatusText[status]
+  }
+  return '离线'
+}
 
 const getStatusClass = (status: number) => {
   switch (status) {
@@ -513,8 +518,7 @@ const submitVideoLink = async () => {
   try {
     const res: any = await sendVideoLink({
       appointmentId: currentAppointment.value.id,
-      platform: videoForm.platform,
-      link: videoForm.link,
+      videoLink: videoForm.link,
       startTime: videoForm.startTime || undefined
     })
     if (res.code === 200) {
