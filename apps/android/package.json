@@ -1,0 +1,10 @@
+{
+  "name": "@ai-adolescent-mental-health/android",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "node ../../scripts/run-workspace-bin.cjs gradlew build",
+    "clean": "node ../../scripts/run-workspace-bin.cjs gradlew clean",
+    "test": "node ../../scripts/run-workspace-bin.cjs gradlew test"
+  }
+}

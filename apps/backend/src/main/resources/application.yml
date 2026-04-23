@@ -1,0 +1,75 @@
+server:
+  tomcat:
+    max-swallow-size: 2MB
+  port: 8080
+
+spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
+      - optional:file:apps/backend/.env[.properties]
+  application:
+    name: AIAdolescentMentalHealthSystem
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    url: jdbc:mysql://${DB_MYSQL_HOST}:${DB_MYSQL_PORT}/${DB_MYSQL_DATABASE}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_MYSQL_USERNAME}
+    password: ${DB_MYSQL_PASSWORD}
+  data:
+    redis:
+      host: ${DB_REDIS_HOST}
+      port: ${DB_REDIS_PORT}
+
+  websocket:
+    max-text-message-buffer-size: 5242880
+    max-binary-message-buffer-size: 5242880
+
+mybatis-plus:
+  mapper-locations: "classpath*:/mapper/**/*.xml"
+
+logging:
+  level:
+    com:
+      xinyuzhilian:
+        aiadolescentmentalhealthsystem: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n%wEx"
+
+aliyun:
+  oss:
+    endpoint: ${ALIYUN_OSS_ENDPOINT}
+    accessKeyId: ${ALIYUN_OSS_ACCESS_KEY_ID}
+    accessKeySecret: ${ALIYUN_OSS_ACCESS_KEY_SECRET}
+    bucketName: ${ALIYUN_OSS_BUCKET_NAME}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
+  issuer: "AIAdolescentMentalHealthSystem"
+  rememberExpiration: 2592000000
+
+dashscope:
+  api:
+    key: ${DASHSCOPE_API_KEY}
+
+wx:
+  appid: ${WX_APP_ID}
+  secret: ${WX_APP_SECRET}
+
+wx-gzh:
+  appid: ${WX_GZH_APP_ID}
+  secret: ${WX_GZH_SECRET}
+  callback-base-url: ${WX_GZH_CALLBACK_BASE_URL}
+
+send:
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}

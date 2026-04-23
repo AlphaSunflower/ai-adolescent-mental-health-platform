@@ -1,0 +1,11 @@
+{
+  "name": "@ai-adolescent-mental-health/wechat-miniapp",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "build": "node -e \"console.log('Use WeChat DevTools to build apps/wechat-miniapp.')\"",
+    "check": "node -e \"console.log('Use WeChat DevTools to open apps/wechat-miniapp for local development.')\"",
+    "clean": "node -e \"console.log('No generated artifacts to clean for wechat-miniapp.')\"",
+    "test": "node -e \"console.log('No automated tests configured for wechat-miniapp.')\""
+  }
+}
