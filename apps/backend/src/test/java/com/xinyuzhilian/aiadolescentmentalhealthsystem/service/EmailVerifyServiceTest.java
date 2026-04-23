@@ -1,11 +1,14 @@
 package com.xinyuzhilian.aiadolescentmentalhealthsystem.service;
 
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.pojo.EmailVerifyCode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -15,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * 注意：此测试需要 MySQL 和 Redis 服务运行
  * 如果服务未启动，请跳过或使用 Mock 测试
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EmailVerifyServiceTest {
 
     @Autowired(required = false)
@@ -28,6 +31,22 @@ class EmailVerifyServiceTest {
     private static final String TEST_OPENID = "test_openid_12345";
     private static final String TEST_OPENID_TYPE = "mini";
     private static final String TEST_SCENE = IEmailVerifyService.SCENE_BIND_EMAIL;
+
+    @BeforeEach
+    void clearRedisState() {
+        if (redisTemplate != null) {
+            redisTemplate.delete(List.of(
+                    "email:verify:send:freq:" + TEST_EMAIL,
+                    "email:verify:send:daily:" + TEST_EMAIL,
+                    "email:verify:error:count:" + TEST_EMAIL,
+                    "email:verify:code:" + TEST_EMAIL,
+                    "email:verify:send:freq:invalid-email",
+                    "email:verify:send:daily:invalid-email",
+                    "email:verify:error:count:invalid-email",
+                    "email:verify:code:invalid-email"
+            ));
+        }
+    }
 
     @Test
     void testSendAndVerifyCode_Success() {
@@ -62,16 +81,16 @@ class EmailVerifyServiceTest {
     }
 
     @Test
-    void testSendCode_InvalidEmail() {
+    void testVerifyCode_InvalidEmail() {
         if (emailVerifyService == null) {
             System.out.println("[SKIP] emailVerifyService 未启动，跳过测试");
             return;
         }
 
-        // 故意发送无效邮箱格式
-        assertThrows(Exception.class, () -> {
-            emailVerifyService.sendVerifyCode("invalid-email", TEST_OPENID, TEST_OPENID_TYPE, TEST_SCENE);
+        // 低层服务的 sendVerifyCode 是 @Async void，参数校验由调用方负责；这里验证无匹配验证码会被拒绝。
+        assertThrows(RuntimeException.class, () -> {
+            emailVerifyService.verifyAndConsumeCode("invalid-email", "000000", TEST_SCENE);
         });
-        System.out.println("[PASS] 无效邮箱正确抛出异常");
+        System.out.println("[PASS] 无匹配验证码正确抛出异常");
     }
 }

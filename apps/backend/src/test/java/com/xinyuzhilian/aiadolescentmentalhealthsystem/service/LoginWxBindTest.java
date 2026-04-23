@@ -2,12 +2,15 @@ package com.xinyuzhilian.aiadolescentmentalhealthsystem.service;
 
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.common.Result;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.pojo.User;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * 2. 手动获取验证码
  * 3. bindEmailWithWx - 用验证码绑定账号
  */
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class LoginWxBindTest {
 
     @Autowired(required = false)
@@ -29,8 +32,23 @@ class LoginWxBindTest {
     @Autowired(required = false)
     private IEmailVerifyService emailVerifyService;
 
+    @Autowired(required = false)
+    private RedisTemplate<String, Object> redisTemplate;
+
     private static final String TEST_EMAIL = "test@example.com";
     private static final String TEST_OPENID = "test_wx_openid_12345";
+
+    @BeforeEach
+    void clearRedisState() {
+        if (redisTemplate != null) {
+            redisTemplate.delete(List.of(
+                    "email:verify:send:freq:" + TEST_EMAIL,
+                    "email:verify:send:daily:" + TEST_EMAIL,
+                    "email:verify:error:count:" + TEST_EMAIL,
+                    "email:verify:code:" + TEST_EMAIL
+            ));
+        }
+    }
 
     /**
      * 测试1: 小程序登录 - 已有账号（直接登录）
