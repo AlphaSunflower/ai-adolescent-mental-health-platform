@@ -60,7 +60,7 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 2. **不要擅自新增 `CLAUDE.md`、`.cursorrules`、`.github/copilot-instructions.md` 等其他 AI 规约文件**；本仓库统一使用 `AGENT.md`。
 3. **不要跨 app 复制源文件**。各端独立演进，若需共享 SQL/常量，考虑放 `infra/`。
 4. **修改根级配置前先说明理由**：`turbo.json`、`pnpm-workspace.yaml`、根 `package.json`、`apps/backend/src/main/resources/application*.yml`。
-5. **不要提交真实密钥**。敏感项全部使用 `${ENV_VAR:REPLACE_ME_*}` 占位符模式，已在 `application.yml` 中固定。
+5. **不要提交真实密钥或环境配置文件**。后端敏感项和环境差异通过 `${ENV_VAR}` 读取，本地可用 `apps/backend/.env`；不要提交真实 `.env` 或 `application-dev.yml`、`application-test.yml`、`application-local.yml` 等 profile 配置。
 6. **工作区内新增依赖**走对应子目录的 `package.json` / `pom.xml` / `build.gradle.kts`；不要把 app 级依赖塞到根 `package.json`。
 7. **文档默认不写 emoji**，与仓库既有风格一致。
 
@@ -83,10 +83,10 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 后端直接依赖的三方能力（对应变量见 `apps/backend/src/main/resources/application.yml`）：
 
 - 阿里云百炼 **DashScope**（`DASHSCOPE_API_KEY`）——小艾 AI 对话
-- **微信小程序 / 公众号**（`WX_APP_SECRET` / `WX_GZH_SECRET`）——登录与回调
-- **阿里云 OSS**（`oss.keyid` / `oss.keysecret` / `oss.bucketname` / `oss.endpoint`）——文件存储
-- **QQ 邮箱 SMTP**（`MAIL_PASSWORD`）——验证码/通知邮件
-- **MySQL / Redis / RabbitMQ**——数据层
+- **微信小程序 / 公众号**（`WX_APP_ID` / `WX_APP_SECRET` / `WX_GZH_APP_ID` / `WX_GZH_SECRET` / `WX_GZH_CALLBACK_BASE_URL`）——登录与回调
+- **阿里云 OSS**（`ALIYUN_OSS_ENDPOINT` / `ALIYUN_OSS_ACCESS_KEY_ID` / `ALIYUN_OSS_ACCESS_KEY_SECRET` / `ALIYUN_OSS_BUCKET_NAME`）——文件存储
+- **QQ 邮箱 SMTP**（`MAIL_HOST` / `MAIL_PORT` / `MAIL_USERNAME` / `MAIL_PASSWORD`）——验证码/通知邮件
+- **MySQL / Redis / RabbitMQ**（`DB_MYSQL_*` / `DB_REDIS_*`）——数据层
 
 本地启动后端的最低运行期条件：MySQL (`xinyuzhilian`) + Redis。RabbitMQ 视所触发的业务而定。
 

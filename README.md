@@ -98,20 +98,23 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 
 ## 后端配置与环境变量
 
-后端配置主文件：[apps/backend/src/main/resources/application.yml](apps/backend/src/main/resources/application.yml)，默认激活 `test` profile。所有敏感项均留有占位符 `REPLACE_ME_*` 或 `CHANGE_ME_*`，请通过环境变量注入，切勿提交真实值。
+后端配置主文件：[apps/backend/src/main/resources/application.yml](apps/backend/src/main/resources/application.yml)。仓库不再提交 `application-dev.yml` / `application-test.yml` 等环境配置文件；CI/CD 通过环境变量注入，本地开发可复制 [apps/backend/.env.example](apps/backend/.env.example) 为 `apps/backend/.env`。缺少必需变量时应让应用启动失败，避免使用无效默认值。
 
 需要在本地或部署环境设置的常见变量：
 
 | 变量 | 用途 |
 | --- | --- |
+| `DB_MYSQL_HOST` / `DB_MYSQL_PORT` / `DB_MYSQL_DATABASE` | MySQL 地址、端口与数据库名 |
+| `DB_MYSQL_USERNAME` / `DB_MYSQL_PASSWORD` | MySQL 账号与密码 |
+| `DB_REDIS_HOST` / `DB_REDIS_PORT` | Redis 地址与端口 |
+| `ALIYUN_OSS_ENDPOINT` / `ALIYUN_OSS_BUCKET_NAME` | 阿里云 OSS endpoint 与 bucket |
+| `ALIYUN_OSS_ACCESS_KEY_ID` / `ALIYUN_OSS_ACCESS_KEY_SECRET` | 阿里云 OSS 凭据 |
 | `JWT_SECRET` | JWT 签名密钥（HS256，至少 256 位） |
 | `DASHSCOPE_API_KEY` | 阿里云百炼 DashScope API Key（小艾 AI 对话） |
-| `WX_APP_SECRET` | 微信小程序 AppSecret |
-| `WX_GZH_SECRET` | 微信公众号 AppSecret |
-| `MAIL_PASSWORD` | QQ 邮箱 SMTP 授权码 |
-| `oss.keyid` / `oss.keysecret` / `oss.bucketname` / `oss.endpoint` | 阿里云 OSS 凭据与 bucket |
-| `db.mysql.host` / `db.mysql.port` / `db.mysql.username` / `db.mysql.pw` | MySQL 连接（均有本地默认值） |
-| `db.redis.host` | Redis 连接（默认 `localhost:6379`） |
+| `WX_APP_ID` / `WX_APP_SECRET` | 微信小程序 AppID 与 AppSecret |
+| `WX_GZH_APP_ID` / `WX_GZH_SECRET` | 微信公众号 AppID 与 AppSecret |
+| `WX_GZH_CALLBACK_BASE_URL` | 微信公众号授权回调基础地址 |
+| `MAIL_HOST` / `MAIL_PORT` / `MAIL_USERNAME` / `MAIL_PASSWORD` | SMTP 服务配置 |
 
 本地起服前请确保：
 

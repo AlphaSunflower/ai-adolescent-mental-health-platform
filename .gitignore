@@ -29,3 +29,13 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+apps/backend/.env
+apps/backend/.env.*
+!apps/backend/.env.example
+
+apps/backend/src/main/resources/application-*.yml
+apps/backend/src/main/resources/application-*.yaml
+apps/backend/src/main/resources/application-*.properties
+apps/backend/src/test/resources/application-*.yml
+apps/backend/src/test/resources/application-*.yaml
+apps/backend/src/test/resources/application-*.properties

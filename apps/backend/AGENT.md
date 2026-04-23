@@ -45,10 +45,10 @@ pnpm --filter @ai-adolescent-mental-health/backend clean
 ## 四、配置与环境变量
 
 - 主配置：`src/main/resources/application.yml`
-- Profile：`application-dev.yml`、`application-test.yml`
-- 所有敏感项通过环境变量注入；占位符形如 `REPLACE_ME_*` / `CHANGE_ME_*`，**请勿替换为真实值后提交**。
-- 关键变量：`JWT_SECRET`、`DASHSCOPE_API_KEY`、`WX_APP_SECRET`、`WX_GZH_SECRET`、`MAIL_PASSWORD`、`oss.keyid` / `oss.keysecret` / `oss.bucketname` / `oss.endpoint`、`db.mysql.host|port|username|pw`、`db.redis.host`
-- MySQL 库名固定为 `xinyuzhilian`；schema 变更需同步 `infra/sql/`。
+- 不提交 Profile 配置：`application-dev.yml`、`application-test.yml`、`application-local.yml` 等由本地 `.env` 或 CI/CD 环境变量替代。
+- 所有敏感项通过 `${ENV_VAR}` 注入；本地真实值可写在忽略提交的 `apps/backend/.env`，缺少必需变量时应让应用启动失败。
+- 关键变量：`DB_MYSQL_*`、`DB_REDIS_*`、`ALIYUN_OSS_*`、`JWT_SECRET`、`DASHSCOPE_API_KEY`、`WX_APP_ID`、`WX_APP_SECRET`、`WX_GZH_APP_ID`、`WX_GZH_SECRET`、`WX_GZH_CALLBACK_BASE_URL`、`MAIL_*`。
+- MySQL 库名通过 `DB_MYSQL_DATABASE` 配置；schema 变更需同步 `infra/sql/`。
 
 ## 五、AI 约束
 
