@@ -18,7 +18,9 @@ const statusMap: Record<number, string> = {
   0: '待审核', 1: '已确认', 2: '已拒绝', 3: '进行中', 4: '已完成', 5: '已取消', 6: '已爽约', 8: '已评价'
 }
 
-const statusTypeMap: Record<number, string> = {
+type StatusTagType = 'primary' | 'success' | 'info' | 'warning' | 'danger'
+
+const statusTypeMap: Record<number, StatusTagType> = {
   0: 'warning', 1: 'success', 2: 'danger', 3: 'primary', 4: 'info', 5: 'info', 6: 'danger', 8: 'success'
 }
 

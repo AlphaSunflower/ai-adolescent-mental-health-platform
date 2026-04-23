@@ -278,7 +278,7 @@ const currentWeekLabel = computed(() => {
 
 // ---- 工具函数 ----
 function formatDate(d: Date): string {
-  return d.toISOString().split('T')[0]
+  return d.toISOString().slice(0, 10)
 }
 
 function formatDateStr(d: Date): string {

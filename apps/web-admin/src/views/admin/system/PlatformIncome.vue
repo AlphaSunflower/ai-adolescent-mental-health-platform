@@ -180,10 +180,15 @@ const fetchStats = async () => {
       }
 
       // 更新模块数据
-      incomeModules.value[0].commission = consult.platformCommission || 0
-      incomeModules.value[0].orderCount = consult.orderCount || 0
-      incomeModules.value[1].commission = member.platformCommission || 0
-      incomeModules.value[1].orderCount = member.orderCount || 0
+      const [consultationModule, memberModule] = incomeModules.value
+      if (consultationModule) {
+        consultationModule.commission = consult.platformCommission || 0
+        consultationModule.orderCount = consult.orderCount || 0
+      }
+      if (memberModule) {
+        memberModule.commission = member.platformCommission || 0
+        memberModule.orderCount = member.orderCount || 0
+      }
     }
   } catch (error: any) {
     ElMessage.error(error.message || '获取统计数据失败')

@@ -39,6 +39,7 @@ export function addPsychologist(data: {
   yearsExperience?: number
   consultationPrice?: number
   qualificationIds?: number[]
+  fieldIds?: number[]
   status?: number
 }): Promise<any> {
   return request({

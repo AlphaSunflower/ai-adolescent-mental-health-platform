@@ -754,8 +754,8 @@ const showBookingDialog = async (item: any) => {
     nextMonth.setMonth(nextMonth.getMonth() + 1)
     const res: any = await getPsychologistSchedule(
       item.id,
-      today.toISOString().split('T')[0],
-      nextMonth.toISOString().split('T')[0]
+      today.toISOString().slice(0, 10),
+      nextMonth.toISOString().slice(0, 10)
     )
     if (res.code === 200) {
       availableSchedules.value = res.data || []
