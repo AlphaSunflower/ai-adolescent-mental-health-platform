@@ -12,11 +12,13 @@
     "dev": "turbo run dev --parallel",
     "dev:backend": "pnpm --filter @ai-adolescent-mental-health/backend dev",
     "dev:web-admin": "pnpm --filter @ai-adolescent-mental-health/web-admin dev",
+    "dev:web-user": "pnpm --filter @ai-adolescent-mental-health/web-user dev",
     "test": "turbo run test",
     "test:android": "pnpm --filter @ai-adolescent-mental-health/android test",
     "test:backend": "pnpm --filter @ai-adolescent-mental-health/backend test",
     "typecheck": "turbo run typecheck",
-    "typecheck:web-admin": "pnpm --filter @ai-adolescent-mental-health/web-admin typecheck"
+    "typecheck:web-admin": "pnpm --filter @ai-adolescent-mental-health/web-admin typecheck",
+    "typecheck:web-user": "pnpm --filter @ai-adolescent-mental-health/web-user typecheck"
   },
   "devDependencies": {
     "turbo": "2.9.6"
