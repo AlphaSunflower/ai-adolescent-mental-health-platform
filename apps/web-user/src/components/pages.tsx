@@ -162,7 +162,7 @@ export function HomePage() {
           </div>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid min-w-0 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
           {quickActions.map((item) => {
             const Icon = item.icon;
             return (
@@ -179,7 +179,7 @@ export function HomePage() {
           })}
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[480px_340px_1fr]">
+        <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)] 2xl:grid-cols-[minmax(420px,480px)_minmax(300px,340px)_minmax(0,1fr)]">
           <ContentCard
             className="flex h-full min-h-[390px] flex-col [&>div:last-child]:flex [&>div:last-child]:flex-1 [&>div:last-child]:flex-col [&>div:last-child]:pb-3"
             title={
@@ -208,7 +208,7 @@ export function HomePage() {
             </div>
           </ContentCard>
 
-          <div className="grid gap-5">
+          <div className="grid min-w-0 gap-5">
             <ContentCard
               title="近期预约"
               action={
@@ -241,7 +241,7 @@ export function HomePage() {
           </div>
 
           <ContentCard
-            className="min-h-[390px]"
+            className="min-h-[390px] min-w-0 xl:col-span-2 2xl:col-span-1"
             title="为你推荐"
             action={
               <Button variant="ghost" size="sm">换一换</Button>

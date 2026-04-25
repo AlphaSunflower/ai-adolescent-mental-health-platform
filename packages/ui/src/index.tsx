@@ -461,7 +461,7 @@ export function ShortcutCard({
     <a
       href={href}
       className={cn(
-        "xyl-card-shadow group flex min-h-[104px] items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-secondary/70",
+        "xyl-card-shadow group flex min-h-[104px] min-w-0 items-center gap-4 rounded-lg border border-border bg-card px-5 py-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:bg-secondary/70",
         className,
       )}
     >
@@ -470,7 +470,7 @@ export function ShortcutCard({
         <span className="block whitespace-nowrap text-[15px] font-semibold text-foreground">{title}</span>
         <span className="mt-1 block text-xs leading-5 text-muted-foreground">{description}</span>
       </span>
-      <ChevronRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+      <ChevronRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1" />
     </a>
   );
 }
@@ -542,7 +542,7 @@ export function AiChatInput({ placeholder = "有什么想和我聊的吗？", on
 
 export function AppointmentCard({ appointment }: { appointment: Appointment }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex min-w-0 items-center gap-3">
       <Avatar className="xyl-avatar-photo size-14 ring-0" aria-label={`${appointment.psychologistName} 咨询师`} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold">{appointment.psychologistName} 咨询师</p>
@@ -570,7 +570,7 @@ export function RecommendationItem({
         <p className="line-clamp-2 text-sm font-medium leading-5">{item.title}</p>
         <p className="mt-1 text-xs text-muted-foreground">{item.type} · {item.readTime}</p>
       </div>
-      <Heart className={cn("size-5 text-muted-foreground", saved && "fill-primary text-primary")} />
+      <Heart className={cn("size-5 shrink-0 text-muted-foreground", saved && "fill-primary text-primary")} />
     </div>
   );
 }
