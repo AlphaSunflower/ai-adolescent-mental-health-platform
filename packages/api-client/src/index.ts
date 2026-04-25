@@ -4,9 +4,14 @@ import type {
   AiSession,
   ApiEnvelope,
   Appointment,
+  AppointmentStatus,
+  AssessmentQuestion,
   AssessmentRecord,
+  AssessmentRiskLevel,
   AssessmentTemplate,
+  ConsultationType,
   LibraryItem,
+  LibraryItemType,
   PageResult,
   PatientContact,
   Psychologist,
@@ -42,6 +47,8 @@ export type RequestConfig = Omit<AxiosRequestConfig, "url" | "baseURL" | "method
   query?: Record<string, string | number | boolean | null | undefined>;
 };
 
+type UnknownRecord = Record<string, unknown>;
+
 function toError(error: unknown, onUnauthorized?: () => void): ApiClientError {
   if (error instanceof ApiClientError) return error;
   if (axios.isAxiosError(error)) {
@@ -68,6 +75,247 @@ function unwrap<T>(payload: ApiEnvelope<T>, onUnauthorized?: () => void) {
     });
   }
   return payload.data;
+}
+
+function asRecord(value: unknown): UnknownRecord {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as UnknownRecord) : {};
+}
+
+function asArray(value: unknown): unknown[] {
+  return Array.isArray(value) ? value : [];
+}
+
+function asString(value: unknown, fallback = "") {
+  if (value === null || value === undefined) return fallback;
+  return String(value);
+}
+
+function asNumber(value: unknown, fallback = 0) {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const next = Number(value);
+    if (Number.isFinite(next)) return next;
+  }
+  return fallback;
+}
+
+function asBoolean(value: unknown) {
+  return value === true || value === 1 || value === "1" || value === "true";
+}
+
+function parseJsonArray(value: unknown): unknown[] {
+  if (Array.isArray(value)) return value;
+  if (typeof value !== "string" || !value.trim()) return [];
+  try {
+    return asArray(JSON.parse(value));
+  } catch {
+    return [];
+  }
+}
+
+function formatDateTime(value: unknown) {
+  const raw = asString(value);
+  if (!raw) return "";
+  return raw.replace("T", " ").slice(0, 16);
+}
+
+function splitAppointmentTime(value: unknown) {
+  const formatted = formatDateTime(value);
+  if (!formatted) return { date: "", time: "" };
+  const [date = "", time = ""] = formatted.split(" ");
+  return { date, time };
+}
+
+function mapPage<T, U>(page: PageResult<T>, mapper: (item: T) => U): PageResult<U> {
+  return {
+    total: page?.total ?? 0,
+    records: asArray(page?.records).map((item) => mapper(item as T)),
+    current: page?.current ?? 1,
+    size: page?.size ?? 0,
+    pages: page?.pages,
+  };
+}
+
+function mapUserProfile(value: unknown, fallbackNickname = "用户"): UserProfile {
+  const data = asRecord(value);
+  return {
+    id: asNumber(data.id),
+    nickname: asString(data.nickname || data.username, fallbackNickname),
+    username: asString(data.username, undefined as unknown as string) || undefined,
+    email: asString(data.email, undefined as unknown as string) || undefined,
+    phone: asString(data.phone, undefined as unknown as string) || undefined,
+    sex: data.sex === undefined ? undefined : asNumber(data.sex),
+    signature: asString(data.signature, undefined as unknown as string) || undefined,
+    headPath: asString(data.headPath, undefined as unknown as string) || undefined,
+    role: data.role as UserProfile["role"],
+  };
+}
+
+function mapPatient(value: unknown): PatientContact {
+  const data = asRecord(value);
+  return {
+    id: asNumber(data.id),
+    name: asString(data.name, "未命名就诊人"),
+    relation: asString(data.relation, "未设置"),
+    age: asNumber(data.age),
+    gender: asString(data.gender, "未设置"),
+    phone: asString(data.phone, undefined as unknown as string) || undefined,
+  };
+}
+
+function fieldName(value: unknown): string {
+  const data = asRecord(value);
+  return asString(data.name || data.fieldName || data.title || value);
+}
+
+function serviceName(value: unknown): string {
+  const data = asRecord(value);
+  const serviceType = asString(data.serviceType || data.type || value).toLowerCase();
+  if (serviceType === "online" || serviceType === "video") return "视频咨询";
+  if (serviceType === "offline") return "到院咨询";
+  if (serviceType === "text") return "文字陪伴";
+  return asString(data.name || data.label || data.serviceType || value, "咨询服务");
+}
+
+function mapPsychologist(value: unknown): Psychologist {
+  const data = asRecord(value);
+  const fields = asArray(data.fields).map(fieldName).filter(Boolean);
+  const services = asArray(data.services).map(serviceName).filter(Boolean);
+  const price = asNumber(data.consultationPrice ?? data.basePrice ?? data.price);
+  return {
+    id: asNumber(data.id),
+    name: asString(data.realName || data.name, "心理咨询师"),
+    title: asString(data.title || data.qualificationName, "心理咨询师"),
+    avatar: asString(data.headPath || data.avatar, undefined as unknown as string) || undefined,
+    fields,
+    rating: asNumber(data.ratingScore ?? data.rating, 0),
+    price,
+    onlinePrice: price,
+    offlinePrice: asNumber(data.offlinePrice, undefined as unknown as number) || undefined,
+    city: asString(data.offlineRegion || data.city, "线上"),
+    availableToday: asNumber(data.onlineStatus) === 1,
+    serviceTypes: services.length ? services : ["视频咨询"],
+    intro: asString(data.introduction || data.intro, "暂无简介"),
+    isFavorite: asBoolean(data.isFavorited ?? data.isFavorite),
+  };
+}
+
+function mapAppointmentStatus(value: unknown): AppointmentStatus {
+  const status = asNumber(value, Number.NaN);
+  if (status === 0) return "待支付";
+  if (status === 1) return "待确认";
+  if (status === 2) return "已预约";
+  if (status === 3) return "进行中";
+  if (status === 4) return "已完成";
+  if (status === 5 || status === 6) return "已取消";
+  const text = asString(value);
+  if (["待支付", "待确认", "已预约", "进行中", "已完成", "已取消"].includes(text)) return text as AppointmentStatus;
+  return "待确认";
+}
+
+function mapConsultationType(value: unknown): ConsultationType {
+  const type = asString(value).toLowerCase();
+  return type === "offline" || type.includes("线下") || type.includes("到院") ? "到院咨询" : "线上咨询";
+}
+
+function mapAppointment(value: unknown): Appointment {
+  const data = asRecord(value);
+  const { date, time } = splitAppointmentTime(data.appointmentTime ?? data.date);
+  return {
+    id: asNumber(data.id),
+    psychologistName: asString(data.psychologistName, "心理咨询师"),
+    patientName: asString(data.patientName || data.patientContactName, "就诊人"),
+    date,
+    time,
+    status: mapAppointmentStatus(data.status),
+    type: mapConsultationType(data.serviceType ?? data.type),
+    fee: asNumber(data.price ?? data.fee),
+  };
+}
+
+function mapAssessmentRisk(value: unknown): AssessmentRiskLevel {
+  const type = asString(value).toUpperCase();
+  if (type.includes("SLEEP")) return "睡眠关注";
+  if (type.includes("PARENT")) return "亲子关系";
+  if (type.includes("STRESS") || type.includes("MOOD")) return "情绪压力";
+  return "日常筛查";
+}
+
+function mapQuestion(value: unknown, index: number): AssessmentQuestion {
+  const data = asRecord(value);
+  const options = asArray(data.options).map((item, optionIndex) => {
+    const option = asRecord(item);
+    return {
+      label: asString(option.label || option.text || item, String(optionIndex + 1)),
+      value: asNumber(option.value ?? option.score, optionIndex + 1),
+    };
+  });
+  return {
+    id: asString(data.id || data.key, String(index)),
+    title: asString(data.title || data.question || data.text, `第 ${index + 1} 题`),
+    options: options.length ? options : undefined,
+  };
+}
+
+function mapAssessmentTemplate(value: unknown): AssessmentTemplate {
+  const data = asRecord(value);
+  const questions = parseJsonArray(data.questionsJson).map(mapQuestion);
+  return {
+    id: asNumber(data.id),
+    title: asString(data.title, "未命名量表"),
+    description: asString(data.description, "暂无量表说明"),
+    questionCount: questions.length,
+    duration: questions.length ? `约 ${Math.max(1, Math.ceil(questions.length / 4))} 分钟` : "按量表题量",
+    riskLevel: mapAssessmentRisk(data.type),
+    questions,
+  };
+}
+
+function mapAssessmentRecord(value: unknown): AssessmentRecord {
+  const data = asRecord(value);
+  const record = asRecord(data.record || data);
+  return {
+    id: asNumber(record.id),
+    title: asString(data.templateTitle || record.templateTitle || record.title, "心理测评"),
+    score: asNumber(record.resultScore ?? record.score),
+    result: asString(record.resultAnalysis ?? record.result, "暂无分析结果"),
+    createTime: formatDateTime(record.createTime),
+  };
+}
+
+function mapAiSession(value: unknown): AiSession {
+  const data = asRecord(value);
+  return {
+    id: asNumber(data.id),
+    title: asString(data.title, "新的会话"),
+    createTime: formatDateTime(data.createTime),
+  };
+}
+
+function mapAiMessage(value: unknown): AiMessage | null {
+  const data = asRecord(value);
+  const role = asString(data.role);
+  if (role !== "user" && role !== "assistant") return null;
+  return {
+    id: asNumber(data.id),
+    role,
+    content: asString(data.content),
+    createTime: formatDateTime(data.createTime),
+  };
+}
+
+function mapLibraryItem(value: unknown, type: LibraryItemType): LibraryItem {
+  const data = asRecord(value);
+  return {
+    id: asNumber(data.id),
+    title: asString(data.title, "未命名内容"),
+    type,
+    tag: asString(data.tagName || data.type || data.categoryName, type),
+    summary: asString(data.description || data.summary || data.content, "暂无简介"),
+    author: asString(data.authorName || data.sourceName || data.author || data.nickname, "心愈智联"),
+    readTime: type === "课程" ? "课程" : type === "书籍" ? "章节导读" : "阅读",
+    views: asNumber(data.view_count ?? data.viewCount ?? data.views),
+  };
 }
 
 export function createHttpClient(options: HttpClientOptions) {
@@ -117,28 +365,50 @@ export type HttpClient = ReturnType<typeof createHttpClient>;
 export function createApiClient(http: HttpClient) {
   return {
     user: {
-      async loginByEmailPassword(email: string, password: string) {
+      async loginByUsernamePassword(username: string, password: string, remember = false) {
+        const data = await http.post<Record<string, unknown>>(
+          "/user/login",
+          {
+            username,
+            password,
+          },
+          { query: { remember } },
+        );
+        const token = asString(data.token);
+        const user = mapUserProfile(data.userInfo ?? data.user, username);
+        return { token, user };
+      },
+      async loginByEmailCode(email: string, code: string) {
+        const data = await http.post<Record<string, unknown>>("/user/login/email", {
+          email,
+          code,
+        });
+        const token = asString(data.token);
+        const user = mapUserProfile(data.userInfo ?? data.user, email);
+        return { token, user };
+      },
+      async loginByEmailPassword(email: string, password: string, remember = false) {
         const data = await http.post<Record<string, unknown>>("/user/login/email/password", {
           email,
           password,
-          remember: "true",
+          remember: String(remember),
         });
-        const token = String(data.token ?? "");
-        const user = (data.userInfo ?? data.user ?? { id: 0, nickname: email }) as UserProfile;
+        const token = asString(data.token);
+        const user = mapUserProfile(data.userInfo ?? data.user, email);
         return { token, user };
       },
       sendEmailCode: (email: string, scene = "login") => http.post<string>("/user/email/send", { email, scene }),
       registerWithEmail: (payload: Record<string, string>) => http.post<string>("/user/register/email", payload),
-      getUserInfo: () => http.get<UserProfile>("/user/info"),
-      updateUserInfo: (payload: Partial<UserProfile>) => http.post<UserProfile>("/user/update", payload),
+      getUserInfo: async () => mapUserProfile(await http.get<unknown>("/user/info")),
+      updateUserInfo: async (payload: Partial<UserProfile>) => mapUserProfile(await http.post<unknown>("/user/update", payload)),
     },
     patient: {
-      list: () => http.get<PatientContact[]>("/patient/list"),
+      list: async () => asArray(await http.get<unknown[]>("/patient/list")).map(mapPatient),
       add: (payload: Omit<PatientContact, "id">) => http.post<string>("/patient/add", payload),
     },
     psychologist: {
-      list: (query?: Record<string, string | number | boolean | undefined>) =>
-        http.get<PageResult<Psychologist>>("/psychologist/list", { query }),
+      list: async (query?: Record<string, string | number | boolean | undefined>) =>
+        mapPage(await http.get<PageResult<unknown>>("/psychologist/list", { query }), mapPsychologist),
       schedule: (id: number, startDate: string, endDate: string) =>
         http.get<Record<string, unknown>[]>(`/psychologist/${id}/schedule`, { query: { startDate, endDate } }),
     },
@@ -149,26 +419,33 @@ export function createApiClient(http: HttpClient) {
         http.post<string>(`/psychologist/appointment/${id}/cancel`, { cancelReason }),
       rate: (id: number, rating: number, content: string) =>
         http.post<string>(`/psychologist/appointment/${id}/rate`, undefined, { query: { rating, content, isAnonymous: 0 } }),
-      my: (status?: number) =>
-        http.get<PageResult<Appointment>>("/psychologist/appointment/my", { query: { page: 1, size: 20, status } }),
+      my: async (status?: number) =>
+        mapPage(await http.get<PageResult<unknown>>("/psychologist/appointment/my", { query: { page: 1, size: 20, status } }), mapAppointment),
     },
     assessment: {
-      templates: () => http.get<AssessmentTemplate[]>("/assessment/templates"),
-      submit: (templateId: number, answers: Record<string, number>, patientContactId?: number) =>
-        http.post<AssessmentRecord>(`/assessment/submit/${templateId}`, { answers, patientContactId }),
-      records: () => http.get<PageResult<AssessmentRecord>>("/assessment/records", { query: { page: 1, size: 20 } }),
+      templates: async () => asArray(await http.get<unknown[]>("/assessment/templates")).map(mapAssessmentTemplate),
+      submit: async (templateId: number, answers: Record<string, number>, patientContactId?: number) =>
+        mapAssessmentRecord(await http.post<unknown>(`/assessment/submit/${templateId}`, { answers, patientContactId })),
+      records: async () =>
+        mapPage(await http.get<PageResult<unknown>>("/assessment/records", { query: { page: 1, size: 20 } }), mapAssessmentRecord),
     },
     ai: {
-      sessions: () => http.get<AiSession[]>("/ai/sessions"),
-      createSession: () => http.post<AiSession>("/ai/session"),
-      messages: (sessionId: number) => http.get<AiMessage[]>(`/ai/session/${sessionId}/messages`),
+      sessions: async () => asArray(await http.get<unknown[]>("/ai/sessions")).map(mapAiSession),
+      createSession: async () => mapAiSession(await http.post<unknown>("/ai/session")),
+      messages: async (sessionId: number) =>
+        asArray(await http.get<unknown[]>(`/ai/session/${sessionId}/messages`)).map(mapAiMessage).filter((item): item is AiMessage => Boolean(item)),
     },
     content: {
-      articles: () => http.get<PageResult<LibraryItem>>("/content/articles", { query: { page: 1, size: 12 } }),
-      courses: () => http.get<PageResult<LibraryItem>>("/content/courses", { query: { page: 1, size: 12 } }),
-      books: () => http.get<PageResult<LibraryItem>>("/book/list", { query: { page: 1, size: 12 } }),
-      communityArticles: () =>
-        http.get<PageResult<LibraryItem>>("/article/user/list/published", { query: { page: 1, size: 12 } }),
+      articles: async () =>
+        mapPage(await http.get<PageResult<unknown>>("/content/articles", { query: { page: 1, size: 12 } }), (item) => mapLibraryItem(item, "文章")),
+      courses: async () =>
+        mapPage(await http.get<PageResult<unknown>>("/content/courses", { query: { page: 1, size: 12 } }), (item) => mapLibraryItem(item, "课程")),
+      books: async () =>
+        mapPage(await http.get<PageResult<unknown>>("/book/list", { query: { page: 1, size: 12 } }), (item) => mapLibraryItem(item, "书籍")),
+      communityArticles: async () =>
+        mapPage(await http.get<PageResult<unknown>>("/article/user/list/published", { query: { page: 1, size: 12 } }), (item) =>
+          mapLibraryItem(item, "社区"),
+        ),
     },
   };
 }

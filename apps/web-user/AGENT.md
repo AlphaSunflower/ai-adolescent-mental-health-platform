@@ -19,7 +19,8 @@ pnpm --filter @ai-adolescent-mental-health/web-user build
 ## 约定
 
 - 默认 API 地址为 `NEXT_PUBLIC_API_BASE_URL`，未设置时使用 `http://localhost:8080`。
-- 真实接口不可用时，用户体验组件应回退到 `src/lib/mock-data.ts` 中的演示数据，并明确显示连接状态。
+- 真实接口不可用、失败或返回空列表时，用户体验组件应展示加载、错误或空状态，不要回退到本地演示数据。
+- 登录入口为独立 `/login` 路由，支持账号登录、邮箱验证码登录和邮箱密码登录；`/me` 未登录时只做登录引导。
 - 登录态封装在 `src/lib/session.ts`，不要在组件里散落直接访问 token 的逻辑。
 - shadcn 组件优先使用语义 token；Tailwind className 中不要写十六进制颜色或 `var()`。
 - Client Component 只放交互状态，数据类型和 API 封装放在 `src/lib/`。

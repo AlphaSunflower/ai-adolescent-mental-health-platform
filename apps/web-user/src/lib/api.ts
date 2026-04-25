@@ -21,8 +21,18 @@ const http = createHttpClient(clientOptions);
 const apiClient = createApiClient(http);
 
 export const api = {
-  async loginByEmailPassword(email: string, password: string) {
-    const result = await apiClient.user.loginByEmailPassword(email, password);
+  async loginByUsernamePassword(username: string, password: string, remember?: boolean) {
+    const result = await apiClient.user.loginByUsernamePassword(username, password, remember);
+    if (result.token) saveSession(result.token, result.user);
+    return result;
+  },
+  async loginByEmailCode(email: string, code: string) {
+    const result = await apiClient.user.loginByEmailCode(email, code);
+    if (result.token) saveSession(result.token, result.user);
+    return result;
+  },
+  async loginByEmailPassword(email: string, password: string, remember?: boolean) {
+    const result = await apiClient.user.loginByEmailPassword(email, password, remember);
     if (result.token) saveSession(result.token, result.user);
     return result;
   },

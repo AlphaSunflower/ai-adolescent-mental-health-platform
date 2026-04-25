@@ -184,12 +184,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Button>
           }
           user={
-            <div className="hidden items-center gap-2 lg:flex">
+            <Link href="/me" className="hidden items-center gap-2 lg:flex" aria-label="个人中心">
               <span className="xyl-avatar-photo relative grid size-11 place-items-center rounded-full">
                 <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-card bg-primary" />
               </span>
               <ChevronDown className="size-4 text-muted-foreground" />
-            </div>
+            </Link>
           }
         />
 

@@ -78,6 +78,16 @@ export type AssessmentTemplate = {
   questionCount: number;
   duration: string;
   riskLevel: AssessmentRiskLevel;
+  questions?: AssessmentQuestion[];
+};
+
+export type AssessmentQuestion = {
+  id: string;
+  title: string;
+  options?: Array<{
+    label: string;
+    value: number;
+  }>;
 };
 
 export type AssessmentRecord = {
