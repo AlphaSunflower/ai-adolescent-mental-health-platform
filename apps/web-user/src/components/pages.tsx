@@ -181,7 +181,7 @@ export function HomePage() {
 
         <div className="grid gap-5 xl:grid-cols-[480px_340px_1fr]">
           <ContentCard
-            className="self-start [&>div:last-child]:pb-3"
+            className="flex h-full min-h-[390px] flex-col [&>div:last-child]:flex [&>div:last-child]:flex-1 [&>div:last-child]:flex-col [&>div:last-child]:pb-3"
             title={
               <>
                 AI 咨询室
@@ -189,19 +189,21 @@ export function HomePage() {
               </>
             }
           >
-            <div className="flex flex-col gap-4">
-              <ChatBubble>
-                <div>
-                  <p className="font-medium">嗨，林小雨 你好</p>
-                  <p className="mt-2 text-muted-foreground">
-                    你昨天提到的“考试压力大、睡得不好”，听起来真的很辛苦呢。
-                    你愿意和我多聊聊最近让你有压力的事情吗？
-                  </p>
-                </div>
-              </ChatBubble>
-              <Button variant="ghost" className="w-fit pl-12">
-                查看完整对话记录 <ChevronRight data-icon="inline-end" />
-              </Button>
+            <div className="flex flex-1 flex-col justify-between gap-4">
+              <div className="flex flex-col gap-4">
+                <ChatBubble>
+                  <div>
+                    <p className="font-medium">嗨，林小雨 你好</p>
+                    <p className="mt-2 text-muted-foreground">
+                      你昨天提到的“考试压力大、睡得不好”，听起来真的很辛苦呢。
+                      你愿意和我多聊聊最近让你有压力的事情吗？
+                    </p>
+                  </div>
+                </ChatBubble>
+                <Button variant="ghost" className="w-fit pl-12">
+                  查看完整对话记录 <ChevronRight data-icon="inline-end" />
+                </Button>
+              </div>
               <AiChatInput onSend={() => toast.message("已记录你的想法，小艾会继续陪你梳理。")} />
             </div>
           </ContentCard>
