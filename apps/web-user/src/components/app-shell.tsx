@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -11,89 +12,139 @@ import {
   ClipboardCheck,
   Heart,
   Home,
+  Leaf,
   Menu,
   NotebookTabs,
   Search,
-  Sprout,
   UserRound,
 } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { USER_BOTTOM_TABS, USER_NAV_ITEMS, type IconKey } from "@ai-adolescent-mental-health/config";
 import {
+  BrandMark,
+  Button,
+  Input,
   Sheet,
   SheetContent,
   SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
+  TopBar,
+  cn,
+} from "@ai-adolescent-mental-health/ui";
 
-const navItems = [
-  { href: "/", label: "首页", icon: Home },
-  { href: "/ai", label: "AI 咨询室", icon: Bot },
-  { href: "/consultation", label: "心理咨询预约", icon: CalendarCheck },
-  { href: "/assessment", label: "心理评估", icon: ClipboardCheck },
-  { href: "/library", label: "内容馆", icon: BookOpen },
-  { href: "/me", label: "我的照护计划", icon: NotebookTabs },
-];
+const iconMap: Record<IconKey, React.ComponentType<{ className?: string }>> = {
+  home: Home,
+  bot: Bot,
+  calendar: CalendarCheck,
+  clipboard: ClipboardCheck,
+  book: BookOpen,
+  heart: NotebookTabs,
+  bell: Bell,
+  user: UserRound,
+  leaf: Leaf,
+};
 
-const secondaryNavItems = [
-  { href: "/me", label: "我的记录", icon: NotebookTabs },
-  { href: "/library", label: "我的收藏", icon: BookOpen },
-  { href: "/me", label: "消息中心", icon: Bell },
-  { href: "/assessment", label: "成长空间", icon: UserRound },
-];
-
-function BrandMark() {
-  return (
-    <Link href="/" className="flex items-center gap-3">
-      <span className="relative grid size-11 place-items-center rounded-lg text-primary">
-        <Heart className="fill-primary/20" />
-        <span className="absolute bottom-1 right-1 size-3 rounded-full bg-primary/80" />
-      </span>
-      <span className="flex flex-col">
-        <span className="text-xl font-semibold leading-tight">心语伴行</span>
-        <span className="text-sm text-muted-foreground">青少年心理健康 AI 平台</span>
-      </span>
-    </Link>
-  );
+function isActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
 }
 
-function NavLinks({
-  items = navItems,
-  onNavigate,
-  muted = false,
-}: {
-  items?: typeof navItems;
-  onNavigate?: () => void;
-  muted?: boolean;
-}) {
+function NavLinks({ compact = false, onNavigate }: { compact?: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
 
   return (
     <nav className="flex flex-col gap-1">
-      {items.map((item) => {
-        const Icon = item.icon;
-        const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+      {USER_NAV_ITEMS.map((item) => {
+        const Icon = iconMap[item.icon];
+        const active = isActive(pathname, item.path);
         return (
           <Link
-            key={item.href}
-            href={item.href}
+            key={item.path}
+            href={item.path}
             onClick={onNavigate}
+            title={item.label}
             className={cn(
-              "flex h-12 items-center gap-4 rounded-lg px-4 text-base font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              active && "bg-sidebar-accent text-primary",
-              muted && "h-11 text-muted-foreground",
+              "group relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-sidebar-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-primary",
+              active && "bg-sidebar-accent font-semibold text-primary",
+              compact && "justify-center px-0",
             )}
           >
-            <Icon />
-            {item.label}
+            {active && !compact && <span className="absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 rounded-full bg-primary" />}
+            <Icon className="size-5" />
+            {!compact && <span className="truncate">{item.label}</span>}
           </Link>
         );
       })}
     </nav>
+  );
+}
+
+const secondaryNavItems = [
+  { href: "/me", label: "我的记录", icon: NotebookTabs },
+  { href: "/library", label: "我的收藏", icon: BookOpen },
+  { href: "/me", label: "消息中心", icon: Bell, dot: true },
+  { href: "/assessment", label: "成长空间", icon: UserRound },
+];
+
+function SecondaryNavLinks() {
+  return (
+    <nav className="flex flex-col gap-1 border-t border-border pt-4">
+      {secondaryNavItems.map((item) => {
+        const Icon = item.icon;
+        return (
+          <Link
+            key={`${item.href}-${item.label}`}
+            href={item.href}
+            className="relative flex min-h-11 items-center gap-3 rounded-lg px-3 text-sm text-muted-foreground transition-colors hover:bg-sidebar-accent/60 hover:text-primary"
+          >
+            <Icon className="size-5" />
+            <span>{item.label}</span>
+            {item.dot && <span className="ml-auto size-2 rounded-full bg-destructive" />}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileMenu() {
+  return (
+    <Sheet>
+      <SheetTrigger render={<Button variant="outline" size="icon-sm" aria-label="打开导航" />}>
+        <Menu />
+      </SheetTrigger>
+      <SheetContent side="left" className="w-80">
+        <SheetHeader>
+          <SheetTitle>心愈智联</SheetTitle>
+          <SheetDescription>选择今天想进入的空间</SheetDescription>
+        </SheetHeader>
+        <div className="px-4">
+          <NavLinks />
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function SearchBox() {
+  return (
+    <div className="relative hidden w-80 md:block">
+      <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <Input className="h-11 rounded-md pl-10 text-sm" placeholder="搜索文章、课程、练习等" />
+    </div>
+  );
+}
+
+function MotivationCard() {
+  return (
+    <div className="xyl-sidebar-motivation relative min-h-40 overflow-hidden rounded-lg p-5">
+      <p className="text-sm font-semibold text-foreground">今天也要照顾好自己</p>
+      <p className="mt-2 text-xs leading-5 text-muted-foreground">记得给自己一点鼓励哦</p>
+      <Button className="mt-4 h-9 min-h-9 bg-card px-4 text-xs text-primary hover:bg-card/80" variant="secondary">
+        记录心情
+      </Button>
+      <Leaf className="absolute bottom-4 right-5 size-14 text-primary/45" />
+    </div>
   );
 }
 
@@ -102,81 +153,88 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 hidden w-72 flex-col border-r bg-sidebar px-5 py-6 lg:flex">
-        <BrandMark />
-        <div className="mt-8">
-          <NavLinks />
+      <aside className="xyl-sidebar-shadow fixed inset-y-0 left-0 z-40 hidden w-[72px] flex-col border-r border-border bg-sidebar px-2 py-5 lg:flex xl:hidden">
+        <Link href="/" className="mb-6 grid h-9 place-items-center text-primary" aria-label="心愈智联首页">
+          <Heart className="size-6 fill-primary/20" />
+        </Link>
+        <NavLinks compact />
+      </aside>
+
+      <aside className="xyl-sidebar-shadow fixed inset-y-0 left-0 z-40 hidden w-[272px] flex-col border-r border-border bg-sidebar px-5 py-7 xl:flex">
+        <Link href="/" className="mb-9 block">
+          <BrandMark />
+        </Link>
+        <NavLinks />
+        <div className="mt-5">
+          <SecondaryNavLinks />
         </div>
-        <div className="mt-5 border-t pt-5">
-          <NavLinks items={secondaryNavItems} muted />
-        </div>
-        <div className="relative mt-auto overflow-hidden rounded-lg bg-muted p-5">
-          <p className="text-sm font-semibold">今天也要照顾好自己</p>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">记得给自己一点鼓励哦</p>
-          <Button className="mt-4 bg-card text-primary hover:bg-card/80" variant="secondary">
-            记录心情
-          </Button>
-          <Sprout className="absolute bottom-3 right-5 text-primary/55" />
+        <div className="mt-auto">
+          <MotivationCard />
         </div>
       </aside>
 
-      <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur lg:ml-72">
-        <div className="flex h-20 items-center gap-3 px-4 lg:px-14">
-          <Sheet>
-            <SheetTrigger render={<Button variant="outline" size="icon" className="lg:hidden" />}>
-              <Menu />
-              <span className="sr-only">打开导航</span>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-80">
-              <SheetHeader>
-                <SheetTitle>心愈智联</SheetTitle>
-                <SheetDescription>选择用户端功能模块</SheetDescription>
-              </SheetHeader>
-              <div className="px-4">
-                <NavLinks />
-              </div>
-            </SheetContent>
-          </Sheet>
+      <div className="lg:pl-[72px] xl:pl-[272px]">
+        <TopBar
+          mobileMenu={<MobileMenu />}
+          search={<SearchBox />}
+          notification={
+            <Button variant="ghost" size="icon-sm" className="relative" aria-label="消息中心">
+              <Bell />
+              <span className="absolute right-2 top-2 size-2 rounded-full bg-destructive" />
+            </Button>
+          }
+          user={
+            <div className="hidden items-center gap-2 lg:flex">
+              <span className="xyl-avatar-photo relative grid size-11 place-items-center rounded-full">
+                <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-card bg-primary" />
+              </span>
+              <ChevronDown className="size-4 text-muted-foreground" />
+            </div>
+          }
+        />
 
-          <div className="ml-auto flex w-full max-w-sm items-center gap-2 rounded-lg border bg-card px-3">
-            <Search className="text-muted-foreground" />
-            <Input
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0"
-              placeholder="搜索文章、课程、练习等"
-            />
+        <nav className="sticky top-20 z-20 hidden border-b border-border bg-card px-4 py-2 md:flex lg:hidden">
+          <div className="flex w-full gap-2 overflow-x-auto">
+            {USER_NAV_ITEMS.map((item) => {
+              const Icon = iconMap[item.icon];
+              const active = isActive(pathname, item.path);
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={cn(
+                    "inline-flex h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm text-muted-foreground",
+                    active && "bg-secondary font-semibold text-primary",
+                  )}
+                >
+                  <Icon className="size-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
           </div>
-          <Button variant="ghost" size="icon" className="relative hidden lg:inline-flex">
-            <Bell />
-            <span className="absolute right-1 top-1 grid size-4 place-items-center rounded-full bg-destructive text-[10px] text-white">
-              3
-            </span>
-          </Button>
-          <div className="hidden items-center gap-2 lg:flex">
-            <span className="grid size-11 place-items-center rounded-full bg-secondary font-semibold text-primary">林</span>
-            <ChevronDown className="text-muted-foreground" />
-          </div>
-        </div>
-      </header>
+        </nav>
 
-      <main className="pb-24 lg:ml-72 lg:pb-0">
-        <div className="w-full px-4 py-6 lg:px-14 lg:py-8">{children}</div>
-      </main>
+        <main className="pb-24 md:pb-0">
+          <div className="mx-auto w-full max-w-[1340px] px-4 py-6 lg:px-14 lg:py-8">{children}</div>
+        </main>
+      </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t bg-background/95 px-2 py-2 backdrop-blur lg:hidden">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+      <nav
+        className="fixed inset-x-0 bottom-0 z-30 grid w-screen border-t border-border bg-card/95 px-2 py-2 backdrop-blur md:hidden"
+        style={{ gridTemplateColumns: "repeat(5, minmax(0, 1fr))" }}
+      >
+        {USER_BOTTOM_TABS.map((item) => {
+          const Icon = iconMap[item.icon];
+          const active = isActive(pathname, item.path);
           return (
             <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex flex-col items-center gap-1 rounded-lg py-2 text-xs text-muted-foreground",
-                active && "bg-accent text-accent-foreground",
-              )}
+              key={item.path}
+              href={item.path}
+              className={cn("flex min-h-11 min-w-0 flex-col items-center justify-center gap-1 rounded-lg text-[11px] text-muted-foreground", active && "bg-secondary text-primary")}
             >
-              <Icon />
-              <span className="truncate">{item.label}</span>
+              <Icon className="size-5" />
+              <span className="max-w-full truncate">{item.label}</span>
             </Link>
           );
         })}

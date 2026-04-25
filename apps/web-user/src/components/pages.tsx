@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import Link from "next/link";
 import {
-  BookOpen,
   BookMarked,
-  Bot,
   CalendarDays,
   CalendarClock,
   CheckCircle2,
@@ -17,22 +14,52 @@ import {
   Plus,
   Send,
   Sparkles,
+  Sprout,
   Star,
 } from "lucide-react";
 import { toast } from "sonner";
+import type {
+  AiMessage,
+  AiSession,
+  AssessmentTemplate,
+  Psychologist,
+  UserProfile,
+} from "@ai-adolescent-mental-health/domain";
+import {
+  AiChatInput,
+  AppointmentCard,
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CarePlanItem,
+  ChatBubble,
+  ContentCard,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+  Progress,
+  RecommendationItem,
+  Separator,
+  ShortcutCard,
+  Skeleton,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Textarea,
+} from "@ai-adolescent-mental-health/ui";
 
 import { AppShell } from "@/components/app-shell";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { api, streamAiChat } from "@/lib/api";
 import {
   mockAiMessages,
@@ -46,13 +73,6 @@ import {
   mockUser,
 } from "@/lib/mock-data";
 import { clearSession, getStoredUser, saveSession } from "@/lib/session";
-import type {
-  AiMessage,
-  AiSession,
-  AssessmentTemplate,
-  Psychologist,
-  UserProfile,
-} from "@/lib/types";
 
 function PageShell({ children }: { children: React.ReactNode }) {
   return <AppShell>{children}</AppShell>;
@@ -108,165 +128,134 @@ function PlantPot({ tall = false }: { tall?: boolean }) {
 
 export function HomePage() {
   const quickActions = [
-    { href: "/ai", label: "AI 咨询室", desc: "24 小时陪伴对话", icon: MessageCircle, tone: "bg-teal-50 border-teal-100 text-teal-700" },
-    { href: "/consultation", label: "心理咨询预约", desc: "与专业心理咨询师对话", icon: CalendarDays, tone: "bg-lime-50 border-lime-100 text-lime-700" },
-    { href: "/assessment", label: "心理评估", desc: "了解你的心理状态", icon: ClipboardIcon, tone: "bg-amber-50 border-amber-100 text-amber-700" },
-    { href: "/library", label: "内容馆", desc: "文章 · 课程 · 练习", icon: BookMarked, tone: "bg-violet-50 border-violet-100 text-violet-700" },
-    { href: "/me", label: "我的照护计划", desc: "定制你的成长方案", icon: HeartPlanIcon, tone: "bg-rose-50 border-rose-100 text-rose-700" },
+    { href: "/ai", label: "AI 咨询室", desc: "24 小时陪伴对话", icon: MessageCircle, tone: "xyl-tone-green" },
+    { href: "/consultation", label: "心理咨询预约", desc: "与专业咨询师对话", icon: CalendarDays, tone: "xyl-tone-yellow" },
+    { href: "/assessment", label: "心理评估", desc: "了解你的心理状态", icon: ClipboardIcon, tone: "xyl-tone-green" },
+    { href: "/library", label: "内容馆", desc: "文章 · 课程 · 练习", icon: BookMarked, tone: "xyl-tone-purple" },
+    { href: "/me", label: "我的照护计划", desc: "定制成长方案", icon: HeartPlanIcon, tone: "xyl-tone-coral" },
   ];
 
   return (
     <PageShell>
       <section className="flex flex-col gap-6">
-        <div className="grid gap-6 lg:grid-cols-[1fr_430px] lg:items-center">
+        <div className="grid gap-6 lg:grid-cols-[1fr_560px] lg:items-center">
           <div>
-            <h1 className="text-4xl font-semibold tracking-normal lg:text-5xl">
-              你好，林小雨 <span className="text-primary">芽</span>
+            <h1 className="text-4xl font-semibold leading-tight text-foreground">
+              你好，林小雨 <Sprout className="inline size-8 text-primary" />
             </h1>
-            <div className="mt-4 flex flex-wrap items-center gap-3 text-base text-muted-foreground">
-              <span>今天是 4 月 24 日，星期五</span>
+            <div className="mt-5 flex flex-wrap items-center gap-3 text-base text-muted-foreground">
+              <span>今天是 5 月 18 日，星期六</span>
               <span className="h-5 w-px bg-border" />
-              <CloudSun />
+              <CloudSun className="size-4" />
               <span>多云 24°C</span>
             </div>
           </div>
-          <div className="relative hidden h-28 overflow-hidden rounded-lg bg-secondary lg:block">
-            <div className="absolute left-8 top-6 text-2xl font-medium leading-10 text-primary">
+          <div className="xyl-banner relative hidden h-28 overflow-hidden rounded-lg lg:block">
+            <div className="absolute left-8 top-5 text-xl font-medium leading-8 text-primary">
               <p>每一次关注自己，</p>
               <p>都是成长的开始。</p>
               <span className="mt-3 block h-1 w-8 rounded-full bg-primary" />
             </div>
-            <div className="absolute bottom-0 right-0 h-full w-52 rounded-l-full bg-accent/35" />
-            <div className="absolute bottom-5 right-8 flex items-end gap-4 text-primary/70">
-              <PlantPot />
-              <PlantPot tall />
-            </div>
+            <div className="xyl-hero-scene absolute bottom-0 right-0 h-full w-72 rounded-l-lg" />
+            <span className="xyl-hero-plant-left" />
+            <span className="xyl-hero-plant-right" />
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-5">
           {quickActions.map((item) => {
             const Icon = item.icon;
             return (
-              <Link
+              <ShortcutCard
                 key={item.href}
                 href={item.href}
-                className={`group flex min-h-28 items-center gap-3 rounded-lg border p-4 transition-transform hover:-translate-y-0.5 ${item.tone}`}
-              >
-                <span className="grid size-14 shrink-0 place-items-center rounded-lg bg-white/70">
-                  <Icon />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block whitespace-nowrap text-base font-semibold text-foreground">{item.label}</span>
-                  <span className="mt-1 block text-sm leading-5 text-muted-foreground">{item.desc}</span>
-                </span>
-                <ChevronRight className="text-foreground/70 transition-transform group-hover:translate-x-1" />
-              </Link>
+                title={item.label}
+                description={item.desc}
+                icon={<Icon className="size-6" />}
+                iconClassName={item.tone}
+                className={item.tone}
+              />
             );
           })}
         </div>
 
-        <div className="grid gap-5 xl:grid-cols-[1.1fr_0.78fr_1.1fr]">
-          <Card className="min-h-[390px]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="size-3 rounded-full bg-primary" />
+        <div className="grid gap-5 xl:grid-cols-[480px_340px_1fr]">
+          <ContentCard
+            className="min-h-[390px]"
+            title={
+              <>
                 AI 咨询室
-                <span className="text-sm font-normal text-muted-foreground">· 最新对话</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="flex h-[300px] flex-col justify-between">
-              <div className="flex items-start gap-5">
-                <div className="grid size-16 shrink-0 place-items-center rounded-full bg-teal-100 text-primary">
-                  <Bot />
-                </div>
-                <div className="rounded-lg bg-muted p-5 text-base leading-8">
+                <span className="ml-1 text-sm font-normal text-muted-foreground">· 最新对话</span>
+              </>
+            }
+          >
+            <div className="flex h-[300px] flex-col justify-between">
+              <ChatBubble>
+                <div>
                   <p className="font-medium">嗨，林小雨 你好</p>
                   <p className="mt-2 text-muted-foreground">
                     你昨天提到的“考试压力大、睡得不好”，听起来真的很辛苦呢。
                     你愿意和我多聊聊最近让你有压力的事情吗？
                   </p>
                 </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Input className="h-12 rounded-full bg-background px-5" placeholder="有什么想和我聊的吗？" />
-                <Button size="icon-lg" className="rounded-full">
-                  <Send />
-                  <span className="sr-only">发送</span>
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </ChatBubble>
+              <AiChatInput onSend={() => toast.message("已记录你的想法，小艾会继续陪你梳理。")} />
+            </div>
+          </ContentCard>
 
           <div className="grid gap-5">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>近期预约</CardTitle>
+            <ContentCard
+              title="近期预约"
+              action={
                 <Button variant="ghost" size="sm">
                   查看全部 <ChevronRight data-icon="inline-end" />
                 </Button>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center gap-4">
-                  <Avatar className="size-14">
-                    <AvatarFallback>王</AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">与 王舒然 咨询师的预约</p>
-                    <p className="mt-2 text-sm text-muted-foreground">5 月 21 日（周二）15:00</p>
-                    <p className="mt-1 text-sm text-muted-foreground">线上咨询 · 50 分钟</p>
-                  </div>
-                  <Badge variant="secondary">待确认</Badge>
-                </div>
-              </CardContent>
-            </Card>
+              }
+            >
+              <AppointmentCard appointment={{ ...mockAppointments[0], psychologistName: "王舒然", date: "5 月 21 日（周二）", time: "15:00", status: "待确认" }} />
+            </ContentCard>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>心理评估进度</CardTitle>
+            <ContentCard
+              title="心理评估进度"
+              action={
                 <Button variant="ghost" size="sm">
                   查看全部 <ChevronRight data-icon="inline-end" />
                 </Button>
-              </CardHeader>
-              <CardContent>
-                <p className="font-medium">青少年心理健康量表（SCL-90）</p>
-                <div className="mt-4 flex items-center gap-4">
-                  <Progress value={60} className="h-2 flex-1" />
-                  <span className="text-sm text-primary">60%</span>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">已完成 54/90 题</p>
-                  <Button size="sm" variant="secondary">继续作答</Button>
-                </div>
-              </CardContent>
-            </Card>
+              }
+            >
+              <p className="font-medium">青少年心理健康量表（SCL-90）</p>
+              <div className="mt-4 flex items-center gap-4">
+                <Progress value={60} className="h-2 flex-1" />
+                <span className="text-sm font-semibold text-primary">60%</span>
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3">
+                <p className="text-sm text-muted-foreground">已完成 54/90 题</p>
+                <Button size="sm" variant="secondary">继续作答</Button>
+              </div>
+            </ContentCard>
           </div>
 
-          <Card className="min-h-[390px]">
-            <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>为你推荐</CardTitle>
+          <ContentCard
+            className="min-h-[390px]"
+            title="为你推荐"
+            action={
               <Button variant="ghost" size="sm">换一换</Button>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              {[
-                ["如何缓解考试焦虑", "文章 · 8 分钟阅读", "bg-rose-100"],
-                ["情绪调节小练习：5 分钟呼吸法", "练习 · 3 分钟", "bg-sky-100"],
-                ["建立自信的 7 个日常习惯", "课程 · 22 分钟", "bg-amber-100"],
-              ].map(([title, meta, color]) => (
-                <div key={title} className="flex items-center gap-4">
-                  <div className={`h-16 w-24 shrink-0 rounded-md ${color}`} />
-                  <div className="min-w-0 flex-1">
-                    <p className="font-medium">{title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">{meta}</p>
-                  </div>
-                  <BookOpen className="text-muted-foreground" />
-                </div>
+            }
+          >
+            <div className="flex flex-col gap-4">
+              {mockLibrary.slice(0, 3).map((item, index) => (
+                <RecommendationItem
+                  key={`${item.type}-${item.id}`}
+                  item={item}
+                  saved={index === 0}
+                  colorClassName={["xyl-thumb-coral", "xyl-thumb-green", "xyl-thumb-yellow"][index]}
+                />
               ))}
               <Button variant="ghost" className="mt-2">
                 查看全部推荐内容 <ChevronRight data-icon="inline-end" />
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </ContentCard>
         </div>
 
         <Card className="bg-card/70">
@@ -287,20 +276,12 @@ export function HomePage() {
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
-              ["情绪觉察", "进行中", "bg-green-100 text-green-700"],
-              ["睡眠改善", "待开始", "bg-violet-100 text-violet-700"],
-              ["压力管理", "已完成", "bg-amber-100 text-amber-700"],
-              ["自信成长", "进行中", "bg-rose-100 text-rose-700"],
-            ].map(([title, state, tone]) => (
-              <div key={title} className="rounded-lg border bg-background p-5">
-                <div className={`grid size-14 place-items-center rounded-full ${tone}`}>
-                  <Sparkles />
-                </div>
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <p className="text-lg font-semibold">{title}</p>
-                  <span className="text-sm text-muted-foreground">{state}</span>
-                </div>
-              </div>
+              { title: "情绪觉察", status: "进行中" as const, tone: "green" as const },
+              { title: "睡眠改善", status: "待开始" as const, tone: "purple" as const },
+              { title: "压力管理", status: "已完成" as const, tone: "yellow" as const },
+              { title: "自信成长", status: "进行中" as const, tone: "coral" as const },
+            ].map((item) => (
+              <CarePlanItem key={item.title} title={item.title} status={item.status} tone={item.tone} icon={<Sparkles className="size-5" />} />
             ))}
           </CardContent>
         </Card>

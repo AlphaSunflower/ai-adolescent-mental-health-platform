@@ -9,7 +9,7 @@ import type {
   PatientContact,
   Psychologist,
   UserProfile,
-} from "@/lib/types";
+} from "@ai-adolescent-mental-health/domain";
 
 export const mockUser: UserProfile = {
   id: 1,

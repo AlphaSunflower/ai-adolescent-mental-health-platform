@@ -1,6 +1,6 @@
 "use client";
 
-import type { UserProfile } from "@/lib/types";
+import type { UserProfile } from "@ai-adolescent-mental-health/domain";
 
 const TOKEN_KEY = "aiamh.webUser.token";
 const USER_KEY = "aiamh.webUser.user";

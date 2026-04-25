@@ -11,6 +11,10 @@
     "clean": "node -e \"require('node:fs').rmSync('.next', { recursive: true, force: true })\""
   },
   "dependencies": {
+    "@ai-adolescent-mental-health/api-client": "workspace:*",
+    "@ai-adolescent-mental-health/config": "workspace:*",
+    "@ai-adolescent-mental-health/domain": "workspace:*",
+    "@ai-adolescent-mental-health/ui": "workspace:*",
     "@base-ui/react": "^1.4.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

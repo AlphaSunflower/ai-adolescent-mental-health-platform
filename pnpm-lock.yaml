@@ -73,6 +73,18 @@ importers:
 
   apps/web-user:
     dependencies:
+      '@ai-adolescent-mental-health/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@ai-adolescent-mental-health/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@ai-adolescent-mental-health/domain':
+        specifier: workspace:*
+        version: link:../../packages/domain
+      '@ai-adolescent-mental-health/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@base-ui/react':
         specifier: ^1.4.1
         version: 1.4.1(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -142,6 +154,72 @@ importers:
         version: 2.4.0(typescript@5.9.3)
 
   apps/wechat-miniapp: {}
+
+  packages/api-client:
+    dependencies:
+      '@ai-adolescent-mental-health/domain':
+        specifier: workspace:*
+        version: link:../domain
+      axios:
+        specifier: ^1.13.5
+        version: 1.15.2
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/config:
+    dependencies:
+      '@ai-adolescent-mental-health/domain':
+        specifier: workspace:*
+        version: link:../domain
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/domain:
+    devDependencies:
+      typescript:
+        specifier: ^5
+        version: 5.9.3
+
+  packages/ui:
+    dependencies:
+      '@ai-adolescent-mental-health/domain':
+        specifier: workspace:*
+        version: link:../domain
+      class-variance-authority:
+        specifier: ^0.7.1
+        version: 0.7.1
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      lucide-react:
+        specifier: ^1.9.0
+        version: 1.9.0(react@19.2.4)
+      react:
+        specifier: '>=19'
+        version: 19.2.4
+      react-dom:
+        specifier: '>=19'
+        version: 19.2.4(react@19.2.4)
+      sonner:
+        specifier: ^2.0.7
+        version: 2.0.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      tailwind-merge:
+        specifier: ^3.5.0
+        version: 3.5.0
+    devDependencies:
+      '@types/react':
+        specifier: ^19
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: ^19
+        version: 19.2.3(@types/react@19.2.14)
+      typescript:
+        specifier: ^5
+        version: 5.9.3
 
 packages:
 
