@@ -181,7 +181,7 @@ export function HomePage() {
 
         <div className="grid gap-5 xl:grid-cols-[480px_340px_1fr]">
           <ContentCard
-            className="min-h-[390px]"
+            className="self-start [&>div:last-child]:pb-3"
             title={
               <>
                 AI 咨询室
@@ -189,7 +189,7 @@ export function HomePage() {
               </>
             }
           >
-            <div className="flex h-[300px] flex-col justify-between">
+            <div className="flex flex-col gap-4">
               <ChatBubble>
                 <div>
                   <p className="font-medium">嗨，林小雨 你好</p>
@@ -199,6 +199,9 @@ export function HomePage() {
                   </p>
                 </div>
               </ChatBubble>
+              <Button variant="ghost" className="w-fit pl-12">
+                查看完整对话记录 <ChevronRight data-icon="inline-end" />
+              </Button>
               <AiChatInput onSend={() => toast.message("已记录你的想法，小艾会继续陪你梳理。")} />
             </div>
           </ContentCard>
@@ -451,7 +454,7 @@ export function ConsultationPage() {
           </Card>
         </div>
 
-        <Card>
+        <Card className="self-start">
           <CardHeader>
             <CardTitle>我的咨询</CardTitle>
             <CardDescription>预约、取消、评价状态集中管理</CardDescription>
@@ -545,8 +548,8 @@ export function AiPage() {
 
   return (
     <PageShell>
-      <div className="grid min-h-[calc(100vh-9rem)] gap-5 lg:grid-cols-[320px_1fr]">
-        <Card>
+      <div className="grid min-h-[calc(100vh-9rem)] gap-5 lg:h-[calc(100vh-9rem)] lg:grid-cols-[320px_1fr]">
+        <Card className="flex min-h-0 flex-col">
           <CardHeader>
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -556,7 +559,7 @@ export function AiPage() {
               <DataState isFallback={isFallback} />
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
+          <CardContent className="min-h-0 flex-1 overflow-y-auto flex flex-col gap-3">
             <Button onClick={newSession}>
               <Plus data-icon="inline-start" />
               新建会话
@@ -576,13 +579,13 @@ export function AiPage() {
           </CardContent>
         </Card>
 
-        <Card className="overflow-hidden">
+        <Card className="flex min-h-0 flex-col overflow-hidden">
           <CardHeader className="border-b">
             <CardTitle>{activeSession.title}</CardTitle>
             <CardDescription>建议把 AI 回答作为支持信息，不能替代专业诊疗或紧急救助。</CardDescription>
           </CardHeader>
-          <CardContent className="flex h-[620px] flex-col gap-4 p-0">
-            <div className="flex-1 overflow-y-auto p-5">
+          <CardContent className="flex min-h-0 flex-1 flex-col p-0">
+            <div className="min-h-0 flex-1 overflow-y-auto p-5">
               <div className="flex flex-col gap-4">
                 {messages.map((message) => (
                   <div
@@ -600,13 +603,16 @@ export function AiPage() {
                 ))}
               </div>
             </div>
-            <div className="border-t p-4">
+            <div className="border-t px-4 py-3">
               <div className="flex gap-2">
-                <Textarea
+                <Input
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") sendMessage();
+                  }}
                   placeholder="把现在最困扰你的事写下来"
-                  className="min-h-12 resize-none"
+                  className="h-12 rounded-full"
                 />
                 <Button size="icon-lg" onClick={sendMessage} disabled={isSending}>
                   {isSending ? <Loader2 className="animate-spin" /> : <Send />}
