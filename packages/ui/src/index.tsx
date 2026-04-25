@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cva, type VariantProps } from "class-variance-authority";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -213,7 +214,8 @@ export function DialogTrigger({ children, render }: { children?: React.ReactNode
 export function DialogContent({ className, children }: React.HTMLAttributes<HTMLDivElement>) {
   const context = React.useContext(DialogContext);
   if (!context?.open) return null;
-  return (
+  if (typeof document === "undefined") return null;
+  return createPortal(
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/10 p-4 backdrop-blur-sm">
       <div className={cn("xyl-dropdown-shadow relative w-full max-w-md rounded-lg bg-card p-5", className)}>
         <Button className="absolute right-3 top-3" variant="ghost" size="icon-sm" onClick={() => context.setOpen(false)} aria-label="关闭">
@@ -221,7 +223,8 @@ export function DialogContent({ className, children }: React.HTMLAttributes<HTML
         </Button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -273,21 +276,26 @@ export function SheetContent({
 }: React.HTMLAttributes<HTMLDivElement> & { side?: "left" | "right" | "top" | "bottom" }) {
   const context = React.useContext(SheetContext);
   if (!context?.open) return null;
-  return (
-    <div className="fixed inset-0 z-50 bg-black/10 backdrop-blur-sm">
+  if (typeof document === "undefined") return null;
+  return createPortal(
+    <div className="fixed inset-0 z-50 bg-black/10 backdrop-blur-sm" onClick={() => context.setOpen(false)}>
       <div
         data-side={side}
+        onClick={(event) => event.stopPropagation()}
         className={cn(
-          "xyl-dropdown-shadow fixed flex h-full w-80 flex-col gap-4 bg-card data-[side=left]:left-0 data-[side=right]:right-0",
+          "xyl-dropdown-shadow fixed inset-y-0 flex h-dvh w-80 max-w-[85vw] flex-col gap-4 bg-card data-[side=left]:left-0 data-[side=right]:right-0",
           className,
         )}
+        role="dialog"
+        aria-modal="true"
       >
         <Button className="absolute right-3 top-3" variant="ghost" size="icon-sm" onClick={() => context.setOpen(false)} aria-label="关闭">
           <X />
         </Button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
