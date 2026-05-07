@@ -536,6 +536,19 @@ export function createApiClient(http: HttpClient) {
       addComment: (articleId: number, content: string, parentId = 0, replyToUserId?: number) =>
         http.post<string>(`/article/${articleId}/comment`, { content, parentId, replyToUserId }),
       likeComment: (commentId: number) => http.post<string>(`/article/comment/${commentId}/like`),
+      bookComments: async (bookId: number, page = 1, size = 10) =>
+        mapPage(await http.get<PageResult<unknown>>(`/book/${bookId}/comments`, { query: { page, size } }), (item) => {
+          const d = asRecord(item);
+          return {
+            id: asNumber(d.id),
+            content: asString(d.content),
+            nickname: asString(d.userNickname ?? d.nickname, "匿名"),
+            userAvatar: asString(d.userAvatar ?? d.avatar ?? d.headPath, ""),
+            createTime: formatDateTime(d.createTime),
+          };
+        }),
+      addBookComment: (bookId: number, content: string) =>
+        http.post<string>("/book/comment", { bookId, content }),
     },
   };
 }
