@@ -9,15 +9,46 @@ type SheetContextValue = { open: boolean; setOpen: (open: boolean) => void };
 
 const SheetContext = React.createContext<SheetContextValue>({ open: false, setOpen: () => {} });
 
-function Sheet({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = React.useState(false);
+function Sheet({
+  children,
+  defaultOpen = false,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+  const open = controlledOpen !== undefined ? controlledOpen : uncontrolledOpen;
+  const setOpen = (value: boolean) => {
+    if (onOpenChange) onOpenChange(value);
+    if (controlledOpen === undefined) setUncontrolledOpen(value);
+  };
   return <SheetContext.Provider value={{ open, setOpen }}>{children}</SheetContext.Provider>;
 }
 
-function SheetTrigger({ children }: { children: React.ReactNode }) {
+function SheetTrigger({
+  children,
+  className,
+  asChild,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  asChild?: boolean;
+}) {
   const { setOpen } = React.useContext(SheetContext);
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<{ onClick?: React.MouseEventHandler }>, {
+      onClick: (e: React.MouseEvent) => {
+        (children as React.ReactElement<{ onClick?: React.MouseEventHandler }>).props.onClick?.(e);
+        setOpen(true);
+      },
+    });
+  }
   return (
-    <span onClick={() => setOpen(true)} className="inline-flex">
+    <span onClick={() => setOpen(true)} className={cn("inline-flex", className)}>
       {children}
     </span>
   );
