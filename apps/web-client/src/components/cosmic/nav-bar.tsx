@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { isLoggedIn, getStoredUser, clearSession } from "@/lib/session";
 import { type UserProfile } from "@/lib/types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { href: "/home", label: "首页" },
@@ -27,8 +27,13 @@ const NAV_ITEMS = [
 export function NavBar() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const loggedIn = isLoggedIn();
-  const user = getStoredUser<UserProfile>();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
+    setLoggedIn(isLoggedIn());
+    setUser(getStoredUser<UserProfile>());
+  }, []);
 
   const handleLogout = () => {
     clearSession();

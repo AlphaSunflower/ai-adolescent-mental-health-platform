@@ -34,14 +34,31 @@ export function AiChatPage() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const chatTopRef = useRef<HTMLDivElement>(null);
+  const isInitialLoadRef = useRef(true);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // On session switch, reset scroll position to top
   useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
+    isInitialLoadRef.current = true;
+    chatTopRef.current?.scrollIntoView();
+  }, [activeSessionId]);
+
+  // Scroll to bottom when user sends a message or during streaming
+  useEffect(() => {
+    if (isInitialLoadRef.current && messages.length > 0 && !sending) {
+      // Initial messages loaded — scroll to top to show conversation start
+      isInitialLoadRef.current = false;
+      chatTopRef.current?.scrollIntoView();
+      return;
+    }
+    if (sending || messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages, sending, scrollToBottom]);
 
   useEffect(() => {
     api.ai.sessions()
@@ -224,6 +241,7 @@ export function AiChatPage() {
                 </div>
               ) : (
                 <div className="mx-auto max-w-3xl space-y-4">
+                  <div ref={chatTopRef} />
                   {messages.map((msg) => (
                     <div
                       key={msg.id}

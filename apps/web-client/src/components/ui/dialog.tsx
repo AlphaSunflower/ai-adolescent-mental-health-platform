@@ -15,8 +15,23 @@ const DialogContext = React.createContext<DialogContextValue>({
   setOpen: () => {},
 });
 
-function Dialog({ children, defaultOpen = false }: { children: React.ReactNode; defaultOpen?: boolean }) {
-  const [open, setOpen] = React.useState(defaultOpen);
+function Dialog({
+  children,
+  defaultOpen = false,
+  open: controlledOpen,
+  onOpenChange,
+}: {
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}) {
+  const [uncontrolledOpen, setUncontrolledOpen] = React.useState(defaultOpen);
+  const open = controlledOpen !== undefined ? controlledOpen : uncontrolledOpen;
+  const setOpen = (value: boolean) => {
+    if (onOpenChange) onOpenChange(value);
+    if (controlledOpen === undefined) setUncontrolledOpen(value);
+  };
   return <DialogContext.Provider value={{ open, setOpen }}>{children}</DialogContext.Provider>;
 }
 
@@ -98,8 +113,24 @@ function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivEleme
   return <div className={cn("flex justify-end gap-3 border-t border-white/10 px-6 py-4", className)} {...props} />;
 }
 
-function DialogClose({ className, children }: { className?: string; children?: React.ReactNode }) {
+function DialogClose({
+  className,
+  children,
+  asChild,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+  asChild?: boolean;
+}) {
   const { setOpen } = useDialog();
+  if (asChild && React.isValidElement(children)) {
+    return React.cloneElement(children as React.ReactElement<{ onClick?: React.MouseEventHandler }>, {
+      onClick: (e: React.MouseEvent) => {
+        (children as React.ReactElement<{ onClick?: React.MouseEventHandler }>).props.onClick?.(e);
+        setOpen(false);
+      },
+    });
+  }
   return (
     <Button variant="outline" size="sm" className={className} onClick={() => setOpen(false)}>
       {children ?? "取消"}

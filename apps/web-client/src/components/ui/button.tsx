@@ -9,6 +9,7 @@ const buttonVariants = cva(
       variant: {
         default: "cosmic-btn min-h-[44px]",
         primary: "cosmic-btn-primary min-h-[44px]",
+        gold: "bg-cosmic-gold/20 text-cosmic-gold border border-cosmic-gold/30 hover:bg-cosmic-gold/30",
         outline: "border border-white/20 bg-transparent text-white hover:border-cosmic-gold/40 hover:bg-white/5",
         secondary: "bg-white/10 text-white hover:bg-white/15",
         ghost: "text-cosmic-muted hover:bg-white/10 hover:text-white",
