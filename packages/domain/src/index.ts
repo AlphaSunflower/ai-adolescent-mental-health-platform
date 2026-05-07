@@ -51,6 +51,8 @@ export type Psychologist = {
   availableToday: boolean;
   serviceTypes: string[];
   intro: string;
+  educationBackground?: string;
+  trainingExperience?: string;
   isFavorite?: boolean;
 };
 

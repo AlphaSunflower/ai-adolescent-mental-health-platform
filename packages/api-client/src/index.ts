@@ -170,11 +170,13 @@ function fieldName(value: unknown): string {
 
 function serviceName(value: unknown): string {
   const data = asRecord(value);
-  const serviceType = asString(data.serviceType || data.type || value).toLowerCase();
-  if (serviceType === "online" || serviceType === "video") return "视频咨询";
-  if (serviceType === "offline") return "到院咨询";
-  if (serviceType === "text") return "文字陪伴";
-  return asString(data.name || data.label || data.serviceType || value, "咨询服务");
+  const raw = asString(data.serviceType || data.type || value);
+  const lower = raw.toLowerCase();
+  if (lower === "online" || lower === "video") return "视频咨询";
+  if (lower === "offline") return "线下面询";
+  if (lower === "text") return "图文咨询";
+  if (lower === "voice") return "语音咨询";
+  return asString(data.name || data.label, raw || "咨询服务");
 }
 
 function mapPsychologist(value: unknown): Psychologist {
@@ -196,6 +198,8 @@ function mapPsychologist(value: unknown): Psychologist {
     availableToday: asNumber(data.onlineStatus) === 1,
     serviceTypes: services.length ? services : ["视频咨询"],
     intro: asString(data.introduction || data.intro, "暂无简介"),
+    educationBackground: asString(data.educationBackground, undefined as unknown as string) || undefined,
+    trainingExperience: asString(data.trainingExperience, undefined as unknown as string) || undefined,
     isFavorite: asBoolean(data.isFavorited ?? data.isFavorite),
   };
 }
@@ -409,6 +413,7 @@ export function createApiClient(http: HttpClient) {
     psychologist: {
       list: async (query?: Record<string, string | number | boolean | undefined>) =>
         mapPage(await http.get<PageResult<unknown>>("/psychologist/list", { query }), mapPsychologist),
+      detail: async (id: number) => mapPsychologist(await http.get<unknown>(`/psychologist/${id}`)),
       schedule: (id: number, startDate: string, endDate: string) =>
         http.get<Record<string, unknown>[]>(`/psychologist/${id}/schedule`, { query: { startDate, endDate } }),
     },

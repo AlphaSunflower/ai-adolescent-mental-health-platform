@@ -51,12 +51,13 @@ function RatingStars({ value, size = "sm" }: { value: number; size?: "sm" | "md"
 // Helper: merge video/voice/text into "线上咨询" and show one combined price
 function getDisplayServices(p: Psychologist) {
   const services: { type: string; label: string; price?: number }[] = [];
-  const onlineTypes = ["text", "video", "voice"];
-  const hasOnline = p.serviceTypes.some((s) => onlineTypes.includes(s));
+  const hasOnline = p.serviceTypes.some((s) =>
+    s.includes("视频") || s.includes("语音") || s.includes("图文"),
+  );
   if (hasOnline) {
     services.push({ type: "online", label: "线上咨询", price: p.onlinePrice ?? p.price });
   }
-  if (p.serviceTypes.includes("offline") || p.offlinePrice) {
+  if (p.serviceTypes.some((s) => s.includes("线下")) || p.offlinePrice) {
     services.push({ type: "offline", label: "线下面询", price: p.offlinePrice });
   }
   if (services.length === 0) {

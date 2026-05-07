@@ -19,12 +19,13 @@ import type { Psychologist } from "@/lib/types";
 
 function getDisplayServices(p: Psychologist) {
   const services: { type: string; label: string; price?: number; icon: typeof MessageCircle }[] = [];
-  const onlineTypes = ["text", "video", "voice"];
-  const hasOnline = p.serviceTypes.some((s) => onlineTypes.includes(s));
+  const hasOnline = p.serviceTypes.some((s) =>
+    s.includes("视频") || s.includes("语音") || s.includes("图文"),
+  );
   if (hasOnline) {
     services.push({ type: "online", label: "线上咨询", price: p.onlinePrice ?? p.price, icon: Video });
   }
-  if (p.serviceTypes.includes("offline") || p.offlinePrice) {
+  if (p.serviceTypes.some((s) => s.includes("线下")) || p.offlinePrice) {
     services.push({ type: "offline", label: "线下面询", price: p.offlinePrice, icon: Building2 });
   }
   if (services.length === 0) {
@@ -45,10 +46,9 @@ export function PsychologistDetailPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const result = await api.psychologist.list({ page: 1, size: 100 });
-        const found = result.records.find((p) => p.id === Number(id));
-        setP(found ?? null);
-        if (found) setIsFavorite(found.isFavorite ?? false);
+        const detail = await api.psychologist.detail(Number(id));
+        setP(detail);
+        setIsFavorite(detail.isFavorite ?? false);
       } catch {
         toast.error("加载咨询师信息失败");
       } finally {
@@ -219,8 +219,17 @@ export function PsychologistDetailPage() {
             <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
               <GraduationCap className="size-5 text-cosmic-sky" />教育背景
             </h3>
-            <p className="leading-relaxed text-cosmic-muted">
-              {p.title} · 认证心理咨询师
+            <p className="leading-relaxed text-cosmic-muted whitespace-pre-wrap">
+              {p.educationBackground || "暂无教育背景信息"}
+            </p>
+          </div>
+
+          <div className="cosmic-card p-6">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
+              <Medal className="size-5 text-cosmic-gold" />受训经历
+            </h3>
+            <p className="leading-relaxed text-cosmic-muted whitespace-pre-wrap">
+              {p.trainingExperience || "暂无受训经历信息"}
             </p>
           </div>
 
