@@ -5,6 +5,7 @@ import type {
   ApiEnvelope,
   Appointment,
   AppointmentStatus,
+  ArticleDetail,
   AssessmentQuestion,
   AssessmentRecord,
   AssessmentRiskLevel,
@@ -323,6 +324,35 @@ function mapLibraryItem(value: unknown, type: LibraryItemType): LibraryItem {
   };
 }
 
+function mapArticleDetail(value: unknown): ArticleDetail {
+  const data = asRecord(value);
+  const article = asRecord(data.article ?? data);
+  return {
+    id: asNumber(article.id),
+    title: asString(article.title, "未命名文章"),
+    content: asString(article.content ?? data.content),
+    tagName: asString(article.tagName ?? data.tagName, ""),
+    type: asString(article.type ?? data.type, ""),
+    createTime: formatDateTime(article.createTime ?? data.createTime),
+    viewCount: asNumber(article.view_count ?? article.viewCount ?? data.viewCount ?? data.view_count),
+    likeCount: asNumber(article.like_count ?? article.likeCount ?? data.likeCount ?? data.like_count),
+    dislikeCount: asNumber(article.dislike_count ?? article.dislikeCount ?? data.dislikeCount ?? data.dislike_count),
+    collectionCount: asNumber(article.collection_count ?? article.collectionCount ?? data.collectionCount ?? data.collection_count),
+    commentCount: asNumber(article.comment_count ?? article.commentCount ?? data.commentCount ?? data.comment_count),
+    authorName: asString(data.authorName ?? data.author ?? article.authorName ?? article.author, "心愈智联"),
+    authorAvatar: asString(data.authorAvatar ?? article.authorAvatar ?? data.avatar ?? "", ""),
+    authorRole: asNumber(data.authorRole ?? article.authorRole),
+    hospitalName: asString(data.hospitalName ?? article.hospitalName, ""),
+    liked: asBoolean(data.liked ?? article.liked),
+    disliked: asBoolean(data.disliked ?? article.disliked),
+    collected: asBoolean(data.collected ?? article.collected),
+    recommendations: (asArray(data.recommendedArticles ?? data.recommendations) as unknown[]).map((r: unknown) => {
+      const rec = asRecord(r);
+      return { id: asNumber(rec.id), title: asString(rec.title, ""), type: "文章" };
+    }),
+  };
+}
+
 export function createHttpClient(options: HttpClientOptions) {
   const client: AxiosInstance = axios.create({
     baseURL: options.baseURL.replace(/\/$/, ""),
@@ -462,6 +492,50 @@ export function createApiClient(http: HttpClient) {
           await http.get<PageResult<unknown>>("/article/user/list/published", { query: { page: params?.page ?? 1, size: params?.size ?? 12 } }),
           (item) => mapLibraryItem(item, "社区"),
         ),
+      articleDetail: async (id: number) => mapArticleDetail(await http.get<unknown>(`/article/${id}`)),
+      bookDetail: async (id: number) => {
+        const data = asRecord(await http.get<unknown>(`/book/${id}`));
+        return {
+          id: asNumber(data.id),
+          title: asString(data.title, "未命名书籍"),
+          content: asString(data.description ?? data.intro ?? data.content, ""),
+          authorName: asString(data.author ?? data.authorName, "未知作者"),
+          coverUrl: asString(data.coverUrl ?? data.cover_url ?? data.cover, ""),
+          createTime: formatDateTime(data.createTime),
+          viewCount: asNumber(data.viewCount ?? data.view_count),
+          commentCount: asNumber(data.commentCount ?? data.comment_count),
+          onlineLink: asString(data.address ?? data.onlineLink, ""),
+        };
+      },
+      interact: (articleId: number, type: number) =>
+        http.post<string>(`/article/${articleId}/interact`, undefined, { query: { type } }),
+      comments: async (articleId: number, page = 1, size = 20) =>
+        mapPage(await http.get<PageResult<unknown>>(`/article/${articleId}/comments`, { query: { page, size } }), (item) => {
+          const d = asRecord(item);
+          return {
+            id: asNumber(d.id),
+            content: asString(d.content),
+            nickname: asString(d.nickname, "匿名"),
+            headPath: asString(d.headPath ?? d.avatar, ""),
+            createTime: formatDateTime(d.createTime),
+            likeCount: asNumber(d.likeCount ?? d.like_count),
+            liked: asBoolean(d.liked),
+            userId: asNumber(d.userId ?? d.user_id),
+            replies: asArray(d.replies).map((r: unknown) => {
+              const reply = asRecord(r);
+              return {
+                id: asNumber(reply.id),
+                content: asString(reply.content),
+                nickname: asString(reply.nickname, "匿名"),
+                replyToNickname: asString(reply.replyToNickname ?? reply.replyTo, ""),
+                createTime: formatDateTime(reply.createTime),
+              };
+            }),
+          };
+        }),
+      addComment: (articleId: number, content: string, parentId = 0, replyToUserId?: number) =>
+        http.post<string>(`/article/${articleId}/comment`, { content, parentId, replyToUserId }),
+      likeComment: (commentId: number) => http.post<string>(`/article/comment/${commentId}/like`),
     },
   };
 }

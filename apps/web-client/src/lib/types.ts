@@ -5,6 +5,7 @@ export type {
   ApiResult,
   Appointment,
   AppointmentStatus,
+  ArticleDetail,
   AssessmentQuestion,
   AssessmentRecord,
   AssessmentRiskLevel,

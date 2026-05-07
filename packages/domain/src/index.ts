@@ -138,6 +138,28 @@ export type CarePlanItem = {
   accent: "green" | "purple" | "yellow" | "coral" | "teal";
 };
 
+export type ArticleDetail = {
+  id: number;
+  title: string;
+  content: string;
+  tagName?: string;
+  type?: string;
+  createTime: string;
+  viewCount: number;
+  likeCount: number;
+  dislikeCount: number;
+  collectionCount: number;
+  commentCount: number;
+  authorName: string;
+  authorAvatar?: string;
+  authorRole?: number;
+  hospitalName?: string;
+  liked: boolean;
+  disliked: boolean;
+  collected: boolean;
+  recommendations: { id: number; title: string; type: string }[];
+};
+
 export type DashboardSnapshot = {
   quote: string;
   moodScore: number;
