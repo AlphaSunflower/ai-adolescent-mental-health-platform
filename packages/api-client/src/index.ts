@@ -319,6 +319,7 @@ function mapLibraryItem(value: unknown, type: LibraryItemType): LibraryItem {
     author: asString(data.authorName || data.sourceName || data.author || data.nickname, "心愈智联"),
     readTime: type === "课程" ? "课程" : type === "书籍" ? "章节导读" : "阅读",
     views: asNumber(data.view_count ?? data.viewCount ?? data.views),
+    coverUrl: asString(data.coverUrl ?? data.cover_url ?? data.cover ?? data.image, ""),
   };
 }
 
@@ -441,15 +442,25 @@ export function createApiClient(http: HttpClient) {
         asArray(await http.get<unknown[]>(`/ai/session/${sessionId}/messages`)).map(mapAiMessage).filter((item): item is AiMessage => Boolean(item)),
     },
     content: {
-      articles: async () =>
-        mapPage(await http.get<PageResult<unknown>>("/content/articles", { query: { page: 1, size: 12 } }), (item) => mapLibraryItem(item, "文章")),
-      courses: async () =>
-        mapPage(await http.get<PageResult<unknown>>("/content/courses", { query: { page: 1, size: 12 } }), (item) => mapLibraryItem(item, "课程")),
-      books: async () =>
-        mapPage(await http.get<PageResult<unknown>>("/book/list", { query: { page: 1, size: 12 } }), (item) => mapLibraryItem(item, "书籍")),
-      communityArticles: async () =>
-        mapPage(await http.get<PageResult<unknown>>("/article/user/list/published", { query: { page: 1, size: 12 } }), (item) =>
-          mapLibraryItem(item, "社区"),
+      articles: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/content/articles", { query: { page: params?.page ?? 1, size: params?.size ?? 12 } }),
+          (item) => mapLibraryItem(item, "文章"),
+        ),
+      courses: async (params?: { page?: number; size?: number; type?: string }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/content/courses", { query: { page: params?.page ?? 1, size: params?.size ?? 12, type: params?.type } }),
+          (item) => mapLibraryItem(item, "课程"),
+        ),
+      books: async (params?: { page?: number; size?: number; keyword?: string }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/book/list", { query: { page: params?.page ?? 1, size: params?.size ?? 12, keyword: params?.keyword } }),
+          (item) => mapLibraryItem(item, "书籍"),
+        ),
+      communityArticles: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/article/user/list/published", { query: { page: params?.page ?? 1, size: params?.size ?? 12 } }),
+          (item) => mapLibraryItem(item, "社区"),
         ),
     },
   };

@@ -126,6 +126,7 @@ export type LibraryItem = {
   author: string;
   readTime: string;
   views: number;
+  coverUrl?: string;
 };
 
 export type CarePlanStatus = "进行中" | "待开始" | "已完成";
