@@ -1,9 +1,22 @@
 "use client";
 
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MessageCircle, Headphones, ArrowRight, Sparkles } from "lucide-react";
 import gsap from "gsap";
+
+type Particle = { left: string; top: string; delay: string; duration: string; width: string; height: string };
+
+function generateParticles(count: number): Particle[] {
+  return Array.from({ length: count }, () => ({
+    left: `${Math.random() * 100}%`,
+    top: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 5}s`,
+    duration: `${4 + Math.random() * 4}s`,
+    width: `${2 + Math.random() * 4}px`,
+    height: `${2 + Math.random() * 4}px`,
+  }));
+}
 
 export function XiaoaiPage() {
   const router = useRouter();
@@ -12,6 +25,11 @@ export function XiaoaiPage() {
   const leftRef = useRef<HTMLButtonElement>(null);
   const rightRef = useRef<HTMLButtonElement>(null);
   const [animating, setAnimating] = useState(false);
+  const [particles, setParticles] = useState<Particle[]>([]);
+
+  useEffect(() => {
+    setParticles(generateParticles(20));
+  }, []);
 
   const handleEnter = useCallback((card: "left" | "right") => {
     if (animating) return;
@@ -66,17 +84,17 @@ export function XiaoaiPage() {
 
       {/* Floating particles */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
+        {particles.map((p, i) => (
           <span
             key={i}
             className="portal-particle"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 5}s`,
-              animationDuration: `${4 + Math.random() * 4}s`,
-              width: `${2 + Math.random() * 4}px`,
-              height: `${2 + Math.random() * 4}px`,
+              left: p.left,
+              top: p.top,
+              animationDelay: p.delay,
+              animationDuration: p.duration,
+              width: p.width,
+              height: p.height,
             }}
           />
         ))}
