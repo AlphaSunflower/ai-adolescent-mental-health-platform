@@ -547,6 +547,13 @@ export function createApiClient(http: HttpClient) {
       messages: async (sessionId: number) =>
         asArray(await http.get<unknown[]>(`/ai/session/${sessionId}/messages`)).map(mapAiMessage).filter((item): item is AiMessage => Boolean(item)),
     },
+    xiaoai: {
+      getRemainingTime: () => http.get<number>("/xiaoai/remaining"),
+      getMemberType: () => http.get<number>("/xiaoai/member-type"),
+      getDailyLimit: () => http.get<number>("/xiaoai/daily-limit"),
+      getTodayMessages: () => http.get<unknown[]>("/xiaoai/today-messages"),
+      reportUsageTime: (seconds: number) => http.post<string>("/xiaoai/report-usage", { seconds }),
+    },
     content: {
       articles: async (params?: { page?: number; size?: number }) =>
         mapPage(
