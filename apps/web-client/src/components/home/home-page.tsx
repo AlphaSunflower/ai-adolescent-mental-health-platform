@@ -303,7 +303,7 @@ export function HomePage() {
                 {recommendations.map((item) => (
                   <Link
                     key={`${item.type}-${item.id}`}
-                    href={item.type === "书籍" ? `/library/book/${item.id}` : `/library/article/${item.id}`}
+                    href={item.type === "书籍" ? `/library/book/${item.id}` : item.type === "社区" && item.authorId ? `/user/${item.authorId}/article/${item.id}` : `/library/article/${item.id}`}
                   >
                     <div className="group rounded-lg bg-white/5 p-3 transition-colors hover:bg-white/10">
                       <div className="flex items-center gap-2">

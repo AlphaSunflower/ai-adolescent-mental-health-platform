@@ -159,10 +159,9 @@ function mapPatient(value: unknown): PatientContact {
   return {
     id: asNumber(data.id),
     name: asString(data.name, "未命名就诊人"),
-    relation: asString(data.relation, "未设置"),
-    age: asNumber(data.age),
-    gender: asString(data.gender, "未设置"),
-    phone: asString(data.phone, undefined as unknown as string) || undefined,
+    relationship: asString(data.relationship, "未设置"),
+    sex: asNumber(data.sex),
+    birthday: asString(data.birthday),
   };
 }
 
@@ -321,6 +320,7 @@ function mapLibraryItem(value: unknown, type: LibraryItemType): LibraryItem {
     tag: asString(data.tagName || data.type || data.categoryName, type),
     summary: asString(data.description || data.summary || data.content, "暂无简介"),
     author: asString(data.authorName || data.sourceName || data.author || data.nickname, "心愈智联"),
+    authorId: asNumber(data.userId) || undefined,
     readTime: type === "课程" ? "课程" : type === "书籍" ? "章节导读" : "阅读",
     views: asNumber(data.view_count ?? data.viewCount ?? data.views),
     coverUrl: asString(data.coverUrl ?? data.cover_url ?? data.cover ?? data.image, ""),
@@ -342,8 +342,8 @@ function mapArticleDetail(value: unknown): ArticleDetail {
     dislikeCount: asNumber(article.dislike_count ?? article.dislikeCount ?? data.dislikeCount ?? data.dislike_count),
     collectionCount: asNumber(article.collection_count ?? article.collectionCount ?? data.collectionCount ?? data.collection_count),
     commentCount: asNumber(article.comment_count ?? article.commentCount ?? data.commentCount ?? data.comment_count),
-    authorName: asString(data.authorName ?? data.author ?? article.authorName ?? article.author, "心愈智联"),
-    authorAvatar: asString(data.authorAvatar ?? article.authorAvatar ?? data.avatar ?? "", ""),
+    authorName: asString(data.authorName ?? data.author ?? data.userNickname ?? article.authorName ?? article.author, "心愈智联"),
+    authorAvatar: asString(data.authorAvatar ?? data.userAvatar ?? article.authorAvatar ?? data.avatar ?? "", ""),
     authorRole: asNumber(data.authorRole ?? article.authorRole),
     hospitalName: asString(data.hospitalName ?? article.hospitalName, ""),
     liked: asBoolean(data.liked ?? article.liked),
@@ -564,6 +564,29 @@ export function createApiClient(http: HttpClient) {
       detail: async (id: number) => mapPsychologist(await http.get<unknown>(`/psychologist/${id}`)),
       schedule: (id: number, startDate: string, endDate: string) =>
         http.get<Record<string, unknown>[]>(`/psychologist/${id}/schedule`, { query: { startDate, endDate } }),
+      favorite: (id: number) => http.post<string>(`/psychologist/favorite/${id}`),
+      myFavorites: async () => {
+        const data = asArray(await http.get<unknown[]>("/psychologist/favorites"));
+        return data.map((item) => {
+          const d = asRecord(item);
+          return {
+            id: asNumber(d.psychologistId ?? d.id),
+            name: asString(d.psychologistName ?? d.realName ?? d.name, "心理咨询师"),
+            title: asString(d.title ?? d.qualificationName, "心理咨询师"),
+            avatar: asString(d.psychologistHead ?? d.headPath ?? d.avatar, undefined as unknown as string) || undefined,
+            fields: asArray(d.fields).map(fieldName).filter(Boolean),
+            rating: asNumber(d.ratingScore ?? d.rating, 0),
+            price: asNumber(d.basePrice ?? d.consultationPrice ?? d.price),
+            onlinePrice: asNumber(d.onlinePrice, undefined as unknown as number) || undefined,
+            offlinePrice: asNumber(d.offlinePrice, undefined as unknown as number) || undefined,
+            city: asString(d.offlineRegion ?? d.city, "线上"),
+            availableToday: asNumber(d.onlineStatus) === 1,
+            serviceTypes: asArray(d.services ?? d.serviceTypes).map(serviceName).filter(Boolean),
+            intro: asString(d.introduction ?? d.intro, "暂无简介"),
+            isFavorite: true,
+          } as Psychologist;
+        });
+      },
     },
     appointment: {
       create: (payload: Record<string, unknown>) => http.post<Record<string, unknown>>("/psychologist/appointment", payload),
@@ -629,7 +652,25 @@ export function createApiClient(http: HttpClient) {
           await http.get<PageResult<unknown>>("/article/user/list/published", { query: { page: params?.page ?? 1, size: params?.size ?? 12 } }),
           (item) => mapLibraryItem(item, "社区"),
         ),
+      myArticles: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/article/user/list", { query: { page: params?.page ?? 1, size: params?.size ?? 10 } }),
+          (item) => {
+            const d = asRecord(item);
+            return {
+              id: asNumber(d.id),
+              title: asString(d.title),
+              coverUrl: asString(d.coverUrl ?? d.cover_url, ""),
+              status: asNumber(d.status ?? 0, 0),
+              viewCount: asNumber(d.viewCount ?? d.view_count, 0),
+              likeCount: asNumber(d.likeCount ?? d.like_count, 0),
+              commentCount: asNumber(d.commentCount ?? d.comment_count, 0),
+              createTime: formatDateTime(d.createTime),
+            };
+          },
+        ),
       articleDetail: async (id: number) => mapArticleDetail(await http.get<unknown>(`/content/article/detail/${id}`)),
+      userArticleDetail: async (id: number) => mapArticleDetail(await http.get<unknown>(`/article/user/detail/${id}`)),
       bookDetail: async (id: number) => {
         const data = asRecord(await http.get<unknown>(`/book/${id}`));
         return {
@@ -706,7 +747,7 @@ export async function streamAiChat(
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}`, token } : {}),
     },
-    body: JSON.stringify({ sessionId, content }),
+    body: JSON.stringify({ sessionId, message: content }),
   });
 
   if (response.status === 401) options.onUnauthorized?.();

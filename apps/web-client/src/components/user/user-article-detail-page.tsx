@@ -20,7 +20,7 @@ export function UserArticleDetailPage() {
   useEffect(() => {
     (async () => {
       try {
-        const detail = await api.content.articleDetail(Number(articleId));
+        const detail = await api.content.userArticleDetail(Number(articleId));
         setArticle(detail);
       } catch {
         setNotFound(true);

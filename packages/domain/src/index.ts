@@ -31,10 +31,9 @@ export type UserProfile = {
 export type PatientContact = {
   id: number;
   name: string;
-  relation: string;
-  age: number;
-  gender: string;
-  phone?: string;
+  relationship: string;
+  sex: number;
+  birthday: string;
 };
 
 export type Psychologist = {
@@ -125,6 +124,7 @@ export type LibraryItem = {
   tag: string;
   summary: string;
   author: string;
+  authorId?: number;
   readTime: string;
   views: number;
   coverUrl?: string;

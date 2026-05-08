@@ -180,7 +180,9 @@ export function LibraryPage() {
                     href={
                       item.type === "书籍"
                         ? `/library/book/${item.id}`
-                        : `/library/article/${item.id}`
+                        : item.type === "社区" && item.authorId
+                          ? `/user/${item.authorId}/article/${item.id}`
+                          : `/library/article/${item.id}`
                     }
                   >
                     <div className="cosmic-card group cursor-pointer overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1">
