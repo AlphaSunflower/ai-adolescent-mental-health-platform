@@ -271,34 +271,36 @@ export function PsychologistListPage() {
     const services = getDisplayServices(p);
 
     return (
-      <div className="cosmic-card group flex gap-5 p-4 transition-all duration-300 hover:-translate-y-0.5 relative">
-        <button
-          type="button"
-          onClick={(e) => handleToggleFavorite(e, p)}
-          className="absolute right-3 top-3 z-10 rounded-full p-1.5 transition-colors hover:bg-white/10"
-        >
-          <Heart className={`size-4 ${p.isFavorite ? "fill-cosmic-gold text-cosmic-gold" : "text-cosmic-dim"}`} />
-        </button>
-
-        <div className="flex shrink-0 flex-col items-center gap-1">
-          <div
-            className="size-16 rounded-full flex items-center justify-center"
-            style={{
-              background: "rgba(100, 149, 237, 0.2)",
-              boxShadow: "0 0 0 3px rgba(255, 215, 0, 0.3)",
-            }}
+      <div className="cosmic-card group flex flex-col gap-3 p-3 transition-all duration-300 hover:-translate-y-0.5 relative sm:flex-row sm:gap-5 sm:p-4">
+        <div className="flex items-start gap-3 sm:contents">
+          <button
+            type="button"
+            onClick={(e) => handleToggleFavorite(e, p)}
+            className="absolute right-3 top-3 z-10 rounded-full p-1.5 transition-colors hover:bg-white/10"
           >
-            {p.avatar ? (
-              <img src={p.avatar} alt={p.name} className="size-16 rounded-full object-cover" />
-            ) : (
-              <span className="text-2xl font-bold text-cosmic-sky">{p.name[0]}</span>
-            )}
+            <Heart className={`size-4 ${p.isFavorite ? "fill-cosmic-gold text-cosmic-gold" : "text-cosmic-dim"}`} />
+          </button>
+
+          <div className="flex shrink-0 flex-col items-center gap-1">
+            <div
+              className="size-14 rounded-full flex items-center justify-center sm:size-16"
+              style={{
+                background: "rgba(100, 149, 237, 0.2)",
+                boxShadow: "0 0 0 3px rgba(255, 215, 0, 0.3)",
+              }}
+            >
+              {p.avatar ? (
+                <img src={p.avatar} alt={p.name} className="size-14 rounded-full object-cover sm:size-16" />
+              ) : (
+                <span className="text-xl font-bold text-cosmic-sky sm:text-2xl">{p.name[0]}</span>
+              )}
+            </div>
+            <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${
+              p.availableToday ? "bg-green-500/80 text-white" : "bg-gray-500/60 text-gray-300"
+            }`}>
+              {p.availableToday ? "在线" : "离线"}
+            </span>
           </div>
-          <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-            p.availableToday ? "bg-green-500/80 text-white" : "bg-gray-500/60 text-gray-300"
-          }`}>
-            {p.availableToday ? "在线" : "离线"}
-          </span>
         </div>
 
         <div className="min-w-0 flex-1">
@@ -309,28 +311,28 @@ export function PsychologistListPage() {
             <span className="text-xs text-cosmic-muted">{p.title}</span>
           </div>
           <div className="mt-1"><RatingStars value={p.rating} /></div>
-          <div className="mt-1.5 space-y-1 text-xs text-cosmic-dim">
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-cosmic-dim">
             {p.city && (
-              <span className="inline-flex items-center gap-1 mr-3">
-                <MapPin className="size-3" />{p.city}
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="size-3 shrink-0" />{p.city}
               </span>
             )}
             {p.fields.length > 0 && (
-              <span className="inline-flex items-center gap-1 mr-3">
-                <Medal className="size-3 text-cosmic-gold" />
+              <span className="inline-flex items-center gap-1">
+                <Medal className="size-3 shrink-0 text-cosmic-gold" />
                 {p.fields.slice(0, 3).join("、")}
               </span>
             )}
             {p.yearsExperience != null && p.yearsExperience > 0 && (
               <span className="inline-flex items-center gap-1">
-                <Clock className="size-3" />
+                <Clock className="size-3 shrink-0" />
                 {p.yearsExperience} 年经验
               </span>
             )}
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end justify-between">
+        <div className="flex shrink-0 flex-row items-center justify-between border-t border-white/10 pt-3 sm:flex-col sm:items-end sm:justify-between sm:border-t-0 sm:pt-0">
           <div className="text-right">
             {services.map((s) => (
               <div key={s.type} className="text-sm">

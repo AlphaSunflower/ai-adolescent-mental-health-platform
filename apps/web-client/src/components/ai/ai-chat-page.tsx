@@ -148,7 +148,7 @@ export function AiChatPage() {
       {/* Mobile sidebar toggle */}
       <button
         type="button"
-        className="fixed left-4 top-20 z-30 rounded-lg bg-cosmic-card-bg p-2 backdrop-blur-md lg:hidden border border-white/10"
+        className="fixed left-4 top-20 z-30 rounded-lg bg-cosmic-card-bg p-3 backdrop-blur-md lg:hidden border border-white/10"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         {sidebarOpen ? <X className="size-5 text-cosmic-muted" /> : <Menu className="size-5 text-cosmic-muted" />}

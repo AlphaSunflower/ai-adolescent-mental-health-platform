@@ -117,7 +117,7 @@ export function LoginPage() {
   const scale = cardHeight > 0 ? Math.min(cardHeight / H, MAX_SCALE) : 1;
 
   return (
-    <div className="flex items-end justify-center">
+    <div className="flex items-end justify-center px-4">
       {/* Peek characters — left side, bottom-aligned, all tabs */}
       {cardHeight > 0 && (
         <div

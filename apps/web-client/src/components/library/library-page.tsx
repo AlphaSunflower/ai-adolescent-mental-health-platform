@@ -228,7 +228,7 @@ export function LibraryPage() {
                       <p className="mb-3 line-clamp-2 text-sm text-cosmic-muted">
                         {item.summary}
                       </p>
-                      <div className="flex items-center gap-4 text-xs text-cosmic-dim">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-cosmic-dim">
                         <span>{item.author}</span>
                         <span className="inline-flex items-center gap-1">
                           <Clock className="size-3" />
@@ -246,7 +246,7 @@ export function LibraryPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="mt-8 flex items-center justify-center gap-2">
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
                   <Button
                     variant="ghost"
                     size="icon-sm"

@@ -204,7 +204,7 @@ export function PsychologyPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 pt-2 border-t border-white/5">
+                  <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-white/5">
                     {(item.status === "待确认" || item.status === "已预约" || item.status === "进行中") && (
                       <>
                         <Button variant="primary" size="xs" onClick={() => router.push(`/consultation/chat/${item.id}`)}>

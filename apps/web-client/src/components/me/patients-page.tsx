@@ -266,7 +266,7 @@ export function PatientsPage() {
       ) : (
         <>
           <Tabs value={activePatientId} onValueChange={handleTabChange}>
-            <TabsList className="mb-4">
+            <TabsList className="mb-4 flex-wrap">
               {patients.map((p) => (
                 <TabsTrigger key={p.id} value={String(p.id)}>{p.name}</TabsTrigger>
               ))}
@@ -314,7 +314,7 @@ export function PatientsPage() {
                   ) : records.length === 0 ? (
                     <div className="py-12 text-center text-cosmic-muted">暂无就诊记录</div>
                   ) : (
-                    <div className="cosmic-card overflow-hidden">
+                    <div className="cosmic-card overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
                           <tr className="border-b border-white/5 text-left text-cosmic-dim">

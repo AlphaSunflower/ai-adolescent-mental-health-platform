@@ -89,7 +89,7 @@ export function ArticlesPage() {
                       <Link href={`/library/article/${item.id}`} className="font-medium text-white hover:text-cosmic-sky transition-colors line-clamp-1">
                         {item.title}
                       </Link>
-                      <div className="mt-1 flex items-center gap-3 text-xs text-cosmic-dim">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-cosmic-dim">
                         <Badge variant={s.variant} className="text-xs">{s.text}</Badge>
                         <span className="inline-flex items-center gap-1"><Eye className="size-3" />{item.viewCount}</span>
                         <span className="inline-flex items-center gap-1"><Heart className="size-3" />{item.likeCount}</span>

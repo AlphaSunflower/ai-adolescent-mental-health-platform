@@ -655,7 +655,7 @@ export function XiaoaiListenPage() {
   return (
     <div className="mx-auto flex h-[calc(100vh-80px)] max-w-[900px] flex-col px-4">
       {/* Header */}
-      <header className="flex items-center justify-between rounded-t-2xl px-5 py-3 border border-white/10 bg-[linear-gradient(145deg,rgba(15,25,60,0.85)_0%,rgba(30,60,114,0.75)_50%,rgba(20,40,80,0.9)_100%)] backdrop-blur-xl">
+      <header className="flex flex-wrap items-center justify-between gap-2 rounded-t-2xl px-4 py-3 sm:px-5 border border-white/10 bg-[linear-gradient(145deg,rgba(15,25,60,0.85)_0%,rgba(30,60,114,0.75)_50%,rgba(20,40,80,0.9)_100%)] backdrop-blur-xl">
         <div className="flex items-center gap-2 text-white font-semibold">
           <span className="text-lg">🪐</span>
           <span>小爱倾听 心理陪伴</span>
@@ -664,7 +664,7 @@ export function XiaoaiListenPage() {
         {/* Voice selector button */}
         <button
           onClick={() => setShowVoiceSelector(true)}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-white/80 hover:bg-white/10 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
         >
           <span>{currentVoice.gender === "female" ? "👩" : "👨"}</span>
           <span>{currentVoice.name}</span>
@@ -681,7 +681,7 @@ export function XiaoaiListenPage() {
             </div>
           )}
           {memberLabel && <span className="text-xs px-1.5 py-0.5 rounded bg-cosmic-gold/20 text-cosmic-gold">{memberLabel}</span>}
-          <button onClick={stopConversation} className="rounded-lg px-3 py-1.5 text-sm text-white/60 hover:bg-white/10 transition-colors">
+          <button onClick={stopConversation} className="rounded-lg px-3 py-2 text-sm text-white/60 hover:bg-white/10 transition-colors">
             退出
           </button>
         </div>
@@ -742,15 +742,15 @@ export function XiaoaiListenPage() {
         {isConnected && (
           <>
             <div className="flex justify-center gap-2 flex-wrap">
-              <button onClick={toggleMute} className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs transition-colors ${isMuted ? "bg-red-500/20 text-red-400" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
+              <button onClick={toggleMute} className={`flex items-center gap-1.5 rounded-lg px-4 py-3 text-xs transition-colors ${isMuted ? "bg-red-500/20 text-red-400" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
                 <span>{isMuted ? "🔇" : "🔊"}</span>
                 <span>静音</span>
               </button>
-              <button onClick={toggleVideoMode} className={`flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs transition-colors ${isVideoMode ? "bg-cosmic-blue/20 text-cosmic-sky" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
+              <button onClick={toggleVideoMode} className={`flex items-center gap-1.5 rounded-lg px-4 py-3 text-xs transition-colors ${isVideoMode ? "bg-cosmic-blue/20 text-cosmic-sky" : "bg-white/5 text-white/70 hover:bg-white/10"}`}>
                 <span>{isVideoMode ? "📹" : "📺"}</span>
                 <span>{isVideoMode ? "关闭视频" : "视频模式"}</span>
               </button>
-              <label className="flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs bg-white/5 text-white/70 hover:bg-white/10 cursor-pointer transition-colors">
+              <label className="flex items-center gap-1.5 rounded-lg px-4 py-3 text-xs bg-white/5 text-white/70 hover:bg-white/10 cursor-pointer transition-colors">
                 <span>🖼️</span>
                 <span>上传图片</span>
                 <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />

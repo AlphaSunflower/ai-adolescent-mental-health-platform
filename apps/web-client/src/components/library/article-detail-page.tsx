@@ -361,11 +361,11 @@ export function ArticleDetailPage() {
           </article>
 
           {/* Bottom interaction bar */}
-          <div className="cosmic-card sticky bottom-4 mt-6 flex items-center justify-around p-4 z-30">
+          <div className="cosmic-card sticky bottom-4 mt-6 flex items-center justify-around gap-1 px-2 py-5 z-30 sm:gap-4 sm:px-4">
             <button
               onClick={() => handleInteract(1)}
               disabled={interacting}
-              className={`flex flex-col items-center gap-1 text-xs transition-colors ${liked ? "text-cosmic-sky" : "text-cosmic-dim hover:text-cosmic-sky"}`}
+              className={`flex flex-col items-center gap-1 text-xs transition-colors min-w-[44px] py-1 ${liked ? "text-cosmic-sky" : "text-cosmic-dim hover:text-cosmic-sky"}`}
             >
               <ThumbsUp className={`size-5 ${liked ? "fill-current" : ""}`} />
               <span>{likeCount} 点赞</span>
@@ -373,7 +373,7 @@ export function ArticleDetailPage() {
             <button
               onClick={() => handleInteract(2)}
               disabled={interacting}
-              className={`flex flex-col items-center gap-1 text-xs transition-colors ${disliked ? "text-red-400" : "text-cosmic-dim hover:text-red-400"}`}
+              className={`flex flex-col items-center gap-1 text-xs transition-colors min-w-[44px] py-1 ${disliked ? "text-red-400" : "text-cosmic-dim hover:text-red-400"}`}
             >
               <ThumbsDown className={`size-5 ${disliked ? "fill-current" : ""}`} />
               <span>{dislikeCount} 踩</span>
@@ -381,21 +381,21 @@ export function ArticleDetailPage() {
             <button
               onClick={() => handleInteract(3)}
               disabled={interacting}
-              className={`flex flex-col items-center gap-1 text-xs transition-colors ${collected ? "text-cosmic-gold" : "text-cosmic-dim hover:text-cosmic-gold"}`}
+              className={`flex flex-col items-center gap-1 text-xs transition-colors min-w-[44px] py-1 ${collected ? "text-cosmic-gold" : "text-cosmic-dim hover:text-cosmic-gold"}`}
             >
               <Star className={`size-5 ${collected ? "fill-current" : ""}`} />
               <span>{collectionCount} 收藏</span>
             </button>
             <button
               onClick={() => setCommentsOpen(true)}
-              className="flex flex-col items-center gap-1 text-xs text-cosmic-dim hover:text-cosmic-sky transition-colors"
+              className="flex flex-col items-center gap-1 text-xs text-cosmic-dim hover:text-cosmic-sky transition-colors min-w-[44px] py-1"
             >
               <MessageCircle className="size-5" />
               <span>{detail.commentCount ?? 0} 评论</span>
             </button>
             <button
               onClick={handleCopyLink}
-              className="flex flex-col items-center gap-1 text-xs text-cosmic-dim hover:text-cosmic-sky transition-colors"
+              className="flex flex-col items-center gap-1 text-xs text-cosmic-dim hover:text-cosmic-sky transition-colors min-w-[44px] py-1"
             >
               <Share2 className="size-5" />
               <span>分享</span>
@@ -429,7 +429,7 @@ export function ArticleDetailPage() {
 
       {/* Comments Dialog */}
       <Dialog open={commentsOpen} onOpenChange={setCommentsOpen}>
-        <DialogContent className="!max-w-[450px]">
+        <DialogContent className="max-w-[450px]">
           <DialogTitle className="flex items-center justify-between">
             <span>全部评论</span>
             <DialogClose asChild>
