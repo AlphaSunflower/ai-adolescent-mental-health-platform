@@ -150,7 +150,7 @@ export function NavBar() {
                   <div className="text-xs text-cosmic-muted">{user.email ?? ""}</div>
                 </div>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => router.push("/user/me")}>
+                <DropdownMenuItem onClick={() => router.push("/me")}>
                   <User className="size-4" /> 个人主页
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push("/me/psychology")}>
