@@ -71,8 +71,8 @@ export function PrivacyPage() {
               }`}
             >
               <span
-                className={`absolute top-0.5 size-5 rounded-full bg-white transition-transform ${
-                  form[item.key] ? "translate-x-[22px]" : "translate-x-[2px]"
+                className={`absolute top-0.5 size-5 rounded-full bg-white transition-all ${
+                  form[item.key] ? "right-0.5" : "left-0.5"
                 }`}
               />
             </button>

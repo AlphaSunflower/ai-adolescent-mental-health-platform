@@ -2,16 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Eye, Heart, MessageCircle, Clock } from "lucide-react";
+import { Eye, Heart, MessageCircle, Clock, Pencil } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "sonner";
 import { api } from "@/lib/api";
 
 const STATUS_TABS = [
-  { value: "all", label: "全部", status: undefined },
+  { value: "all", label: "全部", status: undefined as number | undefined },
   { value: "pending", label: "待审核", status: 0 },
   { value: "published", label: "已发布", status: 1 },
   { value: "removed", label: "已下架", status: 2 },
@@ -30,19 +29,27 @@ type ArticleItem = {
 
 export function ArticlesPage() {
   const [tab, setTab] = useState("all");
-  const [items, setItems] = useState<ArticleItem[]>([]);
+  const [allItems, setAllItems] = useState<ArticleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
     setLoading(true);
-    const status = STATUS_TABS.find((t) => t.value === tab)?.status;
-    api.content.communityArticles({ page, size: 10 })
-      .then((r) => { setItems(r.records as unknown as ArticleItem[]); setTotal(r.total); })
+    api.content.myArticles({ page, size: 10 })
+      .then((r) => {
+        const items = r.records as unknown as ArticleItem[];
+        setAllItems(items);
+        setTotal(r.total);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [tab, page]);
+  }, [page]);
+
+  const statusFilter = STATUS_TABS.find((t) => t.value === tab)?.status;
+  const items = statusFilter !== undefined
+    ? allItems.filter((item) => item.status === statusFilter)
+    : allItems;
 
   const statusLabel = (s: number) => {
     if (s === 0) return { text: "待审核", variant: "secondary" as const };
@@ -56,7 +63,14 @@ export function ArticlesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">我的发布</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-xl font-bold text-white">我的发布</h1>
+        <Link href="/me/publish">
+          <Button variant="primary" size="xs">
+            <Pencil className="size-3.5 mr-1" />发布文章
+          </Button>
+        </Link>
+      </div>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-6">
           {STATUS_TABS.map((t) => <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>)}

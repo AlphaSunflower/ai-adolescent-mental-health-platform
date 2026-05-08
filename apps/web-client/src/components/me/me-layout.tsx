@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
-  User, FileText, Lock, Star, Heart, ClipboardCheck, MessageSquare,
-  Users, MessageCircle, LogOut
+  User, FileText, Lock, Star, ClipboardCheck, MessageSquare,
+  Users, LogOut, Bell, Bookmark
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,14 +16,13 @@ import type { UserProfile } from "@/lib/types";
 
 const MENU_ITEMS = [
   { href: "/me/info", icon: User, label: "个人信息中心" },
-  { href: "/me/articles", icon: FileText, label: "我的发布" },
   { href: "/me/privacy", icon: Lock, label: "隐私设置" },
-  { href: "/me/favorites", icon: Star, label: "我的收藏" },
-  { href: "/me/likes", icon: Heart, label: "我的点赞" },
+  { href: "/me/articles", icon: FileText, label: "我的发布" },
+  { href: "/me/messages", icon: Bell, label: "我的消息" },
   { href: "/me/assessments", icon: ClipboardCheck, label: "我的测评记录" },
-  { href: "/me/feedback", icon: MessageSquare, label: "我的反馈" },
+  { href: "/me/favorites", icon: Bookmark, label: "收藏与点赞" },
   { href: "/me/patients", icon: Users, label: "就诊人病历管理" },
-  { href: "/me/psychology", icon: MessageCircle, label: "我的心理咨询" },
+  { href: "/me/feedback", icon: MessageSquare, label: "我的反馈" },
 ];
 
 export function MeLayout({ children }: { children: React.ReactNode }) {

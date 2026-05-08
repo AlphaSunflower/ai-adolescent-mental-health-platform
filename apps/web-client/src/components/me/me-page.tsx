@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FileText, Heart, Star, ShoppingBag, Calendar, ArrowRight } from "lucide-react";
+import { FileText, Heart, Star, ShoppingBag, Calendar, ArrowRight, Pencil } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
@@ -52,7 +52,19 @@ export function MePage() {
       </p>
 
       {/* Quick action cards */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <Link href="/me/publish">
+          <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
+            <div className="mb-3 inline-flex rounded-lg bg-cosmic-sky/20 p-2">
+              <Pencil className="size-5 text-cosmic-sky" />
+            </div>
+            <div className="text-lg font-bold text-white">发布文章</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-cosmic-dim group-hover:text-cosmic-sky">
+              写文章 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
+            </div>
+          </div>
+        </Link>
+
         <Link href="/me/articles">
           <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
             <div className="mb-3 inline-flex rounded-lg bg-purple-500/20 p-2">

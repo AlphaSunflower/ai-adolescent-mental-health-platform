@@ -283,15 +283,15 @@ export function PatientsPage() {
                       </div>
                       <div>
                         <span className="text-cosmic-dim">年龄：</span>
-                        <span className="text-white">{calculateAge((currentPatient as unknown as Record<string, string>).birthday ?? "")}岁</span>
+                        <span className="text-white">{calculateAge(currentPatient.birthday)}岁</span>
                       </div>
                       <div>
                         <span className="text-cosmic-dim">性别：</span>
-                        <span className="text-white">{currentPatient.gender === "1" || Number(currentPatient.gender) === 1 ? "男" : "女"}</span>
+                        <span className="text-white">{currentPatient.sex === 1 ? "男" : "女"}</span>
                       </div>
                       <div>
                         <span className="text-cosmic-dim">关系：</span>
-                        <span className="text-white">{currentPatient.relation}</span>
+                        <span className="text-white">{currentPatient.relationship}</span>
                       </div>
                       <div className="col-span-2 sm:col-span-4 flex gap-2">
                         <Button variant="ghost" size="xs" onClick={() => openPatientDialog(currentPatient)}>修改</Button>

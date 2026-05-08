@@ -2,6 +2,9 @@
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import MDEditor from "@uiw/react-md-editor";
+import { getCommands, getExtraCommands } from "@uiw/react-md-editor/commands-cn";
+import "@uiw/react-md-editor/markdown-editor.css";
 import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -62,6 +65,21 @@ export function PublishPage() {
     return data.data;
   };
 
+  const handleUploadImage = async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const token = getToken();
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+    const res = await fetch(`${baseUrl}/common/upload`, {
+      method: "POST",
+      body: formData,
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    const data = await res.json() as { code: number; data: string; message?: string };
+    if (data.code !== 200) throw new Error(data.message ?? "图片上传失败");
+    return { url: data.data };
+  };
+
   const handleSubmit = async () => {
     if (!title.trim()) { toast.error("请输入文章标题"); return; }
     if (!content.trim()) { toast.error("请输入文章内容"); return; }
@@ -103,7 +121,7 @@ export function PublishPage() {
     <div>
       <h1 className="mb-6 text-xl font-bold text-white">发布文章</h1>
 
-      <div className="cosmic-card max-w-[800px] p-6 space-y-5">
+      <div className="cosmic-card max-w-[900px] p-6 space-y-5">
         {/* Title */}
         <div>
           <label className="mb-1 block text-sm text-cosmic-dim">文章标题 <span className="text-red-400">*</span></label>
@@ -138,7 +156,7 @@ export function PublishPage() {
               onClick={(e) => { e.stopPropagation(); setCoverFile(null); setCoverPreview(""); }}
               className="mt-1 text-xs text-red-400 hover:text-red-300"
             >
-              移除封面
+              <X className="size-3 inline mr-0.5" />移除封面
             </button>
           )}
           <p className="mt-1 text-xs text-cosmic-dim">支持 JPG/PNG，建议尺寸 800x450，不超过 3MB</p>
@@ -159,15 +177,20 @@ export function PublishPage() {
         </div>
 
         {/* Content */}
-        <div>
-          <label className="mb-1 block text-sm text-cosmic-dim">文章内容 <span className="text-red-400">*</span></label>
-          <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={16}
-            placeholder="请输入文章内容（支持 Markdown 格式）..."
-            className="cosmic-input w-full rounded-lg px-3 py-3 text-sm resize-none font-mono"
-          />
+        <div data-color-mode="dark">
+          <label className="mb-2 block text-sm text-cosmic-dim">文章内容 <span className="text-red-400">*</span></label>
+          <div className="rounded-xl border border-white/15 overflow-hidden">
+            <MDEditor
+              value={content}
+              onChange={(val) => setContent(val ?? "")}
+              height={500}
+              visibleDragbar={false}
+              preview="live"
+              commands={getCommands()}
+              extraCommands={getExtraCommands()}
+            />
+          </div>
+          <p className="mt-1 text-xs text-cosmic-dim">支持 Markdown 格式，可拖拽或粘贴图片</p>
         </div>
 
         {/* Actions */}

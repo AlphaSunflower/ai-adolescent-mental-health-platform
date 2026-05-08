@@ -288,17 +288,20 @@ export function ArticleDetailPage() {
 
             {/* Article content */}
             <div className="prose prose-invert max-w-none
-              prose-headings:text-white prose-headings:border-white/10
-              prose-h2:border-b prose-h2:pb-2
-              prose-p:text-cosmic-muted prose-p:leading-relaxed
-              prose-a:text-cosmic-sky prose-a:no-underline hover:prose-a:underline
-              prose-strong:text-white
-              prose-code:bg-black/30 prose-code:text-cosmic-sky prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
-              prose-pre:bg-black/40 prose-pre:border prose-pre:border-white/10
-              prose-blockquote:border-l-cosmic-blue/50 prose-blockquote:bg-white/5 prose-blockquote:text-cosmic-muted
-              prose-li:text-cosmic-muted
-              prose-img:rounded-lg
-              prose-table:border-white/10 prose-th:bg-white/10 prose-th:text-white prose-td:text-cosmic-muted
+              prose-headings:text-white prose-headings:font-semibold prose-headings:scroll-mt-24
+              prose-h1:text-2xl prose-h1:mt-8 prose-h1:mb-4
+              prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
+              prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3
+              prose-p:text-cosmic-muted prose-p:leading-relaxed prose-p:my-3
+              prose-a:text-cosmic-sky prose-a:no-underline prose-a:underline-offset-2 hover:prose-a:underline
+              prose-strong:text-white prose-strong:font-semibold
+              prose-code:text-cosmic-sky prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:font-normal prose-code:before:content-none prose-code:after:content-none
+              prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl prose-pre:my-4
+              prose-blockquote:border-l-cosmic-blue/60 prose-blockquote:bg-white/5 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-cosmic-muted
+              prose-li:text-cosmic-muted prose-li:my-1
+              prose-img:rounded-xl prose-img:my-4
+              prose-table:border-white/10 prose-th:bg-white/10 prose-th:text-white prose-th:font-semibold prose-th:px-4 prose-th:py-2 prose-td:text-cosmic-muted prose-td:px-4 prose-td:py-2
+              prose-hr:border-white/10
               [&_*]:scroll-mt-24
             ">
               <ReactMarkdown
@@ -319,6 +322,37 @@ export function ArticleDetailPage() {
                     const id = text.toLowerCase().replace(/[^\w一-龥\s-]/g, "").replace(/\s+/g, "-");
                     return <h3 id={id} {...props}>{children}</h3>;
                   },
+                  pre: ({ children }) => (
+                    <div className="group relative my-4">
+                      <div className="flex items-center justify-between rounded-t-xl bg-white/10 px-4 py-2 text-xs text-cosmic-dim">
+                        <span className="inline-flex items-center gap-2">
+                          <span className="size-2 rounded-full bg-red-400/60" />
+                          <span className="size-2 rounded-full bg-yellow-400/60" />
+                          <span className="size-2 rounded-full bg-green-400/60" />
+                        </span>
+                        <span>code</span>
+                      </div>
+                      <pre className="!mt-0 !rounded-t-none">{children}</pre>
+                    </div>
+                  ),
+                  a: ({ href, children }) => (
+                    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-0.5">
+                      {children}
+                    </a>
+                  ),
+                  img: ({ src, alt }) => (
+                    <img src={src} alt={alt} className="rounded-xl my-4 max-w-full" loading="lazy" />
+                  ),
+                  table: ({ children }) => (
+                    <div className="my-4 overflow-x-auto rounded-xl border border-white/10">
+                      <table className="!my-0 w-full">{children}</table>
+                    </div>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-l-4 border-cosmic-blue/60 bg-white/5 py-3 px-4 rounded-r-lg my-4">
+                      {children}
+                    </blockquote>
+                  ),
                 }}
               >
                 {detail.content}

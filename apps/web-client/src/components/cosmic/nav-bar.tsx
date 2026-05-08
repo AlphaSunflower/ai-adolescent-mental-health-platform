@@ -20,6 +20,7 @@ import { isLoggedIn, getStoredUser, clearSession } from "@/lib/session";
 import { api } from "@/lib/api";
 import { type UserProfile } from "@/lib/types";
 import { useState, useEffect, useRef } from "react";
+import { useFeedbackDialog } from "@/components/feedback/feedback-dialog";
 
 const NAV_ITEMS = [
   { href: "/home", label: "首页" },
@@ -36,6 +37,7 @@ const XIAOAI_CHILDREN = [
 
 export function NavBar() {
   const router = useRouter();
+  const { open: openFeedback } = useFeedbackDialog();
   const [searchQuery, setSearchQuery] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -168,13 +170,14 @@ export function NavBar() {
               </span>
             </Link>
 
-            {/* Feedback link */}
-            <Link
-              href="/me/feedback"
-              className="hidden text-sm text-cosmic-dim hover:text-cosmic-gold transition-colors sm:flex"
+            {/* Feedback button */}
+            <button
+              type="button"
+              onClick={openFeedback}
+              className="hidden text-sm text-cosmic-dim hover:text-cosmic-gold transition-colors sm:flex cursor-pointer"
             >
               我要反馈
-            </Link>
+            </button>
 
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-2 cursor-pointer">

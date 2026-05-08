@@ -5,14 +5,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Star, MapPin, Clock, Search, RotateCcw, LayoutGrid, List, Heart,
-  Medal, Phone, MessageCircle, Video, Users, ChevronDown, Calendar, X
+  Medal, Phone, MessageCircle, Video, Users
 } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import type { Psychologist } from "@/lib/types";
 
@@ -88,10 +87,6 @@ export function PsychologistListPage() {
   const [total, setTotal] = useState(0);
   const pageSize = viewMode === "grid" ? 8 : 10;
 
-  // Booking dialog
-  const [bookingOpen, setBookingOpen] = useState(false);
-  const [selectedForBooking, setSelectedForBooking] = useState<Psychologist | null>(null);
-
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const fetchList = useCallback(
@@ -144,34 +139,29 @@ export function PsychologistListPage() {
   const handleToggleFavorite = async (e: React.MouseEvent, p: Psychologist) => {
     e.preventDefault();
     e.stopPropagation();
-    // Optimistic toggle — API not available yet, just toggle UI
+    const wasFavorite = p.isFavorite;
     setPsychologists((prev) =>
       prev.map((item) =>
         item.id === p.id ? { ...item, isFavorite: !item.isFavorite } : item,
       ),
     );
-    toast.success(p.isFavorite ? "已取消收藏" : "已收藏");
+    try {
+      await api.psychologist.favorite(p.id);
+      toast.success(wasFavorite ? "已取消收藏" : "已收藏");
+    } catch {
+      setPsychologists((prevList) =>
+        prevList.map((item) =>
+          item.id === p.id ? { ...item, isFavorite: wasFavorite } : item,
+        ),
+      );
+      toast.error("操作失败，请重试");
+    }
   };
 
   const handleBookingClick = (e: React.MouseEvent, p: Psychologist) => {
     e.preventDefault();
     e.stopPropagation();
-    setSelectedForBooking(p);
-    setBookingOpen(true);
-  };
-
-  const handleCreateAppointment = async () => {
-    if (!selectedForBooking) return;
-    try {
-      await api.appointment.create({
-        psychologistId: selectedForBooking.id,
-        serviceType: getDisplayServices(selectedForBooking)[0]?.type ?? "online",
-      });
-      toast.success("预约成功");
-      setBookingOpen(false);
-    } catch {
-      toast.error("预约失败，请重试");
-    }
+    router.push(`/consultation/psychologist/${p.id}`);
   };
 
   const totalPages = Math.ceil(total / pageSize);
@@ -547,44 +537,6 @@ export function PsychologistListPage() {
         </>
       )}
 
-      {/* Booking Dialog */}
-      <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
-        <DialogContent className="!max-w-lg">
-          <DialogTitle>预约咨询</DialogTitle>
-          {selectedForBooking && (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 rounded-lg bg-white/5 p-3">
-                <div className="size-12 rounded-full bg-cosmic-blue/20 flex items-center justify-center">
-                  <span className="text-lg font-bold text-cosmic-sky">{selectedForBooking.name[0]}</span>
-                </div>
-                <div>
-                  <p className="font-semibold text-white">{selectedForBooking.name}</p>
-                  <p className="text-xs text-cosmic-muted">{selectedForBooking.title}</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-sm text-cosmic-muted">咨询方式</label>
-                {getDisplayServices(selectedForBooking).map((s) => (
-                  <label key={s.type} className="flex cursor-pointer items-center justify-between rounded-lg border border-white/10 bg-white/5 px-4 py-3 hover:border-cosmic-gold/40">
-                    <span className="text-sm text-white">{s.label}</span>
-                    <span className="text-sm font-semibold text-cosmic-gold">¥{s.price?.toFixed(0) ?? "0"}</span>
-                  </label>
-                ))}
-              </div>
-
-              <DialogFooter>
-                <DialogClose asChild>
-                  <Button variant="outline" size="sm">取消</Button>
-                </DialogClose>
-                <Button variant="primary" size="sm" onClick={handleCreateAppointment}>
-                  确认预约
-                </Button>
-              </DialogFooter>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

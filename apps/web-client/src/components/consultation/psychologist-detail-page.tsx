@@ -6,7 +6,7 @@ import Link from "next/link";
 import {
   ArrowLeft, Star, MapPin, Clock, Heart, Calendar, Medal,
   Users, MessageCircle, Video, Phone, CheckCircle2, Sparkles,
-  BookOpen, GraduationCap, Award, ChevronDown, X, Building2
+  BookOpen, GraduationCap, Award, ChevronDown, X, Building2, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,31 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import type { Psychologist } from "@/lib/types";
+
+type ScheduleSlot = {
+  id: number;
+  date: string;
+  timeSlot: string;
+  startTime: string;
+  endTime: string;
+  bookedCount: number;
+  maxAppointments: number;
+  status: number;
+};
+
+function formatDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function timeSlotLabel(timeSlot: string): string {
+  if (timeSlot === "MORNING") return "上午";
+  if (timeSlot === "AFTERNOON") return "下午";
+  if (timeSlot === "EVENING") return "晚上";
+  return timeSlot;
+}
 
 function getDisplayServices(p: Psychologist) {
   const services: { type: string; label: string; price?: number; icon: typeof MessageCircle }[] = [];
@@ -44,6 +69,35 @@ export function PsychologistDetailPage() {
   const [selectedService, setSelectedService] = useState<string | null>(null);
   const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const [schedules, setSchedules] = useState<ScheduleSlot[]>([]);
+  const [loadingSchedules, setLoadingSchedules] = useState(false);
+  const [selectedScheduleId, setSelectedScheduleId] = useState<number | null>(null);
+
+  const fetchSchedules = async (date: Date) => {
+    setLoadingSchedules(true);
+    setSelectedScheduleId(null);
+    try {
+      const dayStart = formatDateStr(date);
+      const dayEnd = formatDateStr(date);
+      const raw = await api.psychologist.schedule(Number(id), dayStart, dayEnd);
+      const mapped: ScheduleSlot[] = (raw as Record<string, unknown>[]).map((s) => ({
+        id: Number(s.id),
+        date: String(s.scheduleDate ?? s.date ?? ""),
+        timeSlot: String(s.timeSlot ?? ""),
+        startTime: String(s.startTime ?? ""),
+        endTime: String(s.endTime ?? ""),
+        bookedCount: Number(s.bookedCount ?? 0),
+        maxAppointments: Number(s.maxAppointments ?? 0),
+        status: Number(s.status ?? 0),
+      }));
+      setSchedules(mapped);
+    } catch {
+      setSchedules([]);
+    } finally {
+      setLoadingSchedules(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,6 +112,12 @@ export function PsychologistDetailPage() {
       }
     };
     fetchData();
+  }, [id]);
+
+  // Auto-load today's schedules on mount
+  useEffect(() => {
+    if (id) fetchSchedules(new Date());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (loading) {
@@ -322,26 +382,31 @@ export function PsychologistDetailPage() {
               <Calendar className="size-5 text-cosmic-sky" />选择预约时间
             </h3>
 
-            {/* 7-day view placeholder */}
+            {/* 7-day view */}
             <div className="mb-6 grid grid-cols-7 gap-2">
               {Array.from({ length: 7 }).map((_, i) => {
                 const date = new Date();
                 date.setDate(date.getDate() + i);
-                const isToday = i === 0;
+                const isSelected = i === selectedDayIndex;
                 const dayNames = ["日", "一", "二", "三", "四", "五", "六"];
                 return (
                   <button
                     key={i}
                     type="button"
-                    disabled={i < 0}
+                    onClick={() => {
+                      setSelectedDayIndex(i);
+                      const d = new Date();
+                      d.setDate(d.getDate() + i);
+                      fetchSchedules(d);
+                    }}
                     className={`rounded-xl border p-3 text-center transition-all hover:-translate-y-0.5 ${
-                      isToday ? "border-cosmic-gold/60 bg-cosmic-gold/10" : "border-white/10 bg-white/5"
+                      isSelected ? "border-cosmic-gold/60 bg-cosmic-gold/10" : "border-white/10 bg-white/5"
                     }`}
                   >
                     <div className="text-xs text-cosmic-dim">
                       周{dayNames[date.getDay()]}
                     </div>
-                    <div className={`text-lg font-bold ${isToday ? "text-cosmic-gold" : "text-white"}`}>
+                    <div className={`text-lg font-bold ${isSelected ? "text-cosmic-gold" : "text-white"}`}>
                       {date.getDate()}
                     </div>
                     <div className="mt-1 flex justify-center gap-0.5">
@@ -354,19 +419,70 @@ export function PsychologistDetailPage() {
               })}
             </div>
 
-            <p className="mb-4 text-sm text-cosmic-dim">点击日期选择可预约时段</p>
+            {loadingSchedules ? (
+              <div className="mb-4 text-sm text-cosmic-dim flex items-center gap-2">
+                <Loader2 className="size-4 animate-spin" /> 加载排班中...
+              </div>
+            ) : schedules.length > 0 ? (
+              <div className="mb-4">
+                <p className="mb-2 text-sm text-cosmic-muted">选择时段：</p>
+                <div className="flex flex-wrap gap-2">
+                  {schedules.map((s) => {
+                    const isFull = s.bookedCount >= s.maxAppointments;
+                    const isPicked = selectedScheduleId === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        disabled={isFull || s.status === 0}
+                        onClick={() => setSelectedScheduleId(s.id)}
+                        className={`rounded-lg border px-4 py-2 text-sm transition-all ${
+                          isPicked
+                            ? "border-cosmic-gold bg-cosmic-gold/20 text-cosmic-gold"
+                            : isFull || s.status === 0
+                              ? "border-white/5 bg-white/5 text-cosmic-dim cursor-not-allowed"
+                              : "border-white/10 bg-white/5 text-cosmic-muted hover:border-white/20 hover:text-white"
+                        }`}
+                      >
+                        <div>{timeSlotLabel(s.timeSlot)} {s.startTime?.slice(0, 5)}-{s.endTime?.slice(0, 5)}</div>
+                        <div className="text-xs mt-0.5 opacity-60">
+                          {isFull ? "已约满" : s.status === 0 ? "休息" : `余${s.maxAppointments - s.bookedCount}位`}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : selectedDayIndex >= 0 ? (
+              <p className="mb-4 text-sm text-cosmic-dim">该日期暂无可用排班</p>
+            ) : null}
 
             {/* Selected service summary */}
-            {selectedService && (
+            {(selectedService || selectedScheduleId) && (
               <div className="rounded-xl bg-cosmic-gold/10 border border-cosmic-gold/20 p-4 mb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <span className="text-sm text-cosmic-muted">已选服务：</span>
-                    <span className="text-sm font-semibold text-white ml-1">
-                      {services.find((s) => s.type === selectedService)?.label}
-                    </span>
+                    {selectedService && (
+                      <>
+                        <span className="text-sm text-cosmic-muted">已选服务：</span>
+                        <span className="text-sm font-semibold text-white ml-1">
+                          {services.find((s) => s.type === selectedService)?.label}
+                        </span>
+                      </>
+                    )}
+                    {selectedScheduleId && (
+                      <span className="text-sm text-cosmic-muted ml-3">
+                        已选时段
+                      </span>
+                    )}
                   </div>
-                  <Button variant="primary" size="xs" onClick={() => setBookingOpen(true)}>
+                  <Button variant="primary" size="xs" onClick={() => {
+                    if (!selectedScheduleId) {
+                      toast.error("请先选择预约时段");
+                      return;
+                    }
+                    setBookingOpen(true);
+                  }}>
                     立即预约
                   </Button>
                 </div>
@@ -396,6 +512,17 @@ export function PsychologistDetailPage() {
                       </span>
                     </div>
                   )}
+                  {selectedScheduleId && (() => {
+                    const sch = schedules.find((s) => s.id === selectedScheduleId);
+                    return sch ? (
+                      <div className="mt-2 flex items-center gap-2 text-sm">
+                        <span className="text-cosmic-muted">时段：</span>
+                        <span className="text-white">
+                          {sch.date} {timeSlotLabel(sch.timeSlot)} {sch.startTime?.slice(0, 5)}-{sch.endTime?.slice(0, 5)}
+                        </span>
+                      </div>
+                    ) : null;
+                  })()}
                 </div>
 
                 <div>
@@ -420,10 +547,14 @@ export function PsychologistDetailPage() {
                   <Button
                     variant="primary"
                     size="sm"
-                    disabled={submitting || !description.trim()}
+                    disabled={submitting || !description.trim() || !selectedScheduleId}
                     onClick={async () => {
                       if (!description.trim()) {
                         toast.error("请填写主要问题");
+                        return;
+                      }
+                      if (!selectedScheduleId) {
+                        toast.error("请选择预约时段");
                         return;
                       }
                       setSubmitting(true);
@@ -431,15 +562,19 @@ export function PsychologistDetailPage() {
                         const svc = selectedService
                           ? services.find((s) => s.type === selectedService)
                           : services[0];
-                        const isOnline = svc?.type === "online" || selectedService === "online";
+                        const isOffline = svc?.type === "offline";
                         await api.appointment.create({
+                          psychologistId: p.id,
+                          scheduleId: selectedScheduleId,
+                          serviceType: isOffline ? "OFFLINE" : "video",
                           description: description.trim(),
-                          type: isOnline ? 1 : 0,
                         });
                         toast.success("预约成功");
                         setBookingOpen(false);
                         setDescription("");
                         setSelectedService(null);
+                        setSelectedScheduleId(null);
+                        setSchedules([]);
                       } catch {
                         toast.error("预约失败，请重试");
                       } finally {

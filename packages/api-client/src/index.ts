@@ -185,7 +185,33 @@ function mapPsychologist(value: unknown): Psychologist {
   const data = asRecord(value);
   const fields = asArray(data.fields).map(fieldName).filter(Boolean);
   const services = asArray(data.services).map(serviceName).filter(Boolean);
-  const price = asNumber(data.consultationPrice ?? data.basePrice ?? data.price);
+
+  // Extract online price from services array (VIDEO/VOICE combined)
+  const svcArr = asArray(data.services);
+  let onlinePriceFromSvc = 0;
+  for (const svc of svcArr) {
+    const s = asRecord(svc);
+    const type = asString(s.serviceType).toUpperCase();
+    if (type === "VIDEO" || type === "VOICE") {
+      const p = asNumber(s.price);
+      if (p > 0) { onlinePriceFromSvc = p; break; }
+    }
+  }
+  // If no VIDEO/VOICE price found, try TEXT
+  if (onlinePriceFromSvc === 0) {
+    for (const svc of svcArr) {
+      const s = asRecord(svc);
+      const type = asString(s.serviceType).toUpperCase();
+      if (type === "TEXT") {
+        onlinePriceFromSvc = asNumber(s.price);
+        break;
+      }
+    }
+  }
+
+  const price = onlinePriceFromSvc > 0
+    ? onlinePriceFromSvc
+    : asNumber(data.consultationPrice ?? data.basePrice ?? data.price);
   return {
     id: asNumber(data.id),
     name: asString(data.realName || data.name, "心理咨询师"),
@@ -561,7 +587,37 @@ export function createApiClient(http: HttpClient) {
     psychologist: {
       list: async (query?: Record<string, string | number | boolean | undefined>) =>
         mapPage(await http.get<PageResult<unknown>>("/psychologist/list", { query }), mapPsychologist),
-      detail: async (id: number) => mapPsychologist(await http.get<unknown>(`/psychologist/${id}`)),
+      detail: async (id: number) => {
+        const [detailData, listPage] = await Promise.all([
+          http.get<unknown>(`/psychologist/${id}`),
+          http.get<PageResult<unknown>>("/psychologist/list", { query: { page: 1, size: 100 } }).catch(() => null),
+        ]);
+        const psychologist = mapPsychologist(detailData);
+        if (listPage && (!psychologist.onlinePrice || psychologist.onlinePrice <= 0)) {
+          const listData = asRecord(listPage);
+          const records = asArray(listData.records ?? listData.data ?? listData.list);
+          for (const item of records) {
+            const record = asRecord(item);
+            if (asNumber(record.id) === id) {
+              const svcArr = asArray(record.services);
+              for (const svc of svcArr) {
+                const s = asRecord(svc);
+                const type = asString(s.serviceType).toUpperCase();
+                if (type === "VIDEO" || type === "VOICE") {
+                  const p = asNumber(s.price);
+                  if (p > 0) { psychologist.onlinePrice = p; psychologist.price = p; break; }
+                }
+              }
+              if (!psychologist.onlinePrice || psychologist.onlinePrice <= 0) {
+                const cp = asNumber(record.consultationPrice);
+                if (cp > 0) { psychologist.onlinePrice = cp; psychologist.price = cp; }
+              }
+              break;
+            }
+          }
+        }
+        return psychologist;
+      },
       schedule: (id: number, startDate: string, endDate: string) =>
         http.get<Record<string, unknown>[]>(`/psychologist/${id}/schedule`, { query: { startDate, endDate } }),
       favorite: (id: number) => http.post<string>(`/psychologist/favorite/${id}`),
@@ -617,6 +673,7 @@ export function createApiClient(http: HttpClient) {
     feedback: {
       platform: () => http.get<PageResult<unknown>>("/feedback/platform/my", { query: { page: 1, size: 100 } }),
       consultation: () => http.get<PageResult<unknown>>("/feedback/consultation/my", { query: { page: 1, size: 100 } }),
+      submitPlatform: (data: { content: string }) => http.post<string>("/feedback/platform", data),
     },
     ai: {
       sessions: async () => asArray(await http.get<unknown[]>("/ai/sessions")).map(mapAiSession),

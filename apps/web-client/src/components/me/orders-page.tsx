@@ -96,8 +96,6 @@ export function MeOrdersPage() {
           {[
             { value: "all", label: "全部" },
             { value: "psychologist", label: "心理咨询" },
-            { value: "book", label: "书籍" },
-            { value: "assessment", label: "测评" },
           ].map((t) => <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>)}
         </TabsList>
         <TabsContent value={tab}>

@@ -1,7 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, Shield, FileText, Stamp, Medal } from "lucide-react";
+import { useFeedbackDialog } from "@/components/feedback/feedback-dialog";
 
 export function Footer() {
+  const { open: openFeedback } = useFeedbackDialog();
   return (
     <footer className="relative z-10 mt-[150px] border-t border-white/10 bg-transparent text-cosmic-footer">
       <div className="mx-auto max-w-6xl px-6 py-10">
@@ -38,29 +42,29 @@ export function Footer() {
             </h4>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="#" className="hover:text-cosmic-blue transition-colors">
+                <Link href="/legal" className="hover:text-cosmic-blue transition-colors">
                   隐私保护协议
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-cosmic-blue transition-colors">
+                <Link href="/legal?tab=terms" className="hover:text-cosmic-blue transition-colors">
                   用户服务协议
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-cosmic-blue transition-colors">
+                <Link href="/legal?tab=disclaimer" className="hover:text-cosmic-blue transition-colors">
                   免责声明
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-cosmic-blue transition-colors">
+                <Link href="/legal?tab=minor" className="hover:text-cosmic-blue transition-colors">
                   未成年人保护指引
                 </Link>
               </li>
               <li>
-                <Link href="/me/feedback" className="hover:text-cosmic-blue transition-colors">
+                <button type="button" onClick={openFeedback} className="hover:text-cosmic-blue transition-colors cursor-pointer">
                   意见反馈
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

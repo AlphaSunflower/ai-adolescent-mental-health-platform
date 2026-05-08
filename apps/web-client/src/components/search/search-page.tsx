@@ -56,15 +56,15 @@ export function SearchPage() {
 
   const loadHotKeywords = async () => {
     try {
-      const res = await httpClient.get<{ data: string[] }>("/search/hot-keywords");
-      setHotKeywords(res.data ?? []);
+      const res = await httpClient.get<string[]>("/search/hot-keywords");
+      setHotKeywords(res ?? []);
     } catch { /* ignore */ }
   };
 
   const loadHistory = async () => {
     try {
-      const res = await httpClient.get<{ data: string[] }>("/search/history");
-      setSearchHistory(res.data ?? []);
+      const res = await httpClient.get<string[]>("/search/history");
+      setSearchHistory(res ?? []);
     } catch { /* ignore */ }
   };
 
@@ -73,13 +73,13 @@ export function SearchPage() {
     setLoading(true);
     setHasSearched(true);
     try {
-      const res = await httpClient.get<{ data: { total: number; data: SearchResultItem[] } }>(
+      const res = await httpClient.get<{ total: number; data: SearchResultItem[] }>(
         "/search/global",
         { query: { keyword: kw.trim(), pageNum: "1", pageSize: "20" } },
       );
-      setResults(res.data?.data ?? []);
-      setTotal(res.data?.total ?? 0);
-      try { await httpClient.post("/search/history", { keyword: kw.trim() }); } catch { /* ignore */ }
+      setResults(res.data ?? []);
+      setTotal(res.total ?? 0);
+      try { await httpClient.post("/search/history", JSON.stringify(kw.trim())); } catch { /* ignore */ }
       loadHistory();
     } catch {
       toast.error("搜索失败，请重试");

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Calendar, Clock, Video, MessageCircle, Star } from "lucide-react";
+import { Calendar, Clock, Video, MessageCircle, Star, Heart, MapPin } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
-import type { Appointment, AppointmentStatus } from "@/lib/types";
+import type { Appointment, AppointmentStatus, Psychologist } from "@/lib/types";
 
 const STATUS_VARIANTS: Record<string, "secondary" | "gold" | "success" | "destructive"> = {
   "待支付": "gold",
@@ -49,6 +49,9 @@ export function PsychologyPage() {
   const [cancelReason, setCancelReason] = useState("");
   const [cancelSaving, setCancelSaving] = useState(false);
 
+  const [favorites, setFavorites] = useState<Psychologist[]>([]);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
+
   useEffect(() => {
     setLoading(true);
     api.appointment.my()
@@ -56,6 +59,16 @@ export function PsychologyPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (tab === "favorite" && favorites.length === 0) {
+      setFavoritesLoading(true);
+      api.psychologist.myFavorites()
+        .then((data) => setFavorites(data))
+        .catch(() => {})
+        .finally(() => setFavoritesLoading(false));
+    }
+  }, [tab, favorites.length]);
 
   const filtered = (() => {
     if (tab === "active") return appointments.filter((a) => a.status === "待确认" || a.status === "已预约" || a.status === "进行中");
@@ -129,12 +142,41 @@ export function PsychologyPage() {
         </TabsList>
         <TabsContent value={tab}>
           {tab === "favorite" ? (
-            <div className="py-20 text-center text-cosmic-muted">
-              还没有收藏的咨询师
-              <div className="mt-4">
-                <Link href="/consultation/psychologist"><Button variant="primary" size="sm">去发现咨询师</Button></Link>
+            favoritesLoading ? (
+              <div className="space-y-4">
+                {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
               </div>
-            </div>
+            ) : favorites.length === 0 ? (
+              <div className="py-20 text-center text-cosmic-muted">
+                还没有收藏的咨询师
+                <div className="mt-4">
+                  <Link href="/consultation/psychologist"><Button variant="primary" size="sm">去发现咨询师</Button></Link>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {favorites.map((fav) => (
+                  <Link key={fav.id} href={`/consultation/psychologist/${fav.id}`} className="cosmic-card flex items-center gap-4 p-4 transition-all hover:-translate-y-0.5 block">
+                    <div className="size-14 rounded-full flex items-center justify-center shrink-0" style={{ background: "rgba(100, 149, 237, 0.2)", boxShadow: "0 0 0 2px rgba(255, 215, 0, 0.3)" }}>
+                      {fav.avatar ? (
+                        <img src={fav.avatar} alt={fav.name} className="size-14 rounded-full object-cover" />
+                      ) : (
+                        <span className="text-xl font-bold text-cosmic-sky">{fav.name[0]}</span>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-white">{fav.name}</h3>
+                      <p className="text-xs text-cosmic-muted">{fav.title}</p>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-cosmic-dim">
+                        {fav.city && <span className="inline-flex items-center gap-0.5"><MapPin className="size-3" />{fav.city}</span>}
+                        <span className="text-cosmic-gold font-medium">¥{fav.price}/次</span>
+                      </div>
+                    </div>
+                    <Heart className="size-5 text-cosmic-gold fill-cosmic-gold shrink-0" />
+                  </Link>
+                ))}
+              </div>
+            )
           ) : tab === "chat" ? (
             <div className="py-20 text-center text-cosmic-muted">暂无图文咨询记录</div>
           ) : filtered.length === 0 ? (
@@ -176,7 +218,15 @@ export function PsychologyPage() {
                     )}
                     {item.status === "待支付" && (
                       <>
-                        <Button variant="primary" size="xs">去支付</Button>
+                        <Button variant="primary" size="xs" onClick={async () => {
+                          try {
+                            await api.appointment.pay(item.id);
+                            toast.success("支付成功");
+                            setAppointments((prev) => prev.map((a) => a.id === item.id ? { ...a, status: "待确认" as AppointmentStatus } : a));
+                          } catch {
+                            toast.error("支付失败，请重试");
+                          }
+                        }}>去支付</Button>
                         <Button variant="ghost" size="xs" className="text-red-400" onClick={() => openCancel(item.id)}>取消预约</Button>
                       </>
                     )}
