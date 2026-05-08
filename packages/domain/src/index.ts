@@ -171,6 +171,15 @@ export type InteractionItem = {
   authorRole: number;
 };
 
+export type FollowUser = {
+  userId: number;
+  nickname: string;
+  headPath: string;
+  signature: string;
+  isFollowing: boolean;
+  isFollowed: boolean;
+};
+
 export type DashboardSnapshot = {
   quote: string;
   moodScore: number;

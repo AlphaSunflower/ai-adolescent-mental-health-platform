@@ -11,6 +11,7 @@ import type {
   AssessmentRiskLevel,
   AssessmentTemplate,
   ConsultationType,
+  FollowUser,
   InteractionItem,
   LibraryItem,
   LibraryItemType,
@@ -368,6 +369,18 @@ function mapInteractionItem(value: unknown): InteractionItem {
   };
 }
 
+function mapFollowUser(value: unknown): FollowUser {
+  const d = asRecord(value);
+  return {
+    userId: asNumber(d.userId ?? d.id),
+    nickname: asString(d.nickname, ""),
+    headPath: asString(d.headPath ?? d.avatar ?? d.head_path, ""),
+    signature: asString(d.signature, ""),
+    isFollowing: asBoolean(d.isFollowing ?? d.is_following),
+    isFollowed: asBoolean(d.isFollowed ?? d.is_followed),
+  };
+}
+
 export function createHttpClient(options: HttpClientOptions) {
   const client: AxiosInstance = axios.create({
     baseURL: options.baseURL.replace(/\/$/, ""),
@@ -475,6 +488,20 @@ export function createApiClient(http: HttpClient) {
       update: (record: Record<string, unknown>, images?: string[]) =>
         http.put<string>("/medical-record/update", { record, images: images ?? [] }),
       delete: (id: number) => http.delete<string>(`/medical-record/${id}`),
+    },
+    follow: {
+      myFollowings: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/user/followings", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
+          mapFollowUser,
+        ),
+      myFollowers: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/user/followers", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
+          mapFollowUser,
+        ),
+      follow: (userId: number) => http.post<string>(`/user/follow/${userId}`),
+      unfollow: (userId: number) => http.delete<string>(`/user/follow/${userId}`),
     },
     psychologist: {
       list: async (query?: Record<string, string | number | boolean | undefined>) =>
