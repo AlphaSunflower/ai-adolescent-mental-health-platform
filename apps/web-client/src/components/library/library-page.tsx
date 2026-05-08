@@ -120,8 +120,32 @@ export function LibraryPage() {
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
       <h1 className="cosmic-page-title mb-8 text-2xl">内容馆</h1>
 
-      <div className="flex gap-6">
-        {/* Sidebar */}
+      <div className="flex flex-col gap-6 md:flex-row">
+        {/* Mobile filter tabs — horizontal scroll */}
+        <div className="md:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide">
+          <nav className="flex gap-2 pb-2">
+            {SIDEBAR_ITEMS.map((item) => {
+              const isActive = tab === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => handleNavClick(item.value)}
+                  className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm transition-colors whitespace-nowrap ${
+                    isActive
+                      ? "bg-cosmic-blue/30 text-cosmic-sky border border-cosmic-sky/30"
+                      : "bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10"
+                  }`}
+                >
+                  <item.icon className="size-3.5 shrink-0" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Desktop Sidebar */}
         <aside className="hidden md:block w-[180px] shrink-0">
           <nav className="cosmic-card sticky top-24 py-2">
             {SIDEBAR_ITEMS.map((item) => {
@@ -192,7 +216,7 @@ export function LibraryPage() {
             </div>
           ) : (
             <>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 min-w-0">
                 {items.map((item) => (
                   <Link
                     key={`${item.type}-${item.id}`}
@@ -203,8 +227,9 @@ export function LibraryPage() {
                           ? `/user/${item.authorId}/article/${item.id}`
                           : `/library/article/${item.id}`
                     }
+                    className="block min-w-0"
                   >
-                    <div className="cosmic-card group cursor-pointer overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1">
+                    <div className="cosmic-card group cursor-pointer overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 w-full">
                       {/* Cover image */}
                       {item.coverUrl && (
                         <div className="mb-4 overflow-hidden rounded-lg">

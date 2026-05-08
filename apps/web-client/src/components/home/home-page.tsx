@@ -157,9 +157,9 @@ export function HomePage() {
 
       {/* Row 2: Quick Actions */}
       <section className="mb-10">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 min-w-0">
           {SHORTCUTS.map((item) => (
-            <Link key={item.href} href={item.href}>
+            <Link key={item.href} href={item.href} className="block min-w-0">
               <Card className="cosmic-card group cursor-pointer p-5 transition-all duration-300 hover:-translate-y-1">
                 <div className={`mb-3 inline-flex rounded-xl ${item.bg} p-2.5`}>
                   <item.icon className={`size-5 ${item.color}`} />
@@ -173,9 +173,9 @@ export function HomePage() {
       </section>
 
       {/* Row 3: Three-column content */}
-      <section className="mb-10 grid gap-5 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_280px_300px]">
+      <section className="mb-10 grid gap-5 min-w-0 lg:grid-cols-[1fr_300px] xl:grid-cols-[1fr_280px_300px]">
         {/* Left: AI 咨询室 */}
-        <Card className="cosmic-card flex min-h-[320px] flex-col">
+        <Card className="cosmic-card flex min-h-[320px] flex-col min-w-0">
           <CardContent className="flex flex-1 flex-col p-5">
             <div className="mb-4 flex items-center gap-2">
               <MessageCircle className="size-5 text-cosmic-sky" />
@@ -215,7 +215,7 @@ export function HomePage() {
         </Card>
 
         {/* Middle: Appointments + Assessments */}
-        <div className="flex flex-col gap-5 xl:col-span-1 lg:col-span-1">
+        <div className="flex flex-col gap-5 xl:col-span-1 lg:col-span-1 min-w-0">
           {/* Recent Appointment */}
           <Card className="cosmic-card">
             <CardContent className="p-5">
@@ -285,7 +285,7 @@ export function HomePage() {
         </div>
 
         {/* Right: Recommendations */}
-        <Card className="cosmic-card lg:col-span-2 xl:col-span-1">
+        <Card className="cosmic-card lg:col-span-2 xl:col-span-1 min-w-0">
           <CardContent className="p-5">
             <div className="mb-4 flex items-center gap-2">
               <Sparkles className="size-4 text-cosmic-gold" />
@@ -342,7 +342,7 @@ export function HomePage() {
           </div>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 min-w-0">
           {CARE_PLAN.map((item) => (
             <Card key={item.title} className="cosmic-card p-4">
               <div className="flex items-center gap-3">
