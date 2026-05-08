@@ -491,6 +491,13 @@ export function createApiClient(http: HttpClient) {
         http.put<string>("/medical-record/update", { record, images: images ?? [] }),
       delete: (id: number) => http.delete<string>(`/medical-record/${id}`),
     },
+    message: {
+      list: async (params?: { page?: number; size?: number }) =>
+        http.get<PageResult<unknown>>("/user/messages", { query: { page: params?.page ?? 1, size: params?.size ?? 10 } }),
+      markRead: (id: number) => http.put<string>(`/user/messages/${id}/read`),
+      markAllRead: () => http.put<string>("/user/messages/read-all"),
+      unreadCount: () => http.get<number>("/user/messages/unread-count"),
+    },
     follow: {
       myFollowings: async (params?: { page?: number; size?: number }) =>
         mapPage(
