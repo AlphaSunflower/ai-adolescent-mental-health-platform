@@ -11,6 +11,7 @@ import type {
   AssessmentRiskLevel,
   AssessmentTemplate,
   ConsultationType,
+  InteractionItem,
   LibraryItem,
   LibraryItemType,
   PageResult,
@@ -353,6 +354,20 @@ function mapArticleDetail(value: unknown): ArticleDetail {
   };
 }
 
+function mapInteractionItem(value: unknown): InteractionItem {
+  const d = asRecord(value);
+  return {
+    articleId: asNumber(d.articleId ?? d.id),
+    articleTitle: asString(d.articleTitle ?? d.title, ""),
+    authorNickname: asString(d.authorNickname ?? d.nickname, ""),
+    authorId: asNumber(d.authorId ?? d.userId ?? d.author_id),
+    coverUrl: asString(d.coverUrl ?? d.cover_url ?? d.cover, ""),
+    createTime: formatDateTime(d.createTime ?? d.create_time),
+    source: asString(d.source, "user"),
+    authorRole: asNumber(d.authorRole ?? d.author_role),
+  };
+}
+
 export function createHttpClient(options: HttpClientOptions) {
   const client: AxiosInstance = axios.create({
     baseURL: options.baseURL.replace(/\/$/, ""),
@@ -436,6 +451,16 @@ export function createApiClient(http: HttpClient) {
       registerWithEmail: (payload: Record<string, string>) => http.post<string>("/user/register/email", payload),
       getUserInfo: async () => mapUserProfile(await http.get<unknown>("/user/info")),
       updateUserInfo: async (payload: Partial<UserProfile>) => mapUserProfile(await http.post<unknown>("/user/update", payload)),
+      myCollections: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/user/content/collections", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
+          mapInteractionItem,
+        ),
+      myLikes: async (params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>("/user/content/likes", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
+          mapInteractionItem,
+        ),
     },
     patient: {
       list: async () => asArray(await http.get<unknown[]>("/patient/list")).map(mapPatient),

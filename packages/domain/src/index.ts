@@ -160,6 +160,17 @@ export type ArticleDetail = {
   recommendations: { id: number; title: string; type: string }[];
 };
 
+export type InteractionItem = {
+  articleId: number;
+  articleTitle: string;
+  authorNickname: string;
+  authorId: number;
+  coverUrl: string;
+  createTime: string;
+  source: string;
+  authorRole: number;
+};
+
 export type DashboardSnapshot = {
   quote: string;
   moodScore: number;

@@ -1,0 +1,103 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Eye, Heart, MessageCircle, Clock } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import { api } from "@/lib/api";
+
+const STATUS_TABS = [
+  { value: "all", label: "全部", status: undefined },
+  { value: "pending", label: "待审核", status: 0 },
+  { value: "published", label: "已发布", status: 1 },
+  { value: "removed", label: "已下架", status: 2 },
+];
+
+type ArticleItem = {
+  id: number;
+  title: string;
+  coverUrl?: string;
+  status: number;
+  viewCount: number;
+  likeCount: number;
+  commentCount: number;
+  createTime: string;
+};
+
+export function ArticlesPage() {
+  const [tab, setTab] = useState("all");
+  const [items, setItems] = useState<ArticleItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    setLoading(true);
+    const status = STATUS_TABS.find((t) => t.value === tab)?.status;
+    api.content.communityArticles({ page, size: 10 })
+      .then((r) => { setItems(r.records as unknown as ArticleItem[]); setTotal(r.total); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [tab, page]);
+
+  const statusLabel = (s: number) => {
+    if (s === 0) return { text: "待审核", variant: "secondary" as const };
+    if (s === 1) return { text: "已发布", variant: "success" as const };
+    return { text: "已下架", variant: "secondary" as const };
+  };
+
+  if (loading) {
+    return <div className="space-y-4">{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}</div>;
+  }
+
+  return (
+    <div>
+      <h1 className="mb-6 text-xl font-bold text-white">我的发布</h1>
+      <Tabs value={tab} onValueChange={setTab}>
+        <TabsList className="mb-6">
+          {STATUS_TABS.map((t) => <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>)}
+        </TabsList>
+        <TabsContent value={tab}>
+          {items.length === 0 ? (
+            <div className="py-20 text-center text-cosmic-muted">暂无内容</div>
+          ) : (
+            <div className="space-y-3">
+              {items.map((item) => {
+                const s = statusLabel(item.status);
+                return (
+                  <div key={item.id} className="cosmic-card flex items-center gap-4 p-4">
+                    {item.coverUrl && <img src={item.coverUrl} alt="" className="size-16 rounded-lg object-cover shrink-0" />}
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/library/article/${item.id}`} className="font-medium text-white hover:text-cosmic-sky transition-colors line-clamp-1">
+                        {item.title}
+                      </Link>
+                      <div className="mt-1 flex items-center gap-3 text-xs text-cosmic-dim">
+                        <Badge variant={s.variant} className="text-xs">{s.text}</Badge>
+                        <span className="inline-flex items-center gap-1"><Eye className="size-3" />{item.viewCount}</span>
+                        <span className="inline-flex items-center gap-1"><Heart className="size-3" />{item.likeCount}</span>
+                        <span className="inline-flex items-center gap-1"><MessageCircle className="size-3" />{item.commentCount}</span>
+                        <span className="inline-flex items-center gap-1"><Clock className="size-3" />{item.createTime}</span>
+                      </div>
+                    </div>
+                    <Link href={`/library/article/${item.id}`}><Button variant="ghost" size="xs">查看</Button></Link>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+          {total > 10 && (
+            <div className="mt-4 flex justify-center gap-2">
+              <Button variant="ghost" size="icon-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
+              <span className="self-center text-sm text-cosmic-dim">{page} / {Math.ceil(total / 10)}</span>
+              <Button variant="ghost" size="icon-sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
