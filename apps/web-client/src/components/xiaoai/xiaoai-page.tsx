@@ -56,7 +56,7 @@ export function XiaoaiPage() {
     gsap.set(overlay, {
       display: "block",
       clipPath: `circle(0px at ${cx}px ${cy}px)`,
-      backgroundColor: card === "left" ? "#1e1b4b" : "#2d1a0e",
+      backgroundColor: card === "left" ? "#1e1b4b" : "#2d2000",
     });
 
     gsap.to(overlay, {
