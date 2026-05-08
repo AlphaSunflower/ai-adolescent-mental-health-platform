@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Calendar, Clock, Video, MessageCircle, Star } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -30,6 +31,7 @@ const STATUS_TABS = [
 ];
 
 export function PsychologyPage() {
+  const router = useRouter();
   const [tab, setTab] = useState("all");
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +60,7 @@ export function PsychologyPage() {
   const filtered = (() => {
     if (tab === "active") return appointments.filter((a) => a.status === "待确认" || a.status === "已预约" || a.status === "进行中");
     if (tab === "history") return appointments.filter((a) => a.status === "已完成" || a.status === "已取消");
+    if (tab === "chat") return appointments.filter((a) => a.type === "线上咨询");
     return appointments;
   })();
 
@@ -162,10 +165,10 @@ export function PsychologyPage() {
                   <div className="flex items-center gap-2 pt-2 border-t border-white/5">
                     {(item.status === "待确认" || item.status === "已预约" || item.status === "进行中") && (
                       <>
-                        <Button variant="primary" size="xs">
+                        <Button variant="primary" size="xs" onClick={() => router.push(`/consultation/chat/${item.id}`)}>
                           <Video className="size-3.5 mr-1" />进入咨询
                         </Button>
-                        <Button variant="ghost" size="xs">
+                        <Button variant="ghost" size="xs" onClick={() => router.push(`/consultation/chat/${item.id}`)}>
                           <MessageCircle className="size-3.5 mr-1" />图文咨询
                         </Button>
                         <Button variant="ghost" size="xs" className="text-red-400" onClick={() => openCancel(item.id)}>取消预约</Button>
