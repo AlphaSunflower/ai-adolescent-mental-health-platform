@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User, ThumbsUp, ThumbsDown, Heart, Share2, Eye, Clock } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -101,10 +103,23 @@ export function UserArticleDetailPage() {
       {/* Article content */}
       <div className="cosmic-card mb-6 p-6 md:p-8">
         {article.content ? (
-          <div
-            className="prose prose-invert prose-sm max-w-none prose-headings:text-white prose-a:text-cosmic-sky prose-strong:text-white prose-code:text-cosmic-gold"
-            dangerouslySetInnerHTML={{ __html: article.content }}
-          />
+          <div className="prose prose-invert max-w-none
+            prose-headings:text-white prose-headings:font-semibold
+            prose-h1:text-2xl prose-h1:mt-8 prose-h1:mb-4
+            prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
+            prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3
+            prose-p:text-cosmic-muted prose-p:leading-relaxed prose-p:my-3
+            prose-a:text-cosmic-sky prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-white prose-strong:font-semibold
+            prose-code:text-cosmic-sky prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+            prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
+            prose-blockquote:border-l-cosmic-blue/60 prose-blockquote:bg-white/5 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-cosmic-muted
+            prose-li:text-cosmic-muted prose-li:my-1
+            prose-img:rounded-xl prose-img:my-4
+            prose-hr:border-white/10
+          ">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
+          </div>
         ) : (
           <p className="text-cosmic-muted text-sm">暂无正文内容</p>
         )}
