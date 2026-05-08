@@ -73,8 +73,8 @@ export function ConsultationChatPage() {
     const id = Number(appointmentId);
     if (!id) return;
     const token = getToken();
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
-    const url = `${baseUrl.replace(/\/$/, "")}/api/psychologist/message/stream/${id}?token=${token || ""}`;
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+    const url = `${baseUrl.replace(/\/$/, "")}/psychologist/message/stream/${id}?token=${token || ""}`;
 
     let eventSource: EventSource | null = null;
     let shouldReconnect = true;

@@ -55,7 +55,7 @@ export function PublishPage() {
     const formData = new FormData();
     formData.append("file", coverFile as File);
     const token = getToken();
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080"}/article/user/cover/upload`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api"}/article/user/cover/upload`, {
       method: "POST",
       body: formData,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -69,7 +69,7 @@ export function PublishPage() {
     const formData = new FormData();
     formData.append("file", file);
     const token = getToken();
-    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
     const res = await fetch(`${baseUrl}/common/upload`, {
       method: "POST",
       body: formData,

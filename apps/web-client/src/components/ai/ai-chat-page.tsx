@@ -10,7 +10,7 @@ import { getToken, clearSession } from "@/lib/session";
 import { streamAiChat } from "@ai-adolescent-mental-health/api-client";
 import type { AiSession, AiMessage } from "@/lib/types";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
 function sessionOptions() {
   return {

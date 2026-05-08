@@ -87,7 +87,7 @@ export function InfoPage() {
         const httpClient = (api as unknown as { _http?: { post: (url: string, data?: unknown) => Promise<unknown> } })._http;
         // Use fetch directly for multipart upload
         const token = getToken();
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080"}/common/upload`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL || "/api"}/common/upload`, {
           method: "POST", body: formData,
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });

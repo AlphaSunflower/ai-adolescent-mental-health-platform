@@ -5,7 +5,7 @@ import {
 import { getToken, clearSession } from "./session";
 
 const httpClient = createHttpClient({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080",
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api",
   getToken,
   onUnauthorized: () => {
     clearSession();
