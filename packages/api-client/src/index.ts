@@ -628,7 +628,7 @@ export function createApiClient(http: HttpClient) {
           await http.get<PageResult<unknown>>("/article/user/list/published", { query: { page: params?.page ?? 1, size: params?.size ?? 12 } }),
           (item) => mapLibraryItem(item, "社区"),
         ),
-      articleDetail: async (id: number) => mapArticleDetail(await http.get<unknown>(`/article/${id}`)),
+      articleDetail: async (id: number) => mapArticleDetail(await http.get<unknown>(`/content/article/detail/${id}`)),
       bookDetail: async (id: number) => {
         const data = asRecord(await http.get<unknown>(`/book/${id}`));
         return {
@@ -644,9 +644,9 @@ export function createApiClient(http: HttpClient) {
         };
       },
       interact: (articleId: number, type: number) =>
-        http.post<string>(`/article/${articleId}/interact`, undefined, { query: { type } }),
+        http.post<string>("/content/article/interact", undefined, { query: { articleId, type } }),
       comments: async (articleId: number, page = 1, size = 20) =>
-        mapPage(await http.get<PageResult<unknown>>(`/article/${articleId}/comments`, { query: { page, size } }), (item) => {
+        mapPage(await http.get<PageResult<unknown>>(`/content/article/comments/${articleId}`, { query: { page, size } }), (item) => {
           const d = asRecord(item);
           return {
             id: asNumber(d.id),
@@ -670,8 +670,8 @@ export function createApiClient(http: HttpClient) {
           };
         }),
       addComment: (articleId: number, content: string, parentId = 0, replyToUserId?: number) =>
-        http.post<string>(`/article/${articleId}/comment`, { content, parentId, replyToUserId }),
-      likeComment: (commentId: number) => http.post<string>(`/article/comment/${commentId}/like`),
+        http.post<string>("/content/article/comment", { articleId, content, parentId, replyToUserId }),
+      likeComment: (commentId: number) => http.post<string>(`/content/article/comment/like/${commentId}`),
       articleTags: () => http.get<unknown[]>("/article/tag/list"),
       publishArticle: (payload: { title: string; content: string; coverUrl?: string; tagId?: number }) =>
         http.post<string>("/article/user", payload),
