@@ -466,6 +466,34 @@ export function createApiClient(http: HttpClient) {
       updateUserInfo: async (payload: Partial<UserProfile>) => mapUserProfile(await http.post<unknown>("/user/update", payload)),
       getPrivacy: () => http.get<Record<string, unknown>>("/user/privacy"),
       updatePrivacy: (payload: Record<string, number>) => http.put<string>("/user/privacy", payload),
+      getUserHome: async (userId: number) => {
+        const data = asRecord(await http.get<unknown>(`/user/home/${userId}`));
+        return {
+          userId: asNumber(data.userId ?? userId),
+          nickname: asString(data.nickname, "用户"),
+          headPath: asString(data.headPath ?? data.avatar, ""),
+          signature: asString(data.signature, ""),
+          isFollowing: asBoolean(data.isFollowing),
+          isFollowed: asBoolean(data.isFollowed),
+          stats: {
+            followCount: asNumber((data.stats as Record<string, unknown>)?.followCount ?? data.followCount),
+            fanCount: asNumber((data.stats as Record<string, unknown>)?.fanCount ?? data.fanCount),
+            articleCount: asNumber((data.stats as Record<string, unknown>)?.articleCount ?? data.articleCount),
+            likeCount: asNumber((data.stats as Record<string, unknown>)?.likeCount ?? data.likeCount),
+          },
+          privacy: {
+            allowViewLikes: asBoolean((data.privacy as Record<string, unknown>)?.allowViewLikes ?? true),
+            allowViewCollections: asBoolean((data.privacy as Record<string, unknown>)?.allowViewCollections ?? true),
+            allowViewFollowings: asBoolean((data.privacy as Record<string, unknown>)?.allowViewFollowings ?? true),
+            allowViewFans: asBoolean((data.privacy as Record<string, unknown>)?.allowViewFans ?? true),
+          },
+        };
+      },
+      getUserArticles: async (userId: number, params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>(`/user/home/${userId}/articles`, { query: { page: params?.page ?? 1, size: params?.size ?? 10 } }),
+          (item) => mapLibraryItem(item, "社区"),
+        ),
       myCollections: async (params?: { page?: number; size?: number }) =>
         mapPage(
           await http.get<PageResult<unknown>>("/user/content/collections", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
@@ -511,6 +539,23 @@ export function createApiClient(http: HttpClient) {
         ),
       follow: (userId: number) => http.post<string>(`/user/follow/${userId}`),
       unfollow: (userId: number) => http.delete<string>(`/user/follow/${userId}`),
+      userFollowings: async (userId: number, params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>(`/user/${userId}/followings`, { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
+          mapFollowUser,
+        ),
+      userFollowers: async (userId: number, params?: { page?: number; size?: number }) =>
+        mapPage(
+          await http.get<PageResult<unknown>>(`/user/${userId}/followers`, { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
+          mapFollowUser,
+        ),
+    },
+    psychologistApply: {
+      check: () => http.get<Record<string, unknown>>("/psychologist-apply/check"),
+      status: () => http.get<Record<string, unknown>>("/psychologist-apply/status"),
+      detail: () => http.get<Record<string, unknown>>("/psychologist-apply/detail"),
+      submitBasic: (payload: Record<string, unknown>) => http.post<string>("/psychologist-apply/basic", payload),
+      submitReport: (payload: Record<string, unknown>) => http.post<string>("/psychologist-apply/report", payload),
     },
     psychologist: {
       list: async (query?: Record<string, string | number | boolean | undefined>) =>
@@ -528,6 +573,14 @@ export function createApiClient(http: HttpClient) {
         http.post<string>(`/psychologist/appointment/${id}/rate`, undefined, { query: { rating, content, isAnonymous: 0 } }),
       my: async (status?: number) =>
         mapPage(await http.get<PageResult<unknown>>("/psychologist/appointment/my", { query: { page: 1, size: 20, status } }), mapAppointment),
+      detail: (id: number) => http.get<Record<string, unknown>>(`/psychologist/appointment/${id}/detail`),
+    },
+    chat: {
+      history: (appointmentId: number) => http.get<unknown[]>(`/psychologist/message/history/${appointmentId}`),
+      send: (appointmentId: number, receiverId: number, content: string, contentType = 0) =>
+        http.post<Record<string, unknown>>("/psychologist/message/send", { appointmentId, receiverId, content, contentType }),
+      sendImage: (appointmentId: number, receiverId: number, imageUrl: string) =>
+        http.post<Record<string, unknown>>("/psychologist/message/send/image", { appointmentId, receiverId, imageUrl }),
     },
     assessment: {
       templates: async () => asArray(await http.get<unknown[]>("/assessment/templates")).map(mapAssessmentTemplate),

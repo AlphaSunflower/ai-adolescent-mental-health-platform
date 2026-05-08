@@ -14,6 +14,7 @@ export type {
   CarePlanStatus,
   ConsultationType,
   DashboardSnapshot,
+  FollowUser,
   LibraryItem,
   LibraryItemType,
   PageResult,
