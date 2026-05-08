@@ -23,12 +23,9 @@ import { useState, useEffect } from "react";
 
 const NAV_ITEMS = [
   { href: "/home", label: "首页" },
-  { href: "/library", label: "心理文章" },
-  { href: "/library?tab=courses", label: "心理课程" },
+  { href: "/library", label: "内容馆" },
   { href: "/assessment", label: "心理测评" },
-  { href: "/consultation", label: "心理咨询" },
   { href: "/ai", label: "线上AI咨询" },
-  { href: "/library?tab=books", label: "心理书籍" },
   { href: "/xiaoai-listen", label: "小爱倾听" },
 ];
 
