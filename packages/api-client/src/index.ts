@@ -465,6 +465,16 @@ export function createApiClient(http: HttpClient) {
     patient: {
       list: async () => asArray(await http.get<unknown[]>("/patient/list")).map(mapPatient),
       add: (payload: Omit<PatientContact, "id">) => http.post<string>("/patient/add", payload),
+      update: (payload: PatientContact) => http.put<string>("/patient/update", payload),
+      delete: (id: number) => http.delete<string>(`/patient/${id}`),
+    },
+    medicalRecord: {
+      list: (patientId: number) => http.get<unknown[]>(`/medical-record/list/${patientId}`),
+      add: (record: Record<string, unknown>, images?: string[]) =>
+        http.post<string>("/medical-record/add", { record, images: images ?? [] }),
+      update: (record: Record<string, unknown>, images?: string[]) =>
+        http.put<string>("/medical-record/update", { record, images: images ?? [] }),
+      delete: (id: number) => http.delete<string>(`/medical-record/${id}`),
     },
     psychologist: {
       list: async (query?: Record<string, string | number | boolean | undefined>) =>
