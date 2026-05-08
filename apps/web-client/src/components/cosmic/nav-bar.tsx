@@ -25,6 +25,7 @@ const NAV_ITEMS = [
   { href: "/home", label: "首页" },
   { href: "/library", label: "内容馆" },
   { href: "/assessment", label: "心理测评" },
+  { href: "/consultation", label: "心理咨询" },
   { href: "/ai", label: "线上AI咨询" },
   { href: "/xiaoai-listen", label: "小爱倾听" },
 ];
