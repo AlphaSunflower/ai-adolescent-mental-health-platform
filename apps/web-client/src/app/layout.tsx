@@ -25,6 +25,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="zh-CN" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <head>
+        <link rel="icon" href="/xinyuzhilian.svg" />
+      </head>
       <body className="h-full antialiased">
         {children}
         <Toaster position="top-center" />

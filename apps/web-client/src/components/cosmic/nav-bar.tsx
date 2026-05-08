@@ -29,7 +29,7 @@ const NAV_ITEMS = [
   { href: "/consultation", label: "心理咨询" },
   { href: "/ai", label: "线上AI咨询" },
   { href: "/library?tab=books", label: "心理书籍" },
-  { href: "/xiaoai", label: "小爱倾听" },
+  { href: "/xiaoai-listen", label: "小爱倾听" },
 ];
 
 export function NavBar() {
