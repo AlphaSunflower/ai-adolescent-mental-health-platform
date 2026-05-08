@@ -34,10 +34,24 @@ export function MeLayout({ children }: { children: React.ReactNode }) {
   const [stats, setStats] = useState({ followCount: 0, fanCount: 0, likeCount: 0 });
 
   useEffect(() => {
-    api.user.getUserInfo()
-      .then(setProfile)
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const fetchData = async () => {
+      try {
+        const p = await api.user.getUserInfo();
+        setProfile(p);
+        const home = await api.user.getUserHome(p.id);
+        const homeStats = (home as Record<string, unknown>).stats as Record<string, unknown> | undefined;
+        setStats({
+          followCount: (homeStats?.followCount as number) ?? 0,
+          fanCount: (homeStats?.fanCount as number) ?? 0,
+          likeCount: (homeStats?.likeCount as number) ?? 0,
+        });
+      } catch {
+        // keep defaults
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
   const displayName = profile?.nickname || profile?.username || "用户";
