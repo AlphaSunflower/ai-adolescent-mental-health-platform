@@ -226,28 +226,30 @@ export function PsychologistListPage() {
           </div>
         </div>
 
-        {/* Fields */}
-        {p.fields.length > 0 && (
-          <div className="mb-3 flex flex-wrap gap-1">
-            {p.fields.slice(0, 3).map((f) => (
-              <span key={f} className="cosmic-tag text-xs">{f}</span>
-            ))}
-            {p.fields.length > 3 && (
-              <span className="text-xs text-cosmic-dim">+{p.fields.length - 3}</span>
-            )}
-          </div>
-        )}
-
-        {/* City */}
-        {p.city && (
-          <div className="mb-2 inline-flex items-center gap-1 rounded-md bg-purple-500/10 px-2 py-1 text-xs text-cosmic-muted">
-            <MapPin className="size-3 text-cosmic-sky" />
-            {p.city}
-          </div>
-        )}
-
-        {/* Intro */}
-        <p className="mb-4 line-clamp-2 flex-1 text-sm text-cosmic-muted">{p.intro}</p>
+        {/* Info: City, Certifications, Experience */}
+        <div className="mb-4 flex-1 space-y-1.5 text-xs text-cosmic-muted">
+          {p.city && (
+            <div className="flex items-center gap-1">
+              <MapPin className="size-3 text-cosmic-sky shrink-0" />
+              <span>{p.city}</span>
+            </div>
+          )}
+          {p.fields.length > 0 && (
+            <div className="flex items-center gap-1">
+              <Medal className="size-3 text-cosmic-gold shrink-0" />
+              <span className="line-clamp-1">{p.fields.slice(0, 3).join("、")}</span>
+            </div>
+          )}
+          {p.yearsExperience != null && p.yearsExperience > 0 && (
+            <div className="flex items-center gap-1">
+              <Clock className="size-3 text-cosmic-sky shrink-0" />
+              <span>{p.yearsExperience} 年咨询经验</span>
+            </div>
+          )}
+          {!p.city && p.fields.length === 0 && !p.yearsExperience && (
+            <span>{p.intro.slice(0, 60)}{p.intro.length > 60 ? "..." : ""}</span>
+          )}
+        </div>
 
         {/* Services + Price */}
         <div className="mb-3 border-t border-white/10 pt-3">
@@ -317,19 +319,25 @@ export function PsychologistListPage() {
             <span className="text-xs text-cosmic-muted">{p.title}</span>
           </div>
           <div className="mt-1"><RatingStars value={p.rating} /></div>
-          {p.city && (
-            <div className="mt-1 inline-flex items-center gap-1 text-xs text-cosmic-dim">
-              <MapPin className="size-3" />{p.city}
-            </div>
-          )}
-          {p.fields.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1">
-              {p.fields.slice(0, 5).map((f) => (
-                <span key={f} className="cosmic-tag text-xs">{f}</span>
-              ))}
-            </div>
-          )}
-          <p className="mt-2 line-clamp-2 text-sm text-cosmic-muted">{p.intro}</p>
+          <div className="mt-1.5 space-y-1 text-xs text-cosmic-dim">
+            {p.city && (
+              <span className="inline-flex items-center gap-1 mr-3">
+                <MapPin className="size-3" />{p.city}
+              </span>
+            )}
+            {p.fields.length > 0 && (
+              <span className="inline-flex items-center gap-1 mr-3">
+                <Medal className="size-3 text-cosmic-gold" />
+                {p.fields.slice(0, 3).join("、")}
+              </span>
+            )}
+            {p.yearsExperience != null && p.yearsExperience > 0 && (
+              <span className="inline-flex items-center gap-1">
+                <Clock className="size-3" />
+                {p.yearsExperience} 年经验
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="flex shrink-0 flex-col items-end justify-between">

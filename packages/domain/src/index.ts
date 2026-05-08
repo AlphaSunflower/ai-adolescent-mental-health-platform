@@ -53,6 +53,7 @@ export type Psychologist = {
   intro: string;
   educationBackground?: string;
   trainingExperience?: string;
+  yearsExperience?: number;
   isFavorite?: boolean;
 };
 

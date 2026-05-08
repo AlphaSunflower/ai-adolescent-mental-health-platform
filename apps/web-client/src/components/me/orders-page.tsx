@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FileText, Clock, Video, CircleCheck, Eye } from "lucide-react";
+import { FileText, Clock, Video, CircleCheck, Eye, MessageCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ const STATUS_VARIANTS: Record<AppointmentStatus, "secondary" | "gold" | "success
 };
 
 export function MeOrdersPage() {
+  const router = useRouter();
   const [orders, setOrders] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("all");
@@ -112,6 +114,16 @@ export function MeOrdersPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={STATUS_VARIANTS[o.status]}>{o.status}</Badge>
+                      {(o.status === "进行中" || o.status === "已预约") && (
+                        <Button
+                          variant="primary"
+                          size="xs"
+                          onClick={() => router.push(`/consultation/chat/${o.id}`)}
+                        >
+                          <MessageCircle className="size-3.5 mr-1" />
+                          {o.type === "线上咨询" ? "进入咨询" : "详情"}
+                        </Button>
+                      )}
                       <Button variant="ghost" size="xs" onClick={() => { setDetail(o); setDetailOpen(true); }}>
                         <Eye className="size-3.5 mr-1" />详情
                       </Button>

@@ -203,6 +203,7 @@ function mapPsychologist(value: unknown): Psychologist {
     intro: asString(data.introduction || data.intro, "暂无简介"),
     educationBackground: asString(data.educationBackground, undefined as unknown as string) || undefined,
     trainingExperience: asString(data.trainingExperience, undefined as unknown as string) || undefined,
+    yearsExperience: asNumber(data.yearsExperience, undefined as unknown as number) || undefined,
     isFavorite: asBoolean(data.isFavorited ?? data.isFavorite),
   };
 }
