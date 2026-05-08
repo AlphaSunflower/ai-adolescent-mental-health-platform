@@ -3,8 +3,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BookOpen, Eye, Clock, Search, ChevronLeft, ChevronRight, Tag } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  BookOpen, Eye, Clock, Search, ChevronLeft, ChevronRight,
+  LayoutGrid, Smile, GraduationCap, MessageCircle,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,12 +15,12 @@ import type { LibraryItem, LibraryItemType } from "@/lib/types";
 
 const PAGE_SIZE = 12;
 
-const TABS: { value: string; label: string; type: LibraryItemType | "全部" }[] = [
-  { value: "all", label: "全部", type: "全部" },
-  { value: "articles", label: "文章", type: "文章" },
-  { value: "courses", label: "课程", type: "课程" },
-  { value: "books", label: "书籍", type: "书籍" },
-  { value: "community", label: "社区", type: "社区" },
+const SIDEBAR_ITEMS: { value: string; label: string; type: LibraryItemType | "全部"; icon: typeof BookOpen }[] = [
+  { value: "all", label: "全部", type: "全部", icon: LayoutGrid },
+  { value: "articles", label: "情绪解忧馆", type: "文章", icon: Smile },
+  { value: "courses", label: "心理研习社", type: "课程", icon: GraduationCap },
+  { value: "books", label: "青春阅享", type: "书籍", icon: BookOpen },
+  { value: "community", label: "心声广场", type: "社区", icon: MessageCircle },
 ];
 
 export function LibraryPage() {
@@ -79,7 +81,7 @@ export function LibraryPage() {
     fetchItems(tab, page, keyword || undefined);
   }, [tab, page, keyword, fetchItems]);
 
-  const handleTabChange = (value: string) => {
+  const handleNavClick = (value: string) => {
     setTab(value);
     setPage(1);
     setKeyword("");
@@ -111,49 +113,66 @@ export function LibraryPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const currentTab = TABS.find((t) => t.value === tab) ?? TABS[0];
+  const currentItem = SIDEBAR_ITEMS.find((t) => t.value === tab) ?? SIDEBAR_ITEMS[0];
   const isBookTab = tab === "books";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
       <h1 className="cosmic-page-title mb-8 text-2xl">内容馆</h1>
 
-      <Tabs value={tab} onValueChange={handleTabChange}>
-        <TabsList className="mb-8 inline-flex">
-          {TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>
-              {t.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <div className="flex gap-6">
+        {/* Sidebar */}
+        <aside className="hidden md:block w-[180px] shrink-0">
+          <nav className="cosmic-card sticky top-24 py-2">
+            {SIDEBAR_ITEMS.map((item) => {
+              const isActive = tab === item.value;
+              return (
+                <button
+                  key={item.value}
+                  type="button"
+                  onClick={() => handleNavClick(item.value)}
+                  className={`flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors text-left ${
+                    isActive
+                      ? "bg-cosmic-blue/15 text-cosmic-sky border-r-2 border-cosmic-sky"
+                      : "text-cosmic-muted hover:bg-white/5 hover:text-white"
+                  }`}
+                >
+                  <item.icon className="size-4 shrink-0" />
+                  <span>{item.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
 
-        {/* Book search */}
-        {isBookTab && (
-          <form onSubmit={handleSearch} className="mb-6 flex gap-2">
-            <div className="flex flex-1 max-w-md">
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="搜索书籍..."
-                className="cosmic-input flex-1 rounded-lg rounded-r-none bg-white/10 px-4 py-2 text-sm"
-              />
-              <button
-                type="submit"
-                className="flex items-center justify-center rounded-lg rounded-l-none bg-cosmic-blue/60 px-4 text-white hover:bg-cosmic-blue/80 transition-colors"
-              >
-                <Search className="size-4" />
-              </button>
-            </div>
-            {keyword && (
-              <Button variant="ghost" size="sm" onClick={handleClearSearch}>
-                清除
-              </Button>
-            )}
-          </form>
-        )}
+        {/* Content */}
+        <main className="flex-1 min-w-0">
+          {/* Book search */}
+          {isBookTab && (
+            <form onSubmit={handleSearch} className="mb-6 flex gap-2">
+              <div className="flex flex-1 max-w-md">
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  placeholder="搜索书籍..."
+                  className="cosmic-input flex-1 rounded-lg rounded-r-none bg-white/10 px-4 py-2 text-sm"
+                />
+                <button
+                  type="submit"
+                  className="flex items-center justify-center rounded-lg rounded-l-none bg-cosmic-blue/60 px-4 text-white hover:bg-cosmic-blue/80 transition-colors"
+                >
+                  <Search className="size-4" />
+                </button>
+              </div>
+              {keyword && (
+                <Button variant="ghost" size="sm" onClick={handleClearSearch}>
+                  清除
+                </Button>
+              )}
+            </form>
+          )}
 
-        <TabsContent value={tab} className="space-y-0">
           {loading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
@@ -169,7 +188,7 @@ export function LibraryPage() {
           ) : items.length === 0 ? (
             <div className="py-20 text-center text-cosmic-muted">
               <BookOpen className="mx-auto mb-4 size-12 opacity-30" />
-              <p>暂无{currentTab.label}内容</p>
+              <p>暂无{currentItem.label}内容</p>
             </div>
           ) : (
             <>
@@ -240,7 +259,6 @@ export function LibraryPage() {
                   {Array.from({ length: totalPages }).map((_, i) => {
                     const pageNum = i + 1;
                     const isCurrent = pageNum === page;
-                    // Show first, last, current, and pages around current
                     const showPage =
                       pageNum === 1 ||
                       pageNum === totalPages ||
@@ -286,8 +304,8 @@ export function LibraryPage() {
               )}
             </>
           )}
-        </TabsContent>
-      </Tabs>
+        </main>
+      </div>
     </div>
   );
 }
