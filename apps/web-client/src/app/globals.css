@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -113,6 +114,40 @@
 @keyframes quoteOut {
   from { opacity: 1; transform: translateY(0) scale(1); }
   to { opacity: 0; transform: translateY(-30px) scale(0.95); }
+}
+
+@keyframes portalWave {
+  0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.7; transform: translate(-50%, -50%) scale(1.08); }
+}
+
+@keyframes portalWaveReverse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.05); }
+  50% { opacity: 0.2; transform: translate(-50%, -50%) scale(0.95); }
+}
+
+@keyframes portalDividerPulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes portalDividerPulseReverse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.15; }
+}
+
+@keyframes portalParticleFloat {
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  20% { opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { transform: translateY(-60px) scale(0.5); opacity: 0; }
+}
+
+@keyframes portalCardParticleFloat {
+  0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+  30% { opacity: 0.8; }
+  70% { opacity: 0.8; }
+  100% { transform: translateY(-40px) translateX(10px) scale(0.4); opacity: 0; }
 }
 
 /* ── Base Layer ── */
@@ -317,5 +352,40 @@
   /* Glow border animation */
   .glow-border-animate {
     animation: glow 2s ease-in-out infinite alternate;
+  }
+
+  /* Portal wave */
+  .portal-wave {
+    animation: portalWave 4s ease-in-out infinite;
+  }
+  .portal-wave-reverse {
+    animation: portalWaveReverse 4s ease-in-out infinite;
+  }
+
+  /* Portal divider */
+  .portal-divider {
+    animation: portalDividerPulse 3s ease-in-out infinite;
+  }
+  .portal-divider-reverse {
+    animation: portalDividerPulseReverse 3s ease-in-out infinite;
+  }
+
+  /* Portal ambient particles */
+  .portal-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(168, 139, 250, 0.6);
+    animation: portalParticleFloat 5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Portal card hover particles */
+  .portal-card-particle {
+    position: absolute;
+    border-radius: 50%;
+    width: 3px;
+    height: 3px;
+    animation: portalCardParticleFloat 2s ease-in-out infinite;
+    pointer-events: none;
   }
 }

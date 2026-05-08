@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Search, User, LogOut, MessageCircle, FileText, Settings,
-  ShoppingBag, Heart, Menu, X, Star
+  ShoppingBag, Heart, Menu, X, Star, Headphones, ChevronDown
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -19,15 +19,19 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { isLoggedIn, getStoredUser, clearSession } from "@/lib/session";
 import { api } from "@/lib/api";
 import { type UserProfile } from "@/lib/types";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const NAV_ITEMS = [
   { href: "/home", label: "首页" },
   { href: "/library", label: "内容馆" },
   { href: "/assessment", label: "心理测评" },
+  { href: "/xiaoai", label: "小爱心理倾诉" },
   { href: "/consultation", label: "心理咨询" },
-  { href: "/ai", label: "线上AI咨询" },
-  { href: "/xiaoai-listen", label: "小爱倾听" },
+];
+
+const XIAOAI_CHILDREN = [
+  { href: "/ai", label: "文字倾诉咨询", icon: MessageCircle },
+  { href: "/xiaoai-listen", label: "视听倾听陪伴", icon: Headphones },
 ];
 
 export function NavBar() {
@@ -36,6 +40,16 @@ export function NavBar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [xiaoaiOpen, setXiaoaiOpen] = useState(false);
+  const xiaoaiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleXiaoaiEnter = () => {
+    if (xiaoaiTimer.current) clearTimeout(xiaoaiTimer.current);
+    setXiaoaiOpen(true);
+  };
+  const handleXiaoaiLeave = () => {
+    xiaoaiTimer.current = setTimeout(() => setXiaoaiOpen(false), 150);
+  };
 
   useEffect(() => {
     setLoggedIn(isLoggedIn());
@@ -73,15 +87,50 @@ export function NavBar() {
 
       {/* Nav Menu — desktop */}
       <nav className="hidden items-center gap-0.5 xl:flex">
-        {NAV_ITEMS.map((item) => (
-          <Link
-            key={item.href + item.label}
-            href={item.href}
-            className="rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/10 hover:text-cosmic-nav-hover"
-          >
-            {item.label}
-          </Link>
-        ))}
+        {NAV_ITEMS.map((item) => {
+          if (item.label === "小爱心理倾诉") {
+            return (
+              <div
+                key={item.label}
+                className="relative"
+                onMouseEnter={handleXiaoaiEnter}
+                onMouseLeave={handleXiaoaiLeave}
+              >
+                <Link
+                  href={item.href}
+                  className="inline-flex items-center gap-1 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/10 hover:text-cosmic-nav-hover"
+                >
+                  {item.label}
+                  <ChevronDown className={`size-3 transition-transform duration-200 ${xiaoaiOpen ? "rotate-180" : ""}`} />
+                </Link>
+                {xiaoaiOpen && (
+                  <div className="absolute left-0 top-full mt-1 w-44 rounded-xl border border-white/10 bg-cosmic-dropdown/95 backdrop-blur-xl py-1 shadow-lg shadow-black/40 animate-slideUp">
+                    {XIAOAI_CHILDREN.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        onMouseEnter={handleXiaoaiEnter}
+                        className="flex items-center gap-3 px-4 py-2.5 text-sm text-cosmic-muted hover:bg-white/10 hover:text-white transition-colors"
+                      >
+                        <child.icon className="size-4 shrink-0" />
+                        <span>{child.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+          return (
+            <Link
+              key={item.href + item.label}
+              href={item.href}
+              className="rounded-lg px-3 py-2 text-sm transition-colors hover:bg-white/10 hover:text-cosmic-nav-hover"
+            >
+              {item.label}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Search — desktop */}
@@ -196,16 +245,42 @@ export function NavBar() {
           </SheetTrigger>
           <SheetContent side="right" className="w-64 pt-12">
             <nav className="flex flex-col gap-1">
-              {NAV_ITEMS.map((item) => (
-                <Link
-                  key={item.href + item.label}
-                  href={item.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg px-4 py-3 text-sm text-cosmic-header hover:bg-white/10 transition-colors"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {NAV_ITEMS.map((item) => {
+                if (item.label === "小爱心理倾诉") {
+                  return (
+                    <div key={item.label}>
+                      <Link
+                        href={item.href}
+                        onClick={() => setMobileOpen(false)}
+                        className="block rounded-lg px-4 py-3 text-sm text-cosmic-header hover:bg-white/10 transition-colors font-medium"
+                      >
+                        {item.label}
+                      </Link>
+                      {XIAOAI_CHILDREN.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="flex items-center gap-3 rounded-lg px-8 py-2.5 text-sm text-cosmic-muted hover:bg-white/10 transition-colors"
+                        >
+                          <child.icon className="size-4 shrink-0" />
+                          <span>{child.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  );
+                }
+                return (
+                  <Link
+                    key={item.href + item.label}
+                    href={item.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="rounded-lg px-4 py-3 text-sm text-cosmic-header hover:bg-white/10 transition-colors"
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
               <div className="mt-4 border-t border-white/10 pt-4">
                 <form
                   onSubmit={(e) => {
