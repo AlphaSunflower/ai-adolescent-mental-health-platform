@@ -42,6 +42,8 @@ export function PsychologistDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -179,7 +181,17 @@ export function PsychologistDetailPage() {
             <Button
               variant={isFavorite ? "gold" : "outline"}
               size="sm"
-              onClick={() => { setIsFavorite(!isFavorite); toast.success(isFavorite ? "已取消收藏" : "已收藏"); }}
+              onClick={async () => {
+                const wasFavorite = isFavorite;
+                setIsFavorite(!isFavorite);
+                try {
+                  await api.psychologist.favorite(p.id);
+                  toast.success(wasFavorite ? "已取消收藏" : "已收藏");
+                } catch {
+                  setIsFavorite(wasFavorite);
+                  toast.error("操作失败，请重试");
+                }
+              }}
             >
               <Heart className={`mr-1 size-4 ${isFavorite ? "fill-current" : ""}`} />
               {isFavorite ? "已收藏" : "收藏"}
@@ -392,6 +404,8 @@ export function PsychologistDetailPage() {
                     rows={4}
                     className="cosmic-input w-full rounded-xl px-4 py-3 text-sm resize-none"
                     placeholder="请描述您希望咨询的主要问题..."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
 
@@ -401,10 +415,39 @@ export function PsychologistDetailPage() {
 
                 <DialogFooter>
                   <DialogClose asChild>
-                    <Button variant="outline" size="sm">取消</Button>
+                    <Button variant="outline" size="sm" disabled={submitting}>取消</Button>
                   </DialogClose>
-                  <Button variant="primary" size="sm">
-                    确认预约
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    disabled={submitting || !description.trim()}
+                    onClick={async () => {
+                      if (!description.trim()) {
+                        toast.error("请填写主要问题");
+                        return;
+                      }
+                      setSubmitting(true);
+                      try {
+                        const svc = selectedService
+                          ? services.find((s) => s.type === selectedService)
+                          : services[0];
+                        const isOnline = svc?.type === "online" || selectedService === "online";
+                        await api.appointment.create({
+                          description: description.trim(),
+                          type: isOnline ? 1 : 0,
+                        });
+                        toast.success("预约成功");
+                        setBookingOpen(false);
+                        setDescription("");
+                        setSelectedService(null);
+                      } catch {
+                        toast.error("预约失败，请重试");
+                      } finally {
+                        setSubmitting(false);
+                      }
+                    }}
+                  >
+                    {submitting ? "预约中..." : "确认预约"}
                   </Button>
                 </DialogFooter>
               </div>
