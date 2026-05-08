@@ -489,6 +489,11 @@ export function createApiClient(http: HttpClient) {
         mapAssessmentRecord(await http.post<unknown>(`/assessment/submit/${templateId}`, { answers, patientContactId })),
       records: async () =>
         mapPage(await http.get<PageResult<unknown>>("/assessment/records", { query: { page: 1, size: 20 } }), mapAssessmentRecord),
+      recordDetail: (id: number) => http.get<Record<string, unknown>>(`/assessment/record/${id}`),
+    },
+    feedback: {
+      platform: () => http.get<PageResult<unknown>>("/feedback/platform/my", { query: { page: 1, size: 100 } }),
+      consultation: () => http.get<PageResult<unknown>>("/feedback/consultation/my", { query: { page: 1, size: 100 } }),
     },
     ai: {
       sessions: async () => asArray(await http.get<unknown[]>("/ai/sessions")).map(mapAiSession),
