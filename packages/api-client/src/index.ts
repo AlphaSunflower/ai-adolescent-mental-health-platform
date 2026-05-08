@@ -464,6 +464,8 @@ export function createApiClient(http: HttpClient) {
       registerWithEmail: (payload: Record<string, string>) => http.post<string>("/user/register/email", payload),
       getUserInfo: async () => mapUserProfile(await http.get<unknown>("/user/info")),
       updateUserInfo: async (payload: Partial<UserProfile>) => mapUserProfile(await http.post<unknown>("/user/update", payload)),
+      getPrivacy: () => http.get<Record<string, unknown>>("/user/privacy"),
+      updatePrivacy: (payload: Record<string, number>) => http.put<string>("/user/privacy", payload),
       myCollections: async (params?: { page?: number; size?: number }) =>
         mapPage(
           await http.get<PageResult<unknown>>("/user/content/collections", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
