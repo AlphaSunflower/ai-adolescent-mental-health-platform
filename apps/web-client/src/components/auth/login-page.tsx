@@ -11,12 +11,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { saveSession } from "@/lib/session";
+import { safeRedirect } from "@/lib/safe-redirect";
 import { PeekCharacters, W, H } from "./peek-characters";
 
 export function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = searchParams.get("redirect") ?? "/me";
+  const nextPath = safeRedirect(searchParams.get("redirect"), "/me");
 
   const [tab, setTab] = useState("account");
   const [showPwd, setShowPwd] = useState(false);

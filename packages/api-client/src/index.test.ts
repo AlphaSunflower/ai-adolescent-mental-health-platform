@@ -252,3 +252,48 @@ describe("streamAiChat", () => {
     ).rejects.toThrow(ApiClientError);
   });
 });
+
+describe("api.user forgot-password", () => {
+  it("sendForgotPasswordCode calls POST /user/forgot/send", async () => {
+    const post = vi.fn().mockResolvedValue("ok");
+    const http = { raw: {} as never, get: vi.fn(), post, put: vi.fn(), delete: vi.fn() };
+    const api = createApiClient(http);
+
+    await api.user.sendForgotPasswordCode("alice", "alice@test.com");
+
+    expect(post).toHaveBeenCalledWith("/user/forgot/send", {
+      username: "alice",
+      email: "alice@test.com",
+    });
+  });
+
+  it("verifyForgotPasswordCode calls POST /user/forgot/verify", async () => {
+    const post = vi.fn().mockResolvedValue("ok");
+    const http = { raw: {} as never, get: vi.fn(), post, put: vi.fn(), delete: vi.fn() };
+    const api = createApiClient(http);
+
+    await api.user.verifyForgotPasswordCode("alice", "alice@test.com", "123456");
+
+    expect(post).toHaveBeenCalledWith("/user/forgot/verify", {
+      username: "alice",
+      email: "alice@test.com",
+      code: "123456",
+    });
+  });
+
+  it("resetPassword calls POST /user/forgot/reset", async () => {
+    const post = vi.fn().mockResolvedValue("ok");
+    const http = { raw: {} as never, get: vi.fn(), post, put: vi.fn(), delete: vi.fn() };
+    const api = createApiClient(http);
+
+    await api.user.resetPassword("alice", "alice@test.com", "123456", "newPwd", "newPwd");
+
+    expect(post).toHaveBeenCalledWith("/user/forgot/reset", {
+      username: "alice",
+      email: "alice@test.com",
+      code: "123456",
+      newPassword: "newPwd",
+      confirmPassword: "newPwd",
+    });
+  });
+});

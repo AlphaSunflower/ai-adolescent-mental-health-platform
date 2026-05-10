@@ -531,6 +531,12 @@ export function createApiClient(http: HttpClient) {
           await http.get<PageResult<unknown>>("/user/content/likes", { query: { page: params?.page ?? 1, size: params?.size ?? 20 } }),
           mapInteractionItem,
         ),
+      sendForgotPasswordCode: (username: string, email: string) =>
+        http.post<string>("/user/forgot/send", { username, email }),
+      verifyForgotPasswordCode: (username: string, email: string, code: string) =>
+        http.post<string>("/user/forgot/verify", { username, email, code }),
+      resetPassword: (username: string, email: string, code: string, newPassword: string, confirmPassword: string) =>
+        http.post<string>("/user/forgot/reset", { username, email, code, newPassword, confirmPassword }),
     },
     patient: {
       list: async () => asArray(await http.get<unknown[]>("/patient/list")).map(mapPatient),
