@@ -745,7 +745,7 @@ export function createApiClient(http: HttpClient) {
       interact: (articleId: number, type: number) =>
         http.post<string>("/content/article/interact", undefined, { query: { articleId, type } }),
       comments: async (articleId: number, page = 1, size = 20) =>
-        mapPage(await http.get<PageResult<unknown>>(`/content/article/comments/${articleId}`, { query: { page, size } }), (item) => {
+        asArray(await http.get<unknown[]>(`/content/article/comments/${articleId}`, { query: { page, size } })).map((item) => {
           const d = asRecord(item);
           return {
             id: asNumber(d.id),
@@ -775,7 +775,7 @@ export function createApiClient(http: HttpClient) {
       publishArticle: (payload: { title: string; content: string; coverUrl?: string; tagId?: number }) =>
         http.post<string>("/article/user", payload),
       bookComments: async (bookId: number, page = 1, size = 10) =>
-        mapPage(await http.get<PageResult<unknown>>(`/book/${bookId}/comments`, { query: { page, size } }), (item) => {
+        mapPage(await http.get<PageResult<unknown>>(`/book/${bookId}/comment/list`, { query: { page, size } }), (item) => {
           const d = asRecord(item);
           return {
             id: asNumber(d.id),
@@ -817,14 +817,20 @@ export async function streamAiChat(
 
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
+  let buffer = "";
   while (true) {
     const { done, value } = await reader.read();
     if (done) break;
-    decoder
-      .decode(value, { stream: true })
-      .split("\n")
-      .map((line) => line.replace(/^data:\s*/, "").trim())
-      .filter(Boolean)
-      .forEach(onChunk);
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? "";
+    for (const line of lines) {
+      const data = line.replace(/^data: ?/, "");
+      if (data) onChunk(data);
+    }
+  }
+  if (buffer) {
+    const data = buffer.replace(/^data: ?/, "");
+    if (data) onChunk(data);
   }
 }

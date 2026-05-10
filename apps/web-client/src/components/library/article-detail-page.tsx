@@ -97,7 +97,7 @@ export function ArticleDetailPage() {
     setCommentsLoading(true);
     try {
       const result = await api.content.comments(Number(id));
-      setComments(result.records as Comment[]);
+      setComments(result as Comment[]);
     } catch { /* silently fail */ } finally {
       setCommentsLoading(false);
     }
