@@ -1,4 +1,4 @@
-# AGENT.md — `apps/web-admin`
+# AGENTS.md — `apps/web-admin`
 
 > 面向 AI 编码助手的管理后台（Web Admin）工作区速查。动手前请同时参阅根 [AGENTS.md](../../AGENTS.md)。
 >

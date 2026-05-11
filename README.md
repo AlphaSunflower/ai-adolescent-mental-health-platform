@@ -147,8 +147,8 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 
 - 面向 AI 编码助手（Claude Code / Codex / Cursor 等）的上下文速查：[AGENTS.md](AGENTS.md)
 - 各 app 单独的 AI 指引：
-  - [apps/backend/AGENT.md](apps/backend/AGENT.md)
-  - [apps/web-admin/AGENT.md](apps/web-admin/AGENT.md)
-  - [apps/android/AGENT.md](apps/android/AGENT.md)
-  - [apps/wechat-miniapp/AGENT.md](apps/wechat-miniapp/AGENT.md)
-  - [apps/wechat-functions/AGENT.md](apps/wechat-functions/AGENT.md)
+  - [apps/backend/AGENTS.md](apps/backend/AGENTS.md)
+  - [apps/web-admin/AGENTS.md](apps/web-admin/AGENTS.md)
+  - [apps/android/AGENTS.md](apps/android/AGENTS.md)
+  - [apps/wechat-miniapp/AGENTS.md](apps/wechat-miniapp/AGENTS.md)
+  - [apps/wechat-functions/AGENTS.md](apps/wechat-functions/AGENTS.md)

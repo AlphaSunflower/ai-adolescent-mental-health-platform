@@ -105,8 +105,8 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 
 进入任何一个 `apps/<name>` 修改前，请先读该目录下的 `AGENTS.md`：
 
-- [apps/backend/AGENT.md](apps/backend/AGENT.md)
-- [apps/web-admin/AGENT.md](apps/web-admin/AGENT.md)
-- [apps/android/AGENT.md](apps/android/AGENT.md)
-- [apps/wechat-miniapp/AGENT.md](apps/wechat-miniapp/AGENT.md)
-- [apps/wechat-functions/AGENT.md](apps/wechat-functions/AGENT.md)
+- [apps/backend/AGENTS.md](apps/backend/AGENTS.md)
+- [apps/web-admin/AGENTS.md](apps/web-admin/AGENTS.md)
+- [apps/android/AGENTS.md](apps/android/AGENTS.md)
+- [apps/wechat-miniapp/AGENTS.md](apps/wechat-miniapp/AGENTS.md)
+- [apps/wechat-functions/AGENTS.md](apps/wechat-functions/AGENTS.md)

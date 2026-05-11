@@ -1,4 +1,4 @@
-# AGENT.md — `apps/android`
+# AGENTS.md — `apps/android`
 
 > 面向 AI 编码助手的 Android 客户端工作区速查。动手前请同时参阅根 [AGENTS.md](../../AGENTS.md)。
 >

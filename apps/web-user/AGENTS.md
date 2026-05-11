@@ -1,4 +1,4 @@
-# AGENT.md — 用户端 Web
+# AGENTS.md — 用户端 Web
 
 ## 定位
 

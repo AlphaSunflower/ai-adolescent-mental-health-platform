@@ -1,4 +1,4 @@
-# AGENT.md — `apps/web-client`
+# AGENTS.md — `apps/web-client`
 
 > 面向 AI 编码助手的 web-client（Next.js 前端）工作区速查。动手前请同时参阅根 [AGENTS.md](../../AGENTS.md)。
 >

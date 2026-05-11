@@ -1,4 +1,4 @@
-# AGENT.md — `apps/wechat-functions`
+# AGENTS.md — `apps/wechat-functions`
 
 > 面向 AI 编码助手的微信云函数工作区速查。动手前请同时参阅根 [AGENTS.md](../../AGENTS.md)。
 >

@@ -1,4 +1,4 @@
-# AGENT.md — `apps/wechat-miniapp`
+# AGENTS.md — `apps/wechat-miniapp`
 
 > 面向 AI 编码助手的微信小程序工作区速查。动手前请同时参阅根 [AGENTS.md](../../AGENTS.md) 以及本目录下已有的 [README.md](README.md)。
 >
