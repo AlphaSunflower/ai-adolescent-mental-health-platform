@@ -1,4 +1,4 @@
-# AGENT.md — 根目录 AI 协作速查
+# AGENTS.md — 根目录 AI 协作速查
 
 > 本文件是面向 AI 编码助手（Claude Code / Codex / Cursor 等）的上下文速查清单。先读这里再动手。人类开发者请优先阅读 [README.md](README.md)。
 
@@ -58,23 +58,23 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 ## 四、变更约束（AI 请严格遵守）
 
 1. **不要修改 `pnpm-lock.yaml`**，除非用户明确要求升级/新增依赖。
-2. **不要擅自新增 `CLAUDE.md`、`.cursorrules`、`.github/copilot-instructions.md` 等其他 AI 规约文件**；本仓库统一使用 `AGENT.md`。
+2. **不要擅自新增 `CLAUDE.md`、`.cursorrules`、`.github/copilot-instructions.md` 等其他 AI 规约文件**；本仓库统一使用 `AGENTS.md`。
 3. **不要跨 app 复制源文件**。各端独立演进，若需共享 SQL/常量，考虑放 `infra/`。
 4. **修改根级配置前先说明理由**：`turbo.json`、`pnpm-workspace.yaml`、根 `package.json`、`apps/backend/src/main/resources/application*.yml`。
 5. **不要提交真实密钥或环境配置文件**。后端敏感项和环境差异通过 `${ENV_VAR}` 读取，本地可用 `apps/backend/.env`；不要提交真实 `.env` 或 `application-dev.yml`、`application-test.yml`、`application-local.yml` 等 profile 配置。
 6. **工作区内新增依赖**走对应子目录的 `package.json` / `pom.xml` / `build.gradle.kts`；不要把 app 级依赖塞到根 `package.json`。
 7. **文档默认不写 emoji**，与仓库既有风格一致。
 
-## 五、文档自更新（AGENT.md / README.md 维护）
+## 五、文档自更新（AGENTS.md / README.md 维护）
 
-- **允许并鼓励** AI 编码助手在以下情况**主动更新** `README.md` 与任意 `AGENT.md`：
+- **允许并鼓励** AI 编码助手在以下情况**主动更新** `README.md` 与任意 `AGENTS.md`：
   - 发现文档描述与代码现状不符（脚本名、路径、版本号、依赖、端口、业务域划分等漂移）
   - 新增或删除了工作区、脚本、环境变量、外部服务依赖
   - 引入了新的约定 / 陷阱 / 常见坑，值得沉淀给后续 AI 或人类
-  - 用户在对话中给出了应长期遵循的规则（例如「以后新增接口都要 xxx」），应沉淀到对应 AGENT.md
+  - 用户在对话中给出了应长期遵循的规则（例如「以后新增接口都要 xxx」），应沉淀到对应 AGENTS.md
 - 更新时遵循：
   1. **先改代码 / 配置，再同步文档**，避免文档先于事实。
-  2. **就近原则**：全局约束写根 `AGENT.md`；仅某个 app 的约束写 `apps/<name>/AGENT.md`。
+  2. **就近原则**：全局约束写根 `AGENTS.md`；仅某个 app 的约束写 `apps/<name>/AGENTS.md`。
   3. **保持锚点准确**：引用的版本号、包名、脚本名须能在当前仓库中核对到。
   4. **在 PR / 提交信息中说明文档变更**，方便 reviewer 对齐认知。
 - **不要**在未征得用户同意时：新增 `CLAUDE.md` / `.cursorrules` 等平行规约文件；大规模重写文档风格；删除他人添加但你不理解的条目（先询问）。
@@ -103,10 +103,10 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 
 ## 八、子工作区深入阅读
 
-进入任何一个 `apps/<name>` 修改前，请先读该目录下的 `AGENT.md`：
+进入任何一个 `apps/<name>` 修改前，请先读该目录下的 `AGENTS.md`：
 
-- [apps/backend/AGENT.md](apps/backend/AGENT.md)
-- [apps/web-admin/AGENT.md](apps/web-admin/AGENT.md)
-- [apps/android/AGENT.md](apps/android/AGENT.md)
-- [apps/wechat-miniapp/AGENT.md](apps/wechat-miniapp/AGENT.md)
-- [apps/wechat-functions/AGENT.md](apps/wechat-functions/AGENT.md)
+- [apps/backend/AGENTS.md](apps/backend/AGENTS.md)
+- [apps/web-admin/AGENTS.md](apps/web-admin/AGENTS.md)
+- [apps/android/AGENTS.md](apps/android/AGENTS.md)
+- [apps/wechat-miniapp/AGENTS.md](apps/wechat-miniapp/AGENTS.md)
+- [apps/wechat-functions/AGENTS.md](apps/wechat-functions/AGENTS.md)
