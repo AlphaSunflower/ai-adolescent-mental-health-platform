@@ -34,6 +34,7 @@ pnpm typecheck      # turbo run typecheck
 pnpm clean          # turbo run clean + 清理 .turbo
 
 pnpm dev:backend           # 只起后端
+pnpm dev:web-client        # 只起 web-client
 pnpm dev:web-admin         # 只起前端
 pnpm test:backend          # 只跑后端测试
 pnpm test:android          # 只跑 Android 测试

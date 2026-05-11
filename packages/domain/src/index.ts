@@ -31,10 +31,9 @@ export type UserProfile = {
 export type PatientContact = {
   id: number;
   name: string;
-  relation: string;
-  age: number;
-  gender: string;
-  phone?: string;
+  relationship: string;
+  sex: number;
+  birthday: string;
 };
 
 export type Psychologist = {
@@ -51,6 +50,9 @@ export type Psychologist = {
   availableToday: boolean;
   serviceTypes: string[];
   intro: string;
+  educationBackground?: string;
+  trainingExperience?: string;
+  yearsExperience?: number;
   isFavorite?: boolean;
 };
 
@@ -122,8 +124,10 @@ export type LibraryItem = {
   tag: string;
   summary: string;
   author: string;
+  authorId?: number;
   readTime: string;
   views: number;
+  coverUrl?: string;
 };
 
 export type CarePlanStatus = "进行中" | "待开始" | "已完成";
@@ -133,6 +137,48 @@ export type CarePlanItem = {
   title: string;
   status: CarePlanStatus;
   accent: "green" | "purple" | "yellow" | "coral" | "teal";
+};
+
+export type ArticleDetail = {
+  id: number;
+  title: string;
+  content: string;
+  tagName?: string;
+  type?: string;
+  createTime: string;
+  viewCount: number;
+  likeCount: number;
+  dislikeCount: number;
+  collectionCount: number;
+  commentCount: number;
+  authorName: string;
+  authorAvatar?: string;
+  authorRole?: number;
+  hospitalName?: string;
+  liked: boolean;
+  disliked: boolean;
+  collected: boolean;
+  recommendations: { id: number; title: string; type: string }[];
+};
+
+export type InteractionItem = {
+  articleId: number;
+  articleTitle: string;
+  authorNickname: string;
+  authorId: number;
+  coverUrl: string;
+  createTime: string;
+  source: string;
+  authorRole: number;
+};
+
+export type FollowUser = {
+  userId: number;
+  nickname: string;
+  headPath: string;
+  signature: string;
+  isFollowing: boolean;
+  isFollowed: boolean;
 };
 
 export type DashboardSnapshot = {

@@ -11,6 +11,7 @@
     "clean": "turbo run clean && node -e \"require('node:fs').rmSync('.turbo', { recursive: true, force: true })\"",
     "dev": "turbo run dev --parallel",
     "dev:backend": "pnpm --filter @ai-adolescent-mental-health/backend dev",
+    "dev:web-client": "pnpm --filter @ai-adolescent-mental-health/web-client dev",
     "dev:web-admin": "pnpm --filter @ai-adolescent-mental-health/web-admin dev",
     "dev:web-user": "pnpm --filter @ai-adolescent-mental-health/web-user dev",
     "test": "turbo run test",
