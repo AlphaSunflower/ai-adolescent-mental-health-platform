@@ -73,6 +73,7 @@ src/
 通过 monorepo 根目录执行：
 
 ```bash
+pnpm dev:web-client                              # 等价：pnpm --filter @ai-adolescent-mental-health/web-client dev
 pnpm --filter @ai-adolescent-mental-health/web-client dev        # next dev --port 3100（Turbopack）
 pnpm --filter @ai-adolescent-mental-health/web-client build      # next build
 pnpm --filter @ai-adolescent-mental-health/web-client start      # next start

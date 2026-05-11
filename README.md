@@ -64,6 +64,7 @@ pnpm dev
 
 ```bash
 pnpm dev:backend      # 等价：pnpm --filter @ai-adolescent-mental-health/backend dev
+pnpm dev:web-client   # 等价：pnpm --filter @ai-adolescent-mental-health/web-client dev
 pnpm dev:web-admin    # 等价：pnpm --filter @ai-adolescent-mental-health/web-admin dev
 ```
 
@@ -83,7 +84,7 @@ pnpm dev:web-admin    # 等价：pnpm --filter @ai-adolescent-mental-health/web-
 | `pnpm test` | 先构建依赖再运行测试 |
 | `pnpm typecheck` | 对支持的工作区执行类型检查 |
 | `pnpm clean` | 清理各工作区产物及根目录 `.turbo` |
-| `pnpm dev:backend` / `pnpm dev:web-admin` | 单独启动后端 / 管理后台开发 |
+| `pnpm dev:backend` / `pnpm dev:web-client` / `pnpm dev:web-admin` | 单独启动后端 / web-client / 管理后台开发 |
 | `pnpm test:backend` / `pnpm test:android` | 只跑后端 / Android 测试 |
 | `pnpm typecheck:web-admin` | 只跑管理后台类型检查 |
 
