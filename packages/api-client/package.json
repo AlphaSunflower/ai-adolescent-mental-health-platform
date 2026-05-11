@@ -1,0 +1,20 @@
+{
+  "name": "@ai-adolescent-mental-health/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\""
+  },
+  "dependencies": {
+    "@ai-adolescent-mental-health/domain": "workspace:*",
+    "axios": "^1.13.5"
+  },
+  "devDependencies": {
+    "typescript": "^5"
+  }
+}
