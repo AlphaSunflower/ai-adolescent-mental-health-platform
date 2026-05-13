@@ -1,13 +1,9 @@
 -- ================================================================
--- 邮箱绑定微信登录 - 数据库结构变更
--- 执行时间: 2026-03-22
+-- 邮箱绑定微信登录 - 邮箱验证码表
+-- wx_gzh_id / email_verified 已合入 schema.sql，此处仅保留建表
 -- ================================================================
 
--- 1. User表新增字段：微信公众号OpenID 和 邮箱是否已验证
-ALTER TABLE user ADD COLUMN wx_gzh_id VARCHAR(64) NULL COMMENT '微信公众号OpenID' AFTER wx_id;
-ALTER TABLE user ADD COLUMN email_verified TINYINT(1) DEFAULT 0 COMMENT '邮箱是否已验证(0-否,1-是)' AFTER email;
-
--- 2. 邮箱验证码表
+-- 邮箱验证码表
 CREATE TABLE IF NOT EXISTS email_verify_code (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键',
     email         VARCHAR(100) NOT NULL COMMENT '邮箱地址',

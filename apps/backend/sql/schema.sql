@@ -29,32 +29,40 @@ create index idx_user_id
 
 create table if not exists xinyuzhilian.appointment
 (
-    id          bigint auto_increment
+    id                 bigint auto_increment
         primary key,
-    user_id     bigint                                   not null comment '用户ID',
-    doctor_id   bigint                                   not null comment '医生ID',
-    schedule_id bigint                                   not null comment '排班ID',
-    status      int            default 0                 null comment '状态(0-待就诊, 1-已完成, 2-已取消, 3-爽约)',
-    create_time datetime       default CURRENT_TIMESTAMP null,
-    description varchar(1000)                            null comment '病情描述/病例表',
-    fee         decimal(10, 2) default 0.00              null comment '挂号费',
-    pay_status  int            default 0                 null comment '支付状态(0-未支付, 1-已支付, 2-已退款)',
-    pay_time    datetime                                 null comment '支付时间'
+    user_id            bigint                                   not null comment '用户ID',
+    patient_contact_id bigint                                   null comment '就诊人ID',
+    doctor_id          bigint                                   not null comment '医生ID',
+    schedule_id        bigint                                   not null comment '排班ID',
+    status             int            default 0                 null comment '状态(0-待就诊, 1-已完成, 2-已取消, 3-爽约)',
+    create_time        datetime       default CURRENT_TIMESTAMP null,
+    description        varchar(1000)                            null comment '病情描述/病例表',
+    fee                decimal(10, 2) default 0.00              null comment '挂号费',
+    pay_status         int            default 0                 null comment '支付状态(0-未支付, 1-已支付, 2-已退款)',
+    pay_time           datetime                                 null comment '支付时间',
+    type               int            default 0                 null comment '0-offline, 1-online',
+    is_rescheduled     int            default 0                 null comment '0-no, 1-yes'
 )
     comment '预约记录表';
 
 create table if not exists xinyuzhilian.article
 (
-    id          bigint auto_increment comment '主键ID'
+    id               bigint auto_increment comment '主键ID'
         primary key,
-    title       varchar(255)                          not null comment '文章标题',
-    content     longtext                              null comment '文章内容(富文本)',
-    cover_url   varchar(255)                          null comment '封面图URL',
-    type        varchar(20) default 'SCIENCE'         null comment '类型(SCIENCE-科普, CASE-案例)',
-    status      int         default 1                 null comment '状态(0-草稿, 1-已发布)',
-    author_id   bigint                                null comment '作者ID',
-    create_time datetime    default CURRENT_TIMESTAMP null,
-    update_time datetime    default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP
+    title            varchar(255)                          not null comment '文章标题',
+    content          longtext                              null comment '文章内容(富文本)',
+    cover_url        varchar(255)                          null comment '封面图URL',
+    type             varchar(20) default 'SCIENCE'         null comment '类型(SCIENCE-科普, CASE-案例)',
+    status           int         default 1                 null comment '状态(0-草稿, 1-已发布)',
+    author_id        bigint                                null comment '作者ID',
+    create_time      datetime    default CURRENT_TIMESTAMP null,
+    update_time      datetime    default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    like_count       int         default 0                 null comment '点赞数',
+    dislike_count    int         default 0                 null comment '踩数',
+    collection_count int         default 0                 null comment '收藏数',
+    comment_count    int         default 0                 null comment '评论数',
+    view_count       int         default 0                 null comment '阅读数'
 )
     comment '心理文章表';
 
@@ -299,26 +307,38 @@ create index idx_user_id
 
 create table if not exists xinyuzhilian.user
 (
-    id          bigint auto_increment comment '主键ID'
+    id                 bigint auto_increment comment '主键ID'
         primary key,
-    username    varchar(50)                          not null comment '用户名',
-    password    varchar(100)                         not null comment '密码(加密)',
-    role        int        default 0                 null comment '角色(0-游客, 1-用户, 2-医生, 3-医院管理员, 4-超级管理员)',
-    nickname    varchar(50)                          null comment '昵称',
-    phone       varchar(20)                          null comment '手机号',
-    email       varchar(100)                         null comment '邮箱',
-    head_path   varchar(255)                         null comment '头像路径',
-    signature   varchar(255)                         null comment '个性签名',
-    sex         int        default 0                 null comment '性别(0-未知, 1-男, 2-女)',
-    birthday    date                                 null comment '出生日期',
-    status      int        default 1                 null comment '状态(0-禁用, 1-正常, 2-冻结)',
-    deleted     tinyint(1) default 0                 null comment '逻辑删除(0-未删除, 1-已删除)',
-    create_time datetime   default CURRENT_TIMESTAMP null comment '创建时间',
-    update_time datetime   default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间',
+    username           varchar(50)                          not null comment '用户名',
+    password           varchar(100)                         not null comment '密码(加密)',
+    role               int        default 0                 null comment '角色(0-游客, 1-用户, 2-医生, 3-医院管理员, 4-超级管理员)',
+    nickname           varchar(50)                          null comment '昵称',
+    phone              varchar(20)                          null comment '手机号',
+    email              varchar(255)                         not null comment '邮箱（登录账号）',
+    is_psychologist    tinyint    default 0                 null comment '是否为心理咨询师(0-否,1-是)',
+    email_verified     tinyint(1) default 0                 null comment '邮箱是否已验证(0-否,1-是)',
+    email_change_count int        default 0                 not null comment '当月邮箱修改次数',
+    email_change_date  date                                 null comment '最近修改邮箱的日期',
+    head_path          varchar(255)                         null comment '头像路径',
+    signature          varchar(255)                         null comment '个性签名',
+    sex                int        default 0                 null comment '性别(0-未知, 1-男, 2-女)',
+    birthday           date                                 null comment '出生日期',
+    status             int        default 1                 null comment '状态(0-禁用, 1-正常, 2-冻结)',
+    deleted            tinyint(1) default 0                 null comment '逻辑删除(0-未删除, 1-已删除)',
+    create_time        datetime   default CURRENT_TIMESTAMP null comment '创建时间',
+    update_time        datetime   default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间',
+    wx_id              varchar(64)                          null comment '微信OpenID',
+    wx_gzh_id          varchar(64)                          null comment '微信公众号OpenID',
+    member_type        tinyint(1) default 0                 null comment '会员类型(0-非会员,1-VIP,2-SVIP)',
+    member_expire_date datetime                             null comment '会员过期时间',
+    constraint uk_username
+        unique (username),
+    constraint uk_email
+        unique (email),
     constraint uk_phone
         unique (phone),
-    constraint uk_username
-        unique (username)
+    constraint uk_wx_id
+        unique (wx_id)
 )
     comment '用户信息表';
 
