@@ -87,23 +87,31 @@ jobs:
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
           DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          GHCR_TOKEN: ${{ github.token }}
+          GHCR_USERNAME: ${{ github.actor }}
         run: |
           set -euo pipefail
 
           : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
           : "${DEPLOY_PATH:?Missing DEPLOY_PATH secret}"
           : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${GHCR_TOKEN:?Missing GHCR_TOKEN}"
+          : "${GHCR_USERNAME:?Missing GHCR_USERNAME}"
 
           remote_env=$(
-            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q' \
+            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q' \
               "$DEPLOY_PATH" \
               "$IMAGE_TAG" \
               "$BACKEND_IMAGE:$IMAGE_TAG" \
-              "$WEB_CLIENT_IMAGE:$IMAGE_TAG"
+              "$WEB_CLIENT_IMAGE:$IMAGE_TAG" \
+              "$GHCR_USERNAME"
           )
 
-          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<'REMOTE_SCRIPT'
+          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<REMOTE_SCRIPT
           set -euo pipefail
+
+          printf '%s' '$GHCR_TOKEN' | docker login ghcr.io -u "\$GHCR_USERNAME" --password-stdin
+          trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
 
           cd "$DEPLOY_PATH"
           git fetch origin main
