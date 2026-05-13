@@ -1,0 +1,60 @@
+services:
+  backend:
+    image: ${BACKEND_IMAGE:-ghcr.io/a-words/ai-adolescent-mental-health-backend:${IMAGE_TAG:-local}}
+    build:
+      context: ..
+      dockerfile: apps/backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      SERVER_PORT: 8080
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
+      JAVA_OPTS: ${JAVA_OPTS:-}
+      DB_MYSQL_HOST: ${DB_MYSQL_HOST:-}
+      DB_MYSQL_PORT: ${DB_MYSQL_PORT:-3306}
+      DB_MYSQL_DATABASE: ${DB_MYSQL_DATABASE:-xinyuzhilian}
+      DB_MYSQL_USERNAME: ${DB_MYSQL_USERNAME:-}
+      DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD:-}
+      DB_REDIS_HOST: ${DB_REDIS_HOST:-}
+      DB_REDIS_PORT: ${DB_REDIS_PORT:-6379}
+      JWT_SECRET: ${JWT_SECRET:-}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+      WX_APP_ID: ${WX_APP_ID:-}
+      WX_APP_SECRET: ${WX_APP_SECRET:-}
+      WX_GZH_APP_ID: ${WX_GZH_APP_ID:-}
+      WX_GZH_SECRET: ${WX_GZH_SECRET:-}
+      WX_GZH_CALLBACK_BASE_URL: ${WX_GZH_CALLBACK_BASE_URL:-}
+      ALIYUN_OSS_ENDPOINT: ${ALIYUN_OSS_ENDPOINT:-}
+      ALIYUN_OSS_ACCESS_KEY_ID: ${ALIYUN_OSS_ACCESS_KEY_ID:-}
+      ALIYUN_OSS_ACCESS_KEY_SECRET: ${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
+      ALIYUN_OSS_BUCKET_NAME: ${ALIYUN_OSS_BUCKET_NAME:-}
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+    networks:
+      - app
+
+  web-client:
+    image: ${WEB_CLIENT_IMAGE:-ghcr.io/a-words/ai-adolescent-mental-health-web-client:${IMAGE_TAG:-local}}
+    build:
+      context: ..
+      dockerfile: apps/web-client/Dockerfile
+      args:
+        BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
+        NEXT_PUBLIC_WS_BASE_URL: ${NEXT_PUBLIC_WS_BASE_URL:-ws://127.0.0.1:8080}
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
+      NEXT_PUBLIC_WS_BASE_URL: ${NEXT_PUBLIC_WS_BASE_URL:-ws://127.0.0.1:8080}
+    ports:
+      - "${WEB_CLIENT_PORT:-3100}:3100"
+    depends_on:
+      - backend
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge

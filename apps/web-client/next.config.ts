@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  output: "standalone",
   transpilePackages: [
     "@ai-adolescent-mental-health/domain",
     "@ai-adolescent-mental-health/api-client",
