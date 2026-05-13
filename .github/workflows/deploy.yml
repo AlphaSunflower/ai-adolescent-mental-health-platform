@@ -24,6 +24,7 @@ jobs:
   deploy:
     name: Build, push, and deploy
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout
