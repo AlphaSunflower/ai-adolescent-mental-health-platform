@@ -23,8 +23,9 @@ ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 ENV NEXT_TELEMETRY_DISABLED=1
 
-ARG BACKEND_URL=http://backend:8080
-ARG NEXT_PUBLIC_WS_BASE_URL=ws://127.0.0.1:8080
+# NEXT_PUBLIC_* values are compiled into the client bundle during this stage.
+ARG BACKEND_URL
+ARG NEXT_PUBLIC_WS_BASE_URL
 ENV BACKEND_URL=$BACKEND_URL
 ENV NEXT_PUBLIC_WS_BASE_URL=$NEXT_PUBLIC_WS_BASE_URL
 
@@ -37,6 +38,7 @@ COPY --from=deps /workspace/apps/web-client/node_modules ./apps/web-client/node_
 COPY --from=deps /workspace/packages ./packages
 COPY . .
 
+RUN test -n "$BACKEND_URL" && test -n "$NEXT_PUBLIC_WS_BASE_URL"
 RUN pnpm --filter @ai-adolescent-mental-health/web-client build
 
 FROM node:24-bookworm-slim AS runtime
@@ -46,7 +48,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3100
 ENV BACKEND_URL=http://backend:8080
-ENV NEXT_PUBLIC_WS_BASE_URL=ws://127.0.0.1:8080
 
 WORKDIR /app
 

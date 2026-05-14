@@ -17,18 +17,27 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   BACKEND_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-backend
   WEB_CLIENT_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-web-client
-  BACKEND_URL: ${{ vars.BACKEND_URL || 'http://backend:8080' }}
-  NEXT_PUBLIC_WS_BASE_URL: ${{ vars.NEXT_PUBLIC_WS_BASE_URL || 'ws://127.0.0.1:8080' }}
+  REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}.git
 
 jobs:
   deploy:
     name: Build, push, and deploy
     runs-on: ubuntu-latest
     environment: production
+    env:
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      NEXT_PUBLIC_WS_BASE_URL: ${{ vars.NEXT_PUBLIC_WS_BASE_URL }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Validate production config
+        run: |
+          set -euo pipefail
+
+          : "${BACKEND_URL:?Missing production environment variable BACKEND_URL}"
+          : "${NEXT_PUBLIC_WS_BASE_URL:?Missing production environment variable NEXT_PUBLIC_WS_BASE_URL}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -99,12 +108,13 @@ jobs:
           : "${GHCR_USERNAME:?Missing GHCR_USERNAME}"
 
           remote_env=$(
-            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q' \
+            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q REPOSITORY_URL=%q' \
               "$DEPLOY_PATH" \
               "$IMAGE_TAG" \
               "$BACKEND_IMAGE:$IMAGE_TAG" \
               "$WEB_CLIENT_IMAGE:$IMAGE_TAG" \
-              "$GHCR_USERNAME"
+              "$GHCR_USERNAME" \
+              "$REPOSITORY_URL"
           )
 
           ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<REMOTE_SCRIPT
@@ -113,9 +123,25 @@ jobs:
           printf '%s' '$GHCR_TOKEN' | docker login ghcr.io -u "\$GHCR_USERNAME" --password-stdin
           trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
 
-          cd "$DEPLOY_PATH"
+          mkdir -p "\$DEPLOY_PATH"
+          cd "\$DEPLOY_PATH"
+
+          if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            if [ -n "\$(find . -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+              echo "DEPLOY_PATH exists but is not an empty git repository: \$DEPLOY_PATH" >&2
+              exit 1
+            fi
+
+            git init
+            git remote add origin "\$REPOSITORY_URL"
+          fi
+
+          if ! git remote get-url origin >/dev/null 2>&1; then
+            git remote add origin "\$REPOSITORY_URL"
+          fi
+
           git fetch origin main
-          git checkout main
+          git checkout -B main origin/main
           git pull --ff-only origin main
 
           export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE

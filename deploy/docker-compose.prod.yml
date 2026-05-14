@@ -33,8 +33,15 @@ services:
       MAIL_PASSWORD: ${MAIL_PASSWORD:-}
     ports:
       - "${BACKEND_PORT:-8080}:8080"
+    # Production MySQL/Redis run on the Docker host; this enables host.docker.internal on Linux.
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     networks:
       - app
 
@@ -44,16 +51,16 @@ services:
       context: ..
       dockerfile: apps/web-client/Dockerfile
       args:
-        BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
-        NEXT_PUBLIC_WS_BASE_URL: ${NEXT_PUBLIC_WS_BASE_URL:-ws://127.0.0.1:8080}
+        BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+        NEXT_PUBLIC_WS_BASE_URL: ${NEXT_PUBLIC_WS_BASE_URL:?NEXT_PUBLIC_WS_BASE_URL is required}
     restart: unless-stopped
     environment:
       BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
-      NEXT_PUBLIC_WS_BASE_URL: ${NEXT_PUBLIC_WS_BASE_URL:-ws://127.0.0.1:8080}
     ports:
       - "${WEB_CLIENT_PORT:-3100}:3100"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - app
 
