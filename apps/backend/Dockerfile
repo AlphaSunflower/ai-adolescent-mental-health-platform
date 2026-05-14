@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 COPY apps/backend/src ./src
 
 RUN --mount=type=cache,target=/root/.m2 \
-  ./mvnw -B clean package -DskipTests
+  ./mvnw -B clean package -DskipTests -DfinalName=app
 
 FROM eclipse-temurin:17-jre-alpine AS runtime
 
@@ -23,7 +23,7 @@ RUN apk add --no-cache curl \
   && addgroup -S spring \
   && adduser -S spring -G spring
 
-COPY --from=build /workspace/apps/backend/target/*.jar app.jar
+COPY --from=build /workspace/apps/backend/target/app.jar app.jar
 
 USER spring
 
@@ -31,4 +31,4 @@ ENV JAVA_OPTS=""
 
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
