@@ -27,6 +27,32 @@ jobs:
     env:
       BACKEND_URL: ${{ vars.BACKEND_URL }}
       NEXT_PUBLIC_WS_BASE_URL: ${{ vars.NEXT_PUBLIC_WS_BASE_URL }}
+      SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
+      JAVA_OPTS: ${{ vars.JAVA_OPTS }}
+      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
+      WEB_CLIENT_PORT: ${{ vars.WEB_CLIENT_PORT }}
+      DB_MYSQL_HOST: ${{ vars.DB_MYSQL_HOST }}
+      DB_MYSQL_PORT: ${{ vars.DB_MYSQL_PORT }}
+      DB_MYSQL_DATABASE: ${{ vars.DB_MYSQL_DATABASE }}
+      DB_MYSQL_USERNAME: ${{ secrets.DB_MYSQL_USERNAME || vars.DB_MYSQL_USERNAME }}
+      DB_MYSQL_PASSWORD: ${{ secrets.DB_MYSQL_PASSWORD }}
+      DB_REDIS_HOST: ${{ vars.DB_REDIS_HOST }}
+      DB_REDIS_PORT: ${{ vars.DB_REDIS_PORT }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      WX_APP_ID: ${{ secrets.WX_APP_ID || vars.WX_APP_ID }}
+      WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
+      WX_GZH_APP_ID: ${{ secrets.WX_GZH_APP_ID || vars.WX_GZH_APP_ID }}
+      WX_GZH_SECRET: ${{ secrets.WX_GZH_SECRET }}
+      WX_GZH_CALLBACK_BASE_URL: ${{ vars.WX_GZH_CALLBACK_BASE_URL }}
+      ALIYUN_OSS_ENDPOINT: ${{ vars.ALIYUN_OSS_ENDPOINT }}
+      ALIYUN_OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_OSS_ACCESS_KEY_ID }}
+      ALIYUN_OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_OSS_ACCESS_KEY_SECRET }}
+      ALIYUN_OSS_BUCKET_NAME: ${{ vars.ALIYUN_OSS_BUCKET_NAME }}
+      MAIL_HOST: ${{ vars.MAIL_HOST }}
+      MAIL_PORT: ${{ vars.MAIL_PORT }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME || vars.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
 
     steps:
       - name: Checkout
@@ -38,6 +64,24 @@ jobs:
 
           : "${BACKEND_URL:?Missing production environment variable BACKEND_URL}"
           : "${NEXT_PUBLIC_WS_BASE_URL:?Missing production environment variable NEXT_PUBLIC_WS_BASE_URL}"
+          : "${DB_MYSQL_HOST:?Missing production environment variable DB_MYSQL_HOST}"
+          : "${DB_MYSQL_USERNAME:?Missing production environment secret or variable DB_MYSQL_USERNAME}"
+          : "${DB_MYSQL_PASSWORD:?Missing production environment secret DB_MYSQL_PASSWORD}"
+          : "${DB_REDIS_HOST:?Missing production environment variable DB_REDIS_HOST}"
+          : "${JWT_SECRET:?Missing production environment secret JWT_SECRET}"
+          : "${DASHSCOPE_API_KEY:?Missing production environment secret DASHSCOPE_API_KEY}"
+          : "${WX_APP_ID:?Missing production environment secret or variable WX_APP_ID}"
+          : "${WX_APP_SECRET:?Missing production environment secret WX_APP_SECRET}"
+          : "${WX_GZH_APP_ID:?Missing production environment secret or variable WX_GZH_APP_ID}"
+          : "${WX_GZH_SECRET:?Missing production environment secret WX_GZH_SECRET}"
+          : "${ALIYUN_OSS_ENDPOINT:?Missing production environment variable ALIYUN_OSS_ENDPOINT}"
+          : "${ALIYUN_OSS_ACCESS_KEY_ID:?Missing production environment secret ALIYUN_OSS_ACCESS_KEY_ID}"
+          : "${ALIYUN_OSS_ACCESS_KEY_SECRET:?Missing production environment secret ALIYUN_OSS_ACCESS_KEY_SECRET}"
+          : "${ALIYUN_OSS_BUCKET_NAME:?Missing production environment variable ALIYUN_OSS_BUCKET_NAME}"
+          : "${MAIL_HOST:?Missing production environment variable MAIL_HOST}"
+          : "${MAIL_PORT:?Missing production environment variable MAIL_PORT}"
+          : "${MAIL_USERNAME:?Missing production environment secret or variable MAIL_USERNAME}"
+          : "${MAIL_PASSWORD:?Missing production environment secret MAIL_PASSWORD}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -107,6 +151,56 @@ jobs:
           : "${GHCR_TOKEN:?Missing GHCR_TOKEN}"
           : "${GHCR_USERNAME:?Missing GHCR_USERNAME}"
 
+          prod_env_file="$(mktemp)"
+          trap 'rm -f "$prod_env_file"' EXIT
+          chmod 600 "$prod_env_file"
+          python3 - "$prod_env_file" <<'PY'
+          import os
+          import sys
+
+          keys = [
+              "BACKEND_URL",
+              "NEXT_PUBLIC_WS_BASE_URL",
+              "SPRING_PROFILES_ACTIVE",
+              "JAVA_OPTS",
+              "BACKEND_PORT",
+              "WEB_CLIENT_PORT",
+              "DB_MYSQL_HOST",
+              "DB_MYSQL_PORT",
+              "DB_MYSQL_DATABASE",
+              "DB_MYSQL_USERNAME",
+              "DB_MYSQL_PASSWORD",
+              "DB_REDIS_HOST",
+              "DB_REDIS_PORT",
+              "JWT_SECRET",
+              "DASHSCOPE_API_KEY",
+              "WX_APP_ID",
+              "WX_APP_SECRET",
+              "WX_GZH_APP_ID",
+              "WX_GZH_SECRET",
+              "WX_GZH_CALLBACK_BASE_URL",
+              "ALIYUN_OSS_ENDPOINT",
+              "ALIYUN_OSS_ACCESS_KEY_ID",
+              "ALIYUN_OSS_ACCESS_KEY_SECRET",
+              "ALIYUN_OSS_BUCKET_NAME",
+              "MAIL_HOST",
+              "MAIL_PORT",
+              "MAIL_USERNAME",
+              "MAIL_PASSWORD",
+          ]
+
+          with open(sys.argv[1], "w", encoding="utf-8") as env_file:
+              for key in keys:
+                  value = os.environ.get(key, "")
+                  escaped = (
+                      value.replace("\\", "\\\\")
+                      .replace("\n", "\\n")
+                      .replace('"', '\\"')
+                      .replace("$", "\\$")
+                  )
+                  env_file.write(f'{key}="{escaped}"\n')
+          PY
+
           remote_env=$(
             printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q REPOSITORY_URL=%q' \
               "$DEPLOY_PATH" \
@@ -116,6 +210,13 @@ jobs:
               "$GHCR_USERNAME" \
               "$REPOSITORY_URL"
           )
+
+          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<'REMOTE_PREP'
+          set -euo pipefail
+          mkdir -p "$DEPLOY_PATH"
+          REMOTE_PREP
+
+          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" "$prod_env_file" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/.env.production"
 
           ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<REMOTE_SCRIPT
           set -euo pipefail
@@ -144,7 +245,8 @@ jobs:
           git checkout -B main origin/main
           git pull --ff-only origin main
 
+          chmod 600 .env.production
           export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE
-          docker compose -f deploy/docker-compose.prod.yml pull
-          docker compose -f deploy/docker-compose.prod.yml up -d --remove-orphans
+          docker compose --env-file .env.production -f deploy/docker-compose.prod.yml pull
+          docker compose --env-file .env.production -f deploy/docker-compose.prod.yml up -d --remove-orphans
           REMOTE_SCRIPT
