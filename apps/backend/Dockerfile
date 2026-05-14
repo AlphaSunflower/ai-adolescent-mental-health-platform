@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 COPY apps/backend/src ./src
 
 RUN --mount=type=cache,target=/root/.m2 \
-  ./mvnw -B clean package -DskipTests -DfinalName=app
+  ./mvnw -B clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine AS runtime
 
