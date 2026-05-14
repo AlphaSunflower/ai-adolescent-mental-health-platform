@@ -14,7 +14,9 @@ COPY apps/backend/src ./src
 
 RUN --mount=type=cache,target=/root/.m2 \
   ./mvnw -B clean package -DskipTests \
-  && cp target/*.jar app.jar
+  && jar_file="$(find target -maxdepth 1 -type f -name '*.jar' ! -name '*.original' -print -quit)" \
+  && test -n "$jar_file" \
+  && cp "$jar_file" app.jar
 
 FROM eclipse-temurin:17-jre-alpine AS runtime
 
