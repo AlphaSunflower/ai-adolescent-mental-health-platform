@@ -13,10 +13,7 @@ RUN --mount=type=cache,target=/root/.m2 \
 COPY apps/backend/src ./src
 
 RUN --mount=type=cache,target=/root/.m2 \
-  ./mvnw -B clean package -DskipTests \
-  && jar_file="$(find target -maxdepth 1 -type f -name '*.jar' ! -name '*.original' -print -quit)" \
-  && test -n "$jar_file" \
-  && cp "$jar_file" app.jar
+  ./mvnw -B clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-alpine AS runtime
 
@@ -26,7 +23,7 @@ RUN apk add --no-cache curl \
   && addgroup -S spring \
   && adduser -S spring -G spring
 
-COPY --from=build /workspace/apps/backend/app.jar app.jar
+COPY --from=build /workspace/apps/backend/target/app.jar app.jar
 
 USER spring
 
