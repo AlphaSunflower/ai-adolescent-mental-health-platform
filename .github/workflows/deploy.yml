@@ -1,0 +1,150 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  BACKEND_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-backend
+  WEB_CLIENT_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-web-client
+  REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}.git
+
+jobs:
+  deploy:
+    name: Build, push, and deploy
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      NEXT_PUBLIC_WS_BASE_URL: ${{ vars.NEXT_PUBLIC_WS_BASE_URL }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate production config
+        run: |
+          set -euo pipefail
+
+          : "${BACKEND_URL:?Missing production environment variable BACKEND_URL}"
+          : "${NEXT_PUBLIC_WS_BASE_URL:?Missing production environment variable NEXT_PUBLIC_WS_BASE_URL}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/backend/Dockerfile
+          push: true
+          tags: ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
+          cache-from: type=gha,scope=backend
+          cache-to: type=gha,scope=backend,mode=max
+
+      - name: Build and push web-client image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/web-client/Dockerfile
+          push: true
+          tags: ${{ env.WEB_CLIENT_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            BACKEND_URL=${{ env.BACKEND_URL }}
+            NEXT_PUBLIC_WS_BASE_URL=${{ env.NEXT_PUBLIC_WS_BASE_URL }}
+          cache-from: type=gha,scope=web-client
+          cache-to: type=gha,scope=web-client,mode=max
+
+      - name: Configure SSH
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+        run: |
+          set -euo pipefail
+
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
+          : "${DEPLOY_SSH_KEY:?Missing DEPLOY_SSH_KEY secret}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${DEPLOY_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Deploy on server
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          GHCR_TOKEN: ${{ github.token }}
+          GHCR_USERNAME: ${{ github.actor }}
+        run: |
+          set -euo pipefail
+
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
+          : "${DEPLOY_PATH:?Missing DEPLOY_PATH secret}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${GHCR_TOKEN:?Missing GHCR_TOKEN}"
+          : "${GHCR_USERNAME:?Missing GHCR_USERNAME}"
+
+          remote_env=$(
+            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q REPOSITORY_URL=%q' \
+              "$DEPLOY_PATH" \
+              "$IMAGE_TAG" \
+              "$BACKEND_IMAGE:$IMAGE_TAG" \
+              "$WEB_CLIENT_IMAGE:$IMAGE_TAG" \
+              "$GHCR_USERNAME" \
+              "$REPOSITORY_URL"
+          )
+
+          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<REMOTE_SCRIPT
+          set -euo pipefail
+
+          printf '%s' '$GHCR_TOKEN' | docker login ghcr.io -u "\$GHCR_USERNAME" --password-stdin
+          trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
+
+          mkdir -p "\$DEPLOY_PATH"
+          cd "\$DEPLOY_PATH"
+
+          if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            if [ -n "\$(find . -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+              echo "DEPLOY_PATH exists but is not an empty git repository: \$DEPLOY_PATH" >&2
+              exit 1
+            fi
+
+            git init
+            git remote add origin "\$REPOSITORY_URL"
+          fi
+
+          if ! git remote get-url origin >/dev/null 2>&1; then
+            git remote add origin "\$REPOSITORY_URL"
+          fi
+
+          git fetch origin main
+          git checkout -B main origin/main
+          git pull --ff-only origin main
+
+          export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE
+          docker compose -f deploy/docker-compose.prod.yml pull
+          docker compose -f deploy/docker-compose.prod.yml up -d --remove-orphans
+          REMOTE_SCRIPT

@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pr-checks:
+    name: PR checks
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_DATABASE: xinyuzhilian
+          MYSQL_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd="redis-cli ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_MYSQL_HOST: 127.0.0.1
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_DATABASE: xinyuzhilian
+      DB_MYSQL_USERNAME: root
+      DB_MYSQL_PASSWORD: root
+      DB_REDIS_HOST: 127.0.0.1
+      DB_REDIS_PORT: 6379
+      JWT_SECRET: ci-test-jwt-secret
+      DASHSCOPE_API_KEY: ci-test-dashscope-key
+      WX_APP_ID: ci-test-wx-app-id
+      WX_APP_SECRET: ci-test-wx-app-secret
+      WX_GZH_APP_ID: ci-test-wx-gzh-app-id
+      WX_GZH_SECRET: ci-test-wx-gzh-secret
+      WX_GZH_CALLBACK_BASE_URL: http://127.0.0.1
+      ALIYUN_OSS_ENDPOINT: http://127.0.0.1
+      ALIYUN_OSS_ACCESS_KEY_ID: ci-test-oss-key-id
+      ALIYUN_OSS_ACCESS_KEY_SECRET: ci-test-oss-key-secret
+      ALIYUN_OSS_BUCKET_NAME: ci-test-bucket
+      MAIL_HOST: localhost
+      MAIL_PORT: 1025
+      MAIL_USERNAME: ci-test-mail-user
+      MAIL_PASSWORD: ci-test-mail-password
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Initialize backend database
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-mysql-client
+
+          mysql -h 127.0.0.1 -uroot -proot xinyuzhilian < apps/backend/sql/schema.sql
+
+          for sql_file in \
+            apps/backend/sql/schema_email_bind.sql \
+            apps/backend/sql/schema_xiaoai_usage.sql \
+            infra/sql/profile_email_limit.sql
+          do
+            if [ -f "$sql_file" ]; then
+              mysql -h 127.0.0.1 -uroot -proot xinyuzhilian < "$sql_file"
+            fi
+          done
+
+      - name: Typecheck web-client
+        run: pnpm --filter @ai-adolescent-mental-health/web-client typecheck
+
+      - name: Build web-client
+        run: pnpm --filter @ai-adolescent-mental-health/web-client build
+
+      - name: Test backend
+        run: pnpm --filter @ai-adolescent-mental-health/backend test
