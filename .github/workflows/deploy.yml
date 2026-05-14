@@ -17,7 +17,6 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   BACKEND_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-backend
   WEB_CLIENT_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-web-client
-  REPOSITORY_URL: ${{ github.server_url }}/${{ github.repository }}.git
 
 jobs:
   deploy:
@@ -202,21 +201,21 @@ jobs:
           PY
 
           remote_env=$(
-            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q REPOSITORY_URL=%q' \
+            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q' \
               "$DEPLOY_PATH" \
               "$IMAGE_TAG" \
               "$BACKEND_IMAGE:$IMAGE_TAG" \
               "$WEB_CLIENT_IMAGE:$IMAGE_TAG" \
-              "$GHCR_USERNAME" \
-              "$REPOSITORY_URL"
+              "$GHCR_USERNAME"
           )
 
           ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<'REMOTE_PREP'
           set -euo pipefail
-          mkdir -p "$DEPLOY_PATH"
+          mkdir -p "$DEPLOY_PATH/deploy"
           REMOTE_PREP
 
           scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" "$prod_env_file" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/.env.production"
+          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" deploy/docker-compose.prod.yml "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy/docker-compose.prod.yml"
 
           ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<REMOTE_SCRIPT
           set -euo pipefail
@@ -224,29 +223,29 @@ jobs:
           printf '%s' '$GHCR_TOKEN' | docker login ghcr.io -u "\$GHCR_USERNAME" --password-stdin
           trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
 
+          retry() {
+            max_attempts="\$1"
+            delay_seconds="\$2"
+            shift 2
+
+            attempt=1
+            until "\$@"; do
+              status="\$?"
+              if [ "\$attempt" -ge "\$max_attempts" ]; then
+                return "\$status"
+              fi
+
+              echo "Command failed with exit code \$status. Retrying in \$delay_seconds seconds... (\$attempt/\$max_attempts)" >&2
+              sleep "\$delay_seconds"
+              attempt="\$((attempt + 1))"
+            done
+          }
+
           mkdir -p "\$DEPLOY_PATH"
           cd "\$DEPLOY_PATH"
 
-          if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-            if [ -n "\$(find . -mindepth 1 -maxdepth 1 -print -quit)" ]; then
-              echo "DEPLOY_PATH exists but is not an empty git repository: \$DEPLOY_PATH" >&2
-              exit 1
-            fi
-
-            git init
-            git remote add origin "\$REPOSITORY_URL"
-          fi
-
-          if ! git remote get-url origin >/dev/null 2>&1; then
-            git remote add origin "\$REPOSITORY_URL"
-          fi
-
-          git fetch origin main
-          git checkout -B main origin/main
-          git pull --ff-only origin main
-
           chmod 600 .env.production
           export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE
-          docker compose --env-file .env.production -f deploy/docker-compose.prod.yml pull
+          retry 3 10 docker compose --env-file .env.production -f deploy/docker-compose.prod.yml pull
           docker compose --env-file .env.production -f deploy/docker-compose.prod.yml up -d --remove-orphans
           REMOTE_SCRIPT
