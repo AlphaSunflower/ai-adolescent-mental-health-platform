@@ -9,35 +9,35 @@ services:
       SERVER_PORT: 8080
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-}
       JAVA_OPTS: ${JAVA_OPTS:-}
-      DB_MYSQL_HOST: ${DB_MYSQL_HOST:-}
+      DB_MYSQL_HOST: ${DB_MYSQL_HOST:?DB_MYSQL_HOST is required}
       DB_MYSQL_PORT: ${DB_MYSQL_PORT:-3306}
       DB_MYSQL_DATABASE: ${DB_MYSQL_DATABASE:-xinyuzhilian}
-      DB_MYSQL_USERNAME: ${DB_MYSQL_USERNAME:-}
-      DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD:-}
-      DB_REDIS_HOST: ${DB_REDIS_HOST:-}
+      DB_MYSQL_USERNAME: ${DB_MYSQL_USERNAME:?DB_MYSQL_USERNAME is required}
+      DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD:?DB_MYSQL_PASSWORD is required}
+      DB_REDIS_HOST: ${DB_REDIS_HOST:?DB_REDIS_HOST is required}
       DB_REDIS_PORT: ${DB_REDIS_PORT:-6379}
-      JWT_SECRET: ${JWT_SECRET:-}
-      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
-      WX_APP_ID: ${WX_APP_ID:-}
-      WX_APP_SECRET: ${WX_APP_SECRET:-}
-      WX_GZH_APP_ID: ${WX_GZH_APP_ID:-}
-      WX_GZH_SECRET: ${WX_GZH_SECRET:-}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:?DASHSCOPE_API_KEY is required}
+      WX_APP_ID: ${WX_APP_ID:?WX_APP_ID is required}
+      WX_APP_SECRET: ${WX_APP_SECRET:?WX_APP_SECRET is required}
+      WX_GZH_APP_ID: ${WX_GZH_APP_ID:?WX_GZH_APP_ID is required}
+      WX_GZH_SECRET: ${WX_GZH_SECRET:?WX_GZH_SECRET is required}
       WX_GZH_CALLBACK_BASE_URL: ${WX_GZH_CALLBACK_BASE_URL:-}
-      ALIYUN_OSS_ENDPOINT: ${ALIYUN_OSS_ENDPOINT:-}
-      ALIYUN_OSS_ACCESS_KEY_ID: ${ALIYUN_OSS_ACCESS_KEY_ID:-}
-      ALIYUN_OSS_ACCESS_KEY_SECRET: ${ALIYUN_OSS_ACCESS_KEY_SECRET:-}
-      ALIYUN_OSS_BUCKET_NAME: ${ALIYUN_OSS_BUCKET_NAME:-}
-      MAIL_HOST: ${MAIL_HOST:-}
-      MAIL_PORT: ${MAIL_PORT:-}
-      MAIL_USERNAME: ${MAIL_USERNAME:-}
-      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      ALIYUN_OSS_ENDPOINT: ${ALIYUN_OSS_ENDPOINT:?ALIYUN_OSS_ENDPOINT is required}
+      ALIYUN_OSS_ACCESS_KEY_ID: ${ALIYUN_OSS_ACCESS_KEY_ID:?ALIYUN_OSS_ACCESS_KEY_ID is required}
+      ALIYUN_OSS_ACCESS_KEY_SECRET: ${ALIYUN_OSS_ACCESS_KEY_SECRET:?ALIYUN_OSS_ACCESS_KEY_SECRET is required}
+      ALIYUN_OSS_BUCKET_NAME: ${ALIYUN_OSS_BUCKET_NAME:?ALIYUN_OSS_BUCKET_NAME is required}
+      MAIL_HOST: ${MAIL_HOST:?MAIL_HOST is required}
+      MAIL_PORT: ${MAIL_PORT:?MAIL_PORT is required}
+      MAIL_USERNAME: ${MAIL_USERNAME:?MAIL_USERNAME is required}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:?MAIL_PASSWORD is required}
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     # Production MySQL/Redis run on the Docker host; this enables host.docker.internal on Linux.
     extra_hosts:
       - "host.docker.internal:host-gateway"
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/health >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health >/dev/null || exit 1"]
       interval: 30s
       timeout: 5s
       retries: 5

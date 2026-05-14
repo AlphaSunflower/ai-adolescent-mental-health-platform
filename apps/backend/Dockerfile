@@ -19,7 +19,9 @@ FROM eclipse-temurin:17-jre-alpine AS runtime
 
 WORKDIR /app
 
-RUN addgroup -S spring && adduser -S spring -G spring
+RUN apk add --no-cache curl \
+  && addgroup -S spring \
+  && adduser -S spring -G spring
 
 COPY --from=build /workspace/apps/backend/target/*.jar app.jar
 
