@@ -17,7 +17,7 @@ export function AssessmentEditor() {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      httpClient.get<Record<string,unknown>>("/admin/assessments/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
+      httpClient.get<Record<string,unknown>>("/assessment/template/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
     }
   }, [id]);
 
@@ -25,9 +25,9 @@ export function AssessmentEditor() {
     if (!form.title.trim()) { alert("请输入测评名称"); return; }
     try {
       if (isEdit) {
-        await httpClient.put("/admin/assessments/" + id, form);
+        await httpClient.put("/assessment/template", form);
       } else {
-        await httpClient.post("/admin/assessments", form);
+        await httpClient.post("/assessment/template", form);
       }
       router.push("/admin/content/assessments");
     } catch { alert("保存失败"); }

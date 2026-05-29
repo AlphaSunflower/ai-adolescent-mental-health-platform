@@ -19,7 +19,7 @@ export function QuoteManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/quotes", { query: { page, size: 20 } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/quote/list", { query: { page, size: 20 } });
       setData(res);
     } catch { /* ignore */ }
   }, []);
@@ -32,9 +32,9 @@ export function QuoteManager() {
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.put(`/admin/quotes/${editingItem.id}`, form);
+        await httpClient.post("/quote", { id: editingItem.id, content: form.content, author: form.author });
       } else {
-        await httpClient.post("/admin/quotes", form);
+        await httpClient.post("/quote", form);
       }
       setDialogVisible(false);
       fetchData();
@@ -43,7 +43,7 @@ export function QuoteManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/quotes/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/quote/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

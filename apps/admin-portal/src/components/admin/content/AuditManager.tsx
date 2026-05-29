@@ -17,7 +17,7 @@ export function AuditManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const url = tab === "article" ? "/admin/articles/audit" : "/admin/complaints";
+      const url = tab === "article" ? "/article/audit/list" : "/complaint/list";
       const res = await httpClient.get<PageResult<Record<string,unknown>>>(url, { query: { page, size: 20 } });
       setData(res);
     } catch { /* ignore */ }
@@ -26,15 +26,21 @@ export function AuditManager() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleApprove = async (id: unknown) => {
-    const url = tab === "article" ? `/admin/articles/${id}/approve` : `/admin/complaints/${id}/resolve`;
-    try { await httpClient.post(url, {}); fetchData(); } catch { /* ignore */ }
+    if (tab === "article") {
+      try { await httpClient.post(`/article/audit/${id}`, { action: 1 }); fetchData(); } catch { /* ignore */ }
+    } else {
+      try { await httpClient.post(`/complaint/audit/${id}`, null, { query: { status: 1 } }); fetchData(); } catch { /* ignore */ }
+    }
   };
 
   const handleReject = async (id: unknown) => {
     const reason = prompt("请输入拒绝/驳回原因:");
     if (!reason) return;
-    const url = tab === "article" ? `/admin/articles/${id}/reject` : `/admin/complaints/${id}/reject`;
-    try { await httpClient.post(url, { reason }); fetchData(); } catch { /* ignore */ }
+    if (tab === "article") {
+      try { await httpClient.post(`/article/audit/${id}`, { action: 2, reason }); fetchData(); } catch { /* ignore */ }
+    } else {
+      try { await httpClient.post(`/complaint/audit/${id}`, null, { query: { status: 2 } }); fetchData(); } catch { /* ignore */ }
+    }
   };
 
   const cols = tab === "article"

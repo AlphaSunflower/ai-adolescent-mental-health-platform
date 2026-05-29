@@ -33,7 +33,7 @@ export function UserList() {
 
   const handleSave = async () => {
     try {
-      await httpClient.post("/admin/users", form);
+      await httpClient.post("/admin/user", form);
       setDialogVisible(false);
       fetchData();
     } catch { /* ignore */ }
@@ -41,7 +41,7 @@ export function UserList() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/users/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/admin/user/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

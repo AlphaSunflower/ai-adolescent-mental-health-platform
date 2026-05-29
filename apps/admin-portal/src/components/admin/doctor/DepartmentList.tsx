@@ -54,7 +54,7 @@ export function DepartmentList() {
     if (!form.name) return;
     setSaving(true);
     try {
-      if (editingId !== null) await httpClient.put("/hospital/department/" + editingId, form);
+      if (editingId !== null) await httpClient.post("/hospital/department", { id: editingId, name: form.name, description: form.description });
       else await httpClient.post("/hospital/department", form);
       setDialogVisible(false); fetchData(page);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }

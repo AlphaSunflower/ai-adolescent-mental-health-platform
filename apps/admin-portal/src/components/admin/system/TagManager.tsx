@@ -19,8 +19,8 @@ export function TagManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/tags", { query: { page, size: 20 } });
-      setData(res);
+      const list = await httpClient.get<Record<string,unknown>[]>("/article/tag/list");
+      setData({ total: list.length, records: list, current: 1, size: list.length, pages: 1 });
     } catch { /* ignore */ }
   }, []);
 
@@ -32,9 +32,9 @@ export function TagManager() {
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.put(`/admin/tags/${editingItem.id}`, form);
+        await httpClient.put(`/article/tag/${editingItem.id}`, form);
       } else {
-        await httpClient.post("/admin/tags", form);
+        await httpClient.post("/article/tag", form);
       }
       setDialogVisible(false);
       fetchData();
@@ -43,7 +43,7 @@ export function TagManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/tags/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/article/tag/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

@@ -39,7 +39,7 @@ export function HospitalComplaints() {
 
   const handleProcess = async (id: number) => {
     try {
-      await httpClient.put("/complaint/" + id, { status: "已处理" });
+      await httpClient.post("/complaint/audit/" + id, null, { query: { status: 1 } });
       fetchData(page);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };

@@ -31,14 +31,14 @@ export function HospitalList() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const openAdd = () => { setEditingItem(null); setForm({ name: "", address: "", phone: "" }); setDialogVisible(true); };
-  const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({ ...item }); setDialogVisible(true); };
+  const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({...item, name: (item.name as string) || "", address: (item.address as string) || "", phone: (item.phone as string) || ""}); setDialogVisible(true); };
 
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.put(`/admin/hospitals/${editingItem.id}`, form);
+        await httpClient.post("/admin/hospital", { id: editingItem.id, ...form });
       } else {
-        await httpClient.post("/admin/hospitals", form);
+        await httpClient.post("/admin/hospital", form);
       }
       setDialogVisible(false);
       fetchData();

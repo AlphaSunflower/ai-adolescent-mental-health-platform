@@ -14,10 +14,11 @@ type PageResult<T> = { total: number; records: T[]; current: number; size: numbe
 export function PlatformIncome() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
 
-  const fetchData = useCallback(async (page = 1) => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/platform/income", { query: { page, size: 20 } });
-      setData(res);
+      const stats = await httpClient.get<Record<string,unknown>>("/admin/platform-income/stats");
+      const records = Object.entries(stats).map(([key, value]) => ({ id: key, source: key, amount: value, createTime: "", status: 1 }));
+      setData({ total: records.length, records, current: 1, size: records.length, pages: 1 });
     } catch { /* ignore */ }
   }, []);
 
@@ -49,9 +50,6 @@ export function PlatformIncome() {
         </table>
         <div style={{ display:"flex", justifyContent:"flex-end", marginTop:"16px", gap:"8px", alignItems:"center" }}>
           <span style={{ fontSize:"13px", color:s.text2 }}>共 {data.total} 条</span>
-          <button onClick={() => fetchData(data.current-1)} disabled={data.current<=1} style={{ padding:"6px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>上一页</button>
-          <span style={{ fontSize:"13px", color:s.text2 }}>{data.current} / {data.pages||1}</span>
-          <button onClick={() => fetchData(data.current+1)} disabled={data.current>=data.pages} style={{ padding:"6px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>下一页</button>
         </div>
       </div>
     </div>

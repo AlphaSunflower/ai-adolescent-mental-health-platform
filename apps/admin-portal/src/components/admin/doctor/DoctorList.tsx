@@ -20,7 +20,7 @@ export function DoctorList() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/hospital/doctor/list", { query: { page, size: 20, keyword: search } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/hospital/doctors", { query: { page, size: 20, keyword: search } });
       setData(res);
     } catch { /* ignore */ }
   }, [search]);
@@ -33,9 +33,9 @@ export function DoctorList() {
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.put(`/hospital/doctor/${editingItem.id}`, form);
+        await httpClient.post("/admin/hospital/doctor", { id: editingItem.id, ...form });
       } else {
-        await httpClient.post("/hospital/doctor", form);
+        await httpClient.post("/admin/hospital/doctor", form);
       }
       setDialogVisible(false);
       fetchData();
@@ -44,7 +44,7 @@ export function DoctorList() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/hospital/doctor/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/admin/hospital/doctor/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

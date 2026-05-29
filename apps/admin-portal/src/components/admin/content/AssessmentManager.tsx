@@ -19,7 +19,7 @@ export function AssessmentManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/assessments", { query: { page, size: 20, keyword: search } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/assessment/admin/templates", { query: { page, size: 20, keyword: search } });
       setData(res);
     } catch { /* ignore */ }
   }, [search]);
@@ -28,7 +28,7 @@ export function AssessmentManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/assessments/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/assessment/template/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

@@ -17,7 +17,7 @@ export function CourseEditor() {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      httpClient.get<Record<string,unknown>>("/admin/courses/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
+      httpClient.get<Record<string,unknown>>("/content/admin/course/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
     }
   }, [id]);
 
@@ -25,9 +25,9 @@ export function CourseEditor() {
     if (!form.title.trim()) { alert("请输入课程名称"); return; }
     try {
       if (isEdit) {
-        await httpClient.put("/admin/courses/" + id, form);
+        await httpClient.post("/content/course", form);
       } else {
-        await httpClient.post("/admin/courses", form);
+        await httpClient.post("/content/course", form);
       }
       router.push("/admin/content/courses");
     } catch { alert("保存失败"); }

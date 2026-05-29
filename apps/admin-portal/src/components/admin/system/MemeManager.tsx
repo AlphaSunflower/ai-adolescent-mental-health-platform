@@ -19,7 +19,7 @@ export function MemeManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/meme", { query: { page, size: 20 } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/meme/admin/list", { query: { page, size: 20 } });
       setData(res);
     } catch { /* ignore */ }
   }, []);
@@ -32,9 +32,9 @@ export function MemeManager() {
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.put(`/admin/meme/${editingItem.id}`, form);
+        await httpClient.post("/meme/admin/update", { id: editingItem.id, ...form });
       } else {
-        await httpClient.post("/admin/meme", form);
+        await httpClient.post("/meme/admin/save", form);
       }
       setDialogVisible(false);
       fetchData();
@@ -43,7 +43,7 @@ export function MemeManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/meme/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/meme/admin/${id}/delete`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

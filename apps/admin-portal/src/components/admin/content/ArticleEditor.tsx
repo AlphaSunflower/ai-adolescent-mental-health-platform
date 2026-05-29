@@ -18,16 +18,16 @@ export function ArticleEditor() {
 
   useEffect(() => {
     if (id) {
-      httpClient.get<Record<string,unknown>>(`/admin/articles/${id}`).then(setForm).catch(() => {});
+      httpClient.get<Record<string,unknown>>(`/content/article/${id}`).then(setForm).catch(() => {});
     }
   }, [id]);
 
   const handleSave = async () => {
     try {
       if (isEdit) {
-        await httpClient.put(`/admin/articles/${id}`, form);
+        await httpClient.put("/content/article", form);
       } else {
-        await httpClient.post("/admin/articles", form);
+        await httpClient.post("/content/article", form);
       }
       router.push("/admin/content/articles");
     } catch { /* ignore */ }

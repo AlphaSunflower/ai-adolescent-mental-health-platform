@@ -17,10 +17,11 @@ export function QualificationManager() {
   const [editingItem, setEditingItem] = useState<Record<string,unknown>|null>(null);
   const [form, setForm] = useState<Record<string,unknown>>({ name: "" });
 
-  const fetchData = useCallback(async (page = 1) => {
+  const fetchData = useCallback(async () => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/psychologist/qualifications", { query: { page, size: 20 } });
-      setData(res);
+      const res = await httpClient.get<Record<string,unknown>[]>("/admin/psychologist/qualifications");
+      const arr = Array.isArray(res) ? res : [];
+      setData({ total: arr.length, records: arr, current: 1, size: arr.length, pages: 1 });
     } catch { /* ignore */ }
   }, []);
 
@@ -32,9 +33,9 @@ export function QualificationManager() {
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.put(`/admin/psychologist/qualifications/${editingItem.id}`, form);
+        await httpClient.put(`/admin/psychologist/qualification/${editingItem.id}`, form);
       } else {
-        await httpClient.post("/admin/psychologist/qualifications", form);
+        await httpClient.post("/admin/psychologist/qualification", form);
       }
       setDialogVisible(false);
       fetchData();
@@ -43,7 +44,7 @@ export function QualificationManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/psychologist/qualifications/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/admin/psychologist/qualification/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (
@@ -74,9 +75,6 @@ export function QualificationManager() {
         </table>
         <div style={{ display:"flex", justifyContent:"flex-end", marginTop:"16px", gap:"8px", alignItems:"center" }}>
           <span style={{ fontSize:"13px", color:s.text2 }}>共 {data.total} 条</span>
-          <button onClick={() => fetchData(data.current-1)} disabled={data.current<=1} style={{ padding:"6px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>上一页</button>
-          <span style={{ fontSize:"13px", color:s.text2 }}>{data.current} / {data.pages||1}</span>
-          <button onClick={() => fetchData(data.current+1)} disabled={data.current>=data.pages} style={{ padding:"6px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>下一页</button>
         </div>
       </div>
       {dialogVisible && (

@@ -19,7 +19,7 @@ export function CourseManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/courses", { query: { page, size: 20, keyword: search } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/content/admin/courses", { query: { page, size: 20, keyword: search } });
       setData(res);
     } catch { /* ignore */ }
   }, [search]);
@@ -28,7 +28,7 @@ export function CourseManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/courses/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/content/course/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (

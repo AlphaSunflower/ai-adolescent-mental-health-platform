@@ -17,7 +17,7 @@ export function ArticleManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/articles", { query: { page, size: 20, keyword: search } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/content/admin/articles", { query: { page, size: 20, keyword: search } });
       setData(res);
     } catch { /* ignore */ }
   }, [search]);
@@ -26,7 +26,7 @@ export function ArticleManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete("/admin/articles/" + id); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete("/content/article/" + id); fetchData(); } catch { /* ignore */ }
   };
 
   return (

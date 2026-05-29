@@ -15,7 +15,7 @@ export function ConsultationIncomeDetail() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/consultation-income", { query: { page, size: 20 } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/platform-income/consultation/list", { query: { page, size: 20 } });
       setData(res);
     } catch { /* ignore */ }
   }, []);

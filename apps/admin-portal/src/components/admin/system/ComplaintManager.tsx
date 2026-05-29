@@ -16,7 +16,7 @@ export function ComplaintManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/complaints", { query: { page, size: 20 } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/complaint/list", { query: { page, size: 20 } });
       setData(res);
     } catch { /* ignore */ }
   }, []);
@@ -24,11 +24,11 @@ export function ComplaintManager() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const handleResolve = async (id: unknown) => {
-    try { await httpClient.post(`/admin/complaints/${id}/resolve`, {}); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.post(`/complaint/audit/${id}`, null, { query: { status: 1 } }); fetchData(); } catch { /* ignore */ }
   };
 
   const handleReject = async (id: unknown) => {
-    try { await httpClient.post(`/admin/complaints/${id}/reject`, {}); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.post(`/complaint/audit/${id}`, null, { query: { status: 2 } }); fetchData(); } catch { /* ignore */ }
   };
 
   return (

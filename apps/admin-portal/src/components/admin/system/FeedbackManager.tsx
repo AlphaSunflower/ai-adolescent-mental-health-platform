@@ -16,7 +16,7 @@ export function FeedbackManager() {
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/feedbacks", { query: { page, size: 20 } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/feedback/platform/list", { query: { page, size: 20 } });
       setData(res);
     } catch { /* ignore */ }
   }, []);
@@ -25,7 +25,7 @@ export function FeedbackManager() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/feedbacks/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.put(`/feedback/platform/${id}/status`, { status: 3, cancelReason: "管理员删除" }); fetchData(); } catch { /* ignore */ }
   };
 
   return (

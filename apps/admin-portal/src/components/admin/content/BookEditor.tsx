@@ -17,7 +17,7 @@ export function BookEditor() {
   useEffect(() => {
     if (id) {
       setLoading(true);
-      httpClient.get<Record<string,unknown>>("/admin/books/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
+      httpClient.get<Record<string,unknown>>("/admin/book/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
     }
   }, [id]);
 
@@ -25,9 +25,9 @@ export function BookEditor() {
     if (!form.title.trim()) { alert("请输入书名"); return; }
     try {
       if (isEdit) {
-        await httpClient.put("/admin/books/" + id, form);
+        await httpClient.put("/admin/book/" + id, form);
       } else {
-        await httpClient.post("/admin/books", form);
+        await httpClient.post("/admin/book", form);
       }
       router.push("/admin/content/books");
     } catch { alert("保存失败"); }
