@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 
 const s = {
@@ -14,6 +15,7 @@ type PageResult<T> = { total: number; records: T[]; current: number; size: numbe
 export function AssessmentManager() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
   const fetchData = useCallback(async (page = 1) => {
     try {
@@ -38,7 +40,7 @@ export function AssessmentManager() {
               style={{ height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, width:"240px", outline:"none" }} />
             <button onClick={() => fetchData()} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>搜索</button>
           </div>
-          <button onClick={() => {}} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>新增测评</button>
+          <button onClick={() => router.push("/admin/content/assessments/new")} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>新增测评</button>
         </div>
         <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
           <thead>
@@ -55,7 +57,7 @@ export function AssessmentManager() {
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.participantCount as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
-                  <button onClick={() => {}} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button>
+                  <button onClick={() => router.push(`/admin/content/assessments/${row.id}/edit`)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button>
                   <button onClick={() => handleDelete(row.id)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button>
                 </td>
               </tr>
