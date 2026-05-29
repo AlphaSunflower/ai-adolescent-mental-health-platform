@@ -93,6 +93,12 @@ public class LoginServiceImpl implements ILoginService {
         return Result.success("登录成功", result);
     }
 
+    @Override
+    public Result<HashMap<Object, Object>> adminLogin(User user, Boolean remember) {
+        HashMap<Object, Object> result = buildLoginResult(user, remember);
+        return Result.success("登录成功", result);
+    }
+
     /* ==================== 2. 小程序微信登录（改造） ==================== */
     @Override
     public Result<HashMap<Object, Object>> loginWx(String code, String userInfo) {
@@ -777,7 +783,7 @@ public class LoginServiceImpl implements ILoginService {
     /**
      * 构建登录结果（Token + userInfo）
      */
-    private HashMap<Object, Object> buildLoginResult(User user, Boolean remember) {
+    public HashMap<Object, Object> buildLoginResult(User user, Boolean remember) {
         // 单设备登录处理
         handleSingleDeviceLogin(user.getId().toString());
 

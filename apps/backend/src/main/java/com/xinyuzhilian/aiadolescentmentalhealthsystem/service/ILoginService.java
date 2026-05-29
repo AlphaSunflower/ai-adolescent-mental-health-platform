@@ -102,4 +102,6 @@ public interface ILoginService {
      * 验证忘记密码验证码（仅验证，不重置）
      */
     Result<String> verifyForgotCode(String username, String email, String code);
+
+    Result<HashMap<Object, Object>> adminLogin(User user, Boolean remember);
 }
