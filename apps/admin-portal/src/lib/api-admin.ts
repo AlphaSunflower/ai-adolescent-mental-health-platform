@@ -10,7 +10,7 @@ const httpClient = createHttpClient({
   onUnauthorized: () => {
     clearSession();
     if (typeof window !== "undefined") {
-      window.location.href = "/admin/login";
+      window.location.href = "/login";
     }
   },
 });

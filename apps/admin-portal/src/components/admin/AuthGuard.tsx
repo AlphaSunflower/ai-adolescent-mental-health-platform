@@ -18,12 +18,12 @@ export function AuthGuard({ children, allowedRoles, allowPsychologist = false }:
   useEffect(() => {
     const token = getToken();
     if (!token) {
-      router.replace("/admin/login");
+      router.replace("/login");
       return;
     }
     const user = getStoredUser();
     if (!user) {
-      router.replace("/admin/login");
+      router.replace("/login");
       return;
     }
     const role = (user as Record<string, unknown>).role as number ?? 1;

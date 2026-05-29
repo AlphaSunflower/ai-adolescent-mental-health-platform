@@ -18,7 +18,7 @@ export function getRoleDashboardPath(role: number, isPsychologist: boolean): str
   if (role === ROLE_SUPER_ADMIN) return "/admin/dashboard";
   if (role === ROLE_HOSPITAL_ADMIN) return "/hospital/dashboard";
   if (role === ROLE_DOCTOR) return "/doctor/dashboard";
-  return "/admin/login";
+  return "/login";
 }
 
 export interface MenuItem {

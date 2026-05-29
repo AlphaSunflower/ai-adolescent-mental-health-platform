@@ -24,7 +24,7 @@ export function AdminHeader() {
 
   const handleLogout = () => {
     clearSession();
-    router.replace("/admin/login");
+    router.replace("/login");
   };
 
   const mainBg = "#ffffff";
