@@ -92,8 +92,8 @@ export function PsychAppointments() {
     if (link === null) return;
     try {
       const now = new Date();
-      const st = now.toISOString().slice(0, 16).replace("T", " ") + ":00";
-      const et = new Date(now.getTime() + 3600000).toISOString().slice(0, 16).replace("T", " ") + ":00";
+      const st = now.toISOString().slice(0, 16) + ":00";
+      const et = new Date(now.getTime() + 3600000).toISOString().slice(0, 16) + ":00";
       await httpClient.post(`/psychologist/admin/appointments/${id}/video-link`, {}, { query: { videoLink: link, startTime: st, endTime: et } });
       fetchData(page);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
@@ -101,7 +101,7 @@ export function PsychAppointments() {
 
   const handleStart = async (id: number) => {
     if (!confirm("确认开始咨询？")) return;
-    try { await httpClient.post(`/psychologist/admin/appointments/${id}/start`, {}, { query: { startTime: new Date().toISOString().slice(0, 16).replace("T", " ") + ":00" } }); fetchData(page); }
+    try { await httpClient.post(`/psychologist/admin/appointments/${id}/start`, {}, { query: { startTime: new Date().toISOString().slice(0, 16) + ":00" } }); fetchData(page); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };
 
