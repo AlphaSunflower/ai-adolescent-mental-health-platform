@@ -23,10 +23,10 @@ interface PageData {
 function getSexLabel(s: number) { if (s === 1) return "男"; if (s === 2) return "女"; return "未知"; }
 function calcAge(birthday: string): string {
   if (!birthday) return "-";
-  try {
-    const diff = Date.now() - new Date(birthday).getTime();
-    return String(Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000)));
-  } catch { return "-"; }
+  const time = new Date(birthday).getTime();
+  if (!Number.isFinite(time) || time > Date.now()) return "-";
+  const diff = Date.now() - time;
+  return String(Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000)));
 }
 
 export function PatientArchives() {
@@ -52,7 +52,7 @@ export function PatientArchives() {
   const filtered = data.records.filter((r) => {
     if (!searchInput.trim()) return true;
     const q = searchInput.toLowerCase();
-    return (r.nickname || r.username || "").toLowerCase().includes(q);
+    return (r.nickname ?? "").toLowerCase().includes(q) || (r.username ?? "").toLowerCase().includes(q);
   });
 
   const thStyle: React.CSSProperties = {

@@ -62,6 +62,7 @@ export function PsychAppointments() {
   const [statusFilter, setStatusFilter] = useState("");
   const [detailItem, setDetailItem] = useState<Appointment | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
@@ -112,7 +113,7 @@ export function PsychAppointments() {
   };
 
   const viewDetail = async (id: number) => {
-    setDetailLoading(true);
+    setDetailOpen(true); setDetailLoading(true);
     try {
       const res = await httpClient.get<Appointment>(`/psychologist/admin/appointments/${id}/detail`);
       setDetailItem(res);
@@ -218,11 +219,11 @@ export function PsychAppointments() {
       </div>
 
       {/* Detail Dialog */}
-      {detailItem && (
-        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }} onClick={() => setDetailItem(null)}>
+      {(detailOpen || detailItem) && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }} onClick={() => { setDetailItem(null); setDetailOpen(false); }}>
           <div style={{ backgroundColor: s.white, borderRadius: "8px", padding: "24px", width: "500px", maxHeight: "80vh", overflow: "auto" }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ margin: "0 0 20px", fontSize: "18px", color: s.text }}>预约详情</h3>
-            {detailLoading ? (
+            {detailLoading || !detailItem ? (
               <div style={{ textAlign: "center", padding: "40px", color: s.text3 }}>加载中...</div>
             ) : (
               <>

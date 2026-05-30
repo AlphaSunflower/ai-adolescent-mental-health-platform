@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
+
 import { getStoredUser } from "@/lib/session";
 
 const s = {
@@ -18,6 +20,7 @@ function renderTableBody(
   records: Record<string, unknown>[],
   fetchData: () => void,
   handleDelete: (id: unknown) => void,
+  handleEdit: (id: unknown) => void,
 ) {
   if (loading) {
     return <tr key="ld"><td colSpan={6} style={{ padding: "40px", textAlign: "center", color: s.text3, fontSize: "13px", borderBottom: "1px solid #ebeef5" }}>加载中...</td></tr>;
@@ -40,7 +43,7 @@ function renderTableBody(
       </td>
       <td style={{ padding: "12px 8px", borderBottom: "1px solid #ebeef5", fontSize: "13px" }}>{row.publishTime as string}</td>
       <td style={{ padding: "12px 8px", borderBottom: "1px solid #ebeef5" }}>
-        <a href={"/admin/content/articles/" + (row.id as string) + "/edit"} style={{ color: "#409eff", border: "none", background: "none", cursor: "pointer", marginRight: "8px", textDecoration: "none" }}>编辑</a>
+        <button onClick={() => handleEdit(row.id)} style={{ color: "#409eff", border: "none", background: "none", cursor: "pointer", marginRight: "8px" }}>编辑</button>
         <button onClick={() => handleDelete(row.id)} style={{ color: "#f56c6c", border: "none", background: "none", cursor: "pointer" }}>删除</button>
       </td>
     </tr>
@@ -48,6 +51,7 @@ function renderTableBody(
 }
 
 export function ArticleManager() {
+  const router = useRouter();
   const [data, setData] = useState<PageResult<Record<string, unknown>>>({ total: 0, records: [], current: 1, size: 20, pages: 0 });
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
@@ -83,7 +87,7 @@ export function ArticleManager() {
               style={{ height: "36px", padding: "0 12px", border: "1px solid #dcdfe6", borderRadius: "4px", width: "240px", outline: "none" }} />
             <button onClick={() => fetchData()} style={{ height: "36px", padding: "0 20px", backgroundColor: "#409eff", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer" }}>搜索</button>
           </div>
-          <a href="/admin/content/articles/new" style={{ height: "36px", padding: "0 20px", backgroundColor: "#409eff", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", display: "inline-flex", alignItems: "center", textDecoration: "none", fontSize: "14px" }}>新增文章</a>
+          <button onClick={() => router.push("/admin/content/articles/new")} style={{ height: "36px", padding: "0 20px", backgroundColor: "#409eff", color: "#fff", border: "none", borderRadius: "4px", cursor: "pointer", fontSize: "14px" }}>新增文章</button>
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #ebeef5" }}>
           <thead>
@@ -92,7 +96,7 @@ export function ArticleManager() {
             </tr>
           </thead>
           <tbody>
-            {renderTableBody(loading, error, data.records, fetchData, handleDelete)}
+            {renderTableBody(loading, error, data.records, fetchData, handleDelete, (id) => router.push("/admin/content/articles/" + id + "/edit"))}
           </tbody>
         </table>
         <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px", gap: "8px", alignItems: "center" }}>

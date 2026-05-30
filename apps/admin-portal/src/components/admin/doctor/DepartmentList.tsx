@@ -39,7 +39,7 @@ export function DepartmentList() {
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
     httpClient.get<PageData>("/hospital/department/list", { query: { page: p, size, keyword } })
-      .then((res) => { setData(res); setPage(p); })
+      .then((res) => { setData(res); setPage(res.current ?? p); })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
   };
