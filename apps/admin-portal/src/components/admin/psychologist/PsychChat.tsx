@@ -2,21 +2,27 @@
 
 import { useState, useEffect, useRef } from "react";
 import { httpClient } from "@/lib/api-admin";
+import { getStoredUser } from "@/lib/session";
 
 const s = {
   primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
   text: "#303133", text2: "#606266", text3: "#909399",
   border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
   radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-  statCardBg: "#fff",
 };
 
 interface Conversation {
-  id: number; userName: string; lastMessage: string; lastTime: string; unread: number;
+  appointmentId: number; userId: number; userName: string;
+  serviceType: string; status: number; lastMessage: string; lastTime: string;
 }
 
 interface Message {
-  id: number; senderId: number; content: string; createTime: string;
+  id: number; senderId: number; content: string; createTime: string; contentType: string;
+}
+
+function getStatusLabel(st: number): string {
+  const map: Record<number, string> = { 0: "待审核", 1: "已确认", 2: "已拒绝", 3: "进行中", 4: "已完成", 5: "已取消", 6: "已爽约", 7: "待进行", 8: "已评价" };
+  return map[st] ?? String(st);
 }
 
 export function PsychChat() {
@@ -29,31 +35,45 @@ export function PsychChat() {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  const user = getStoredUser<Record<string, unknown>>();
+  const currentUserId = (user?.id as number) || 0;
+
   const fetchConversations = () => {
     setLoading(true); setError(null);
-    httpClient.get<Conversation[]>("/psychologist/message/conversations")
-      .then(setConversations)
+    httpClient.get<Record<string, unknown>[]>("/psychologist/message/conversations")
+      .then((raw) => {
+        const convs: Conversation[] = Array.isArray(raw) ? raw.map((c) => ({
+          appointmentId: c.appointmentId as number,
+          userId: c.userId as number,
+          userName: (c.userName as string) || (c.nickname as string) || ("用户" + String(c.userId || "")),
+          serviceType: c.serviceType as string,
+          status: c.status as number,
+          lastMessage: (c.lastMessage as string) || "",
+          lastTime: (c.lastTime as string) || (c.updateTime as string) || "",
+        })) : [];
+        setConversations(convs);
+      })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
   };
 
-  const fetchMessages = (convId: number) => {
-    httpClient.get<Message[]>("/psychologist/message/records", { query: { conversationId: convId } })
-      .then(setMessages)
+  const fetchMessages = (appointmentId: number) => {
+    httpClient.get<Message[]>(`/psychologist/admin/messages/${appointmentId}`)
+      .then((res) => setMessages(Array.isArray(res) ? res : []))
       .catch(() => {});
   };
 
   useEffect(() => { fetchConversations(); }, []);
-  useEffect(() => { if (activeConv) { fetchMessages(activeConv.id); } }, [activeConv]);
+  useEffect(() => { if (activeConv) { fetchMessages(activeConv.appointmentId); } }, [activeConv]);
   useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
 
   const handleSend = async () => {
     if (!inputText.trim() || !activeConv) return;
     setSending(true);
     try {
-      await httpClient.post("/psychologist/message/send", { conversationId: activeConv.id, content: inputText });
+      await httpClient.post("/psychologist/admin/messages/send", { appointmentId: activeConv.appointmentId, content: inputText, type: "TEXT" });
       setInputText("");
-      fetchMessages(activeConv.id);
+      fetchMessages(activeConv.appointmentId);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
     finally { setSending(false); }
   };
@@ -75,27 +95,25 @@ export function PsychChat() {
 
         <div style={{ flex: 1, overflow: "auto" }}>
           {loading ? (
-            <div style={{ padding: "40px", textAlign: "center", color: s.text3 }}>加载中...</div>
+            <div key="loading" style={{ padding: "40px", textAlign: "center", color: s.text3 }}>加载中...</div>
           ) : conversations.length === 0 ? (
-            <div style={{ padding: "40px", textAlign: "center", color: s.text3 }}>暂无会话</div>
+            <div key="empty" style={{ padding: "40px", textAlign: "center", color: s.text3 }}>暂无会话</div>
           ) : (
             conversations.map((conv) => (
-              <div key={conv.id}
+              <div key={conv.appointmentId}
                 onClick={() => setActiveConv(conv)}
                 style={{
                   padding: "14px 16px", cursor: "pointer", borderBottom: "1px solid " + s.border,
-                  backgroundColor: activeConv?.id === conv.id ? s.primary + "10" : s.white,
-                  borderLeft: activeConv?.id === conv.id ? "3px solid " + s.primary : "3px solid transparent",
+                  backgroundColor: activeConv?.appointmentId === conv.appointmentId ? s.primary + "10" : s.white,
+                  borderLeft: activeConv?.appointmentId === conv.appointmentId ? "3px solid " + s.primary : "3px solid transparent",
                 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
                   <span style={{ fontSize: "14px", fontWeight: 600, color: s.text }}>{conv.userName}</span>
                   <span style={{ fontSize: "11px", color: s.text3 }}>{conv.lastTime}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <span style={{ fontSize: "12px", color: s.text3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "200px" }}>{conv.lastMessage ?? ""}</span>
-                  {conv.unread > 0 && (
-                    <span style={{ display: "inline-block", minWidth: "18px", height: "18px", borderRadius: "9px", backgroundColor: s.red, color: s.white, fontSize: "11px", textAlign: "center", lineHeight: "18px", padding: "0 5px" }}>{conv.unread}</span>
-                  )}
+                  <span style={{ fontSize: "12px", color: s.text3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "180px" }}>{conv.lastMessage || getStatusLabel(conv.status)}</span>
+                  <span style={{ fontSize: "11px", color: s.primary }}>{getStatusLabel(conv.status)}</span>
                 </div>
               </div>
             ))
@@ -109,19 +127,20 @@ export function PsychChat() {
           <>
             <div style={{ padding: "14px 20px", borderBottom: "1px solid " + s.border }}>
               <span style={{ fontSize: "15px", fontWeight: 600, color: s.text }}>{activeConv.userName}</span>
+              <span style={{ fontSize: "12px", color: s.text3, marginLeft: "10px" }}>{getStatusLabel(activeConv.status)}</span>
             </div>
 
             <div style={{ flex: 1, overflow: "auto", padding: "16px" }}>
               {messages.length === 0 ? (
-                <div style={{ textAlign: "center", color: s.text3, padding: "40px" }}>暂无消息</div>
+                <div key="no-msg" style={{ textAlign: "center", color: s.text3, padding: "40px" }}>暂无消息</div>
               ) : (
                 messages.map((msg) => (
                   <div key={msg.id} style={{
-                    display: "flex", justifyContent: msg.senderId === 0 ? "flex-end" : "flex-start", marginBottom: "12px",
+                    display: "flex", justifyContent: msg.senderId === currentUserId ? "flex-end" : "flex-start", marginBottom: "12px",
                   }}>
                     <div style={{
                       maxWidth: "70%", padding: "10px 14px", borderRadius: "12px",
-                      backgroundColor: msg.senderId === 0 ? s.primary + "10" : s.bg,
+                      backgroundColor: msg.senderId === currentUserId ? s.primary + "10" : s.bg,
                       color: s.text, fontSize: "13px", lineHeight: 1.5, wordBreak: "break-word",
                     }}>
                       {msg.content}

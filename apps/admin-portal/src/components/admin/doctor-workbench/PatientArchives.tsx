@@ -8,38 +8,53 @@ const s = {
   text: "#303133", text2: "#606266", text3: "#909399",
   border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
   radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-  statCardBg: "#fff",
 };
 
-interface Patient {
-  id: number; patientName: string; gender: string; age: number;
-  lastVisitTime: string;
+interface PatientRecord {
+  id: number; nickname: string; username: string; sex: number;
+  birthday: string; phone: string; email: string; headPath: string;
+  signature: string; role: number; createTime: string;
 }
 
 interface PageData {
-  total: number; current: number; pages: number; records: Patient[];
+  total: number; current: number; pages: number; records: PatientRecord[];
+}
+
+function getSexLabel(s: number) { if (s === 1) return "男"; if (s === 2) return "女"; return "未知"; }
+function calcAge(birthday: string): string {
+  if (!birthday) return "-";
+  try {
+    const diff = Date.now() - new Date(birthday).getTime();
+    return String(Math.floor(diff / (365.25 * 24 * 60 * 60 * 1000)));
+  } catch { return "-"; }
 }
 
 export function PatientArchives() {
   const [data, setData] = useState<PageData>({ total: 0, current: 1, pages: 1, records: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [keyword, setKeyword] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const [page, setPage] = useState(1);
   const [size] = useState(10);
+  const [detailItem, setDetailItem] = useState<PatientRecord | null>(null);
 
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
-    httpClient.get<PageData>("/doctor/patients", { query: { page: p, size, keyword } })
-      .then((res) => { setData(res); setPage(p); })
+    httpClient.get<PageData>("/doctor/patients", { query: { page: p, size } })
+      .then((res) => setData(res))
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
+    setPage(p);
   };
 
-  useEffect(() => { fetchData(1); }, [keyword]);
+  useEffect(() => { fetchData(1); }, []);
 
-  const handleSearch = () => { setKeyword(searchInput); };
+  // Client-side search filter
+  const filtered = data.records.filter((r) => {
+    if (!searchInput.trim()) return true;
+    const q = searchInput.toLowerCase();
+    return (r.nickname || r.username || "").toLowerCase().includes(q);
+  });
 
   const thStyle: React.CSSProperties = {
     padding: "12px 8px", textAlign: "left" as const, fontSize: "13px",
@@ -61,14 +76,10 @@ export function PatientArchives() {
           </div>
         )}
 
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
-          <div style={{ display: "flex", gap: "10px" }}>
-            <input placeholder="搜索患者姓名..." value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleSearch(); }}
-              style={{ height: "36px", padding: "0 12px", border: "1px solid " + s.border, borderRadius: s.radius, width: "240px" }} />
-            <button onClick={handleSearch} style={{ height: "36px", padding: "0 20px", backgroundColor: s.primary, color: s.white, border: "none", borderRadius: s.radius, cursor: "pointer" }}>搜索</button>
-          </div>
+        <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+          <input placeholder="搜索患者姓名..." value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            style={{ height: "36px", padding: "0 12px", border: "1px solid " + s.border, borderRadius: s.radius, width: "240px", outline: "none" }} />
         </div>
 
         {loading ? (
@@ -82,23 +93,23 @@ export function PatientArchives() {
                   <th style={thStyle}>患者姓名</th>
                   <th style={thStyle}>性别</th>
                   <th style={thStyle}>年龄</th>
-                  <th style={thStyle}>最后就诊时间</th>
+                  <th style={thStyle}>手机号</th>
                   <th style={thStyle}>操作</th>
                 </tr>
               </thead>
               <tbody>
-                {data.records.length === 0 ? (
+                {filtered.length === 0 ? (
                   <tr><td colSpan={6} style={{ ...tdStyle, textAlign: "center", color: s.text3 }}>暂无数据</td></tr>
                 ) : (
-                  data.records.map((row, i) => (
-                    <tr key={row.id} style={{ backgroundColor: i % 2 === 0 ? s.white : "#fafafa" }}>
+                  filtered.map((row) => (
+                    <tr key={row.id} style={{ backgroundColor: data.records.indexOf(row) % 2 === 0 ? s.white : "#fafafa" }}>
                       <td style={tdStyle}>{row.id}</td>
-                      <td style={tdStyle}>{row.patientName}</td>
-                      <td style={tdStyle}>{row.gender ?? "-"}</td>
-                      <td style={tdStyle}>{row.age ?? "-"}</td>
-                      <td style={tdStyle}>{row.lastVisitTime ?? "-"}</td>
+                      <td style={tdStyle}>{row.nickname || row.username || "-"}</td>
+                      <td style={tdStyle}>{getSexLabel(row.sex)}</td>
+                      <td style={tdStyle}>{calcAge(row.birthday)}</td>
+                      <td style={tdStyle}>{row.phone || "-"}</td>
                       <td style={tdStyle}>
-                        <button style={{ color: s.primary, border: "none", background: "none", cursor: "pointer" }}>查看详情</button>
+                        <button onClick={() => setDetailItem(row)} style={{ color: s.primary, border: "none", background: "none", cursor: "pointer" }}>查看详情</button>
                       </td>
                     </tr>
                   ))
@@ -116,6 +127,26 @@ export function PatientArchives() {
           </>
         )}
       </div>
+
+      {/* Detail Dialog */}
+      {detailItem && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }} onClick={() => setDetailItem(null)}>
+          <div style={{ backgroundColor: s.white, borderRadius: "8px", padding: "24px", width: "480px" }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: "0 0 20px", fontSize: "18px", color: s.text }}>患者详情</h3>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>ID：</span><span style={{ fontSize: "13px" }}>{detailItem.id}</span></div>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>用户名：</span><span style={{ fontSize: "13px" }}>{detailItem.username}</span></div>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>昵称：</span><span style={{ fontSize: "13px" }}>{detailItem.nickname || "-"}</span></div>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>性别：</span><span style={{ fontSize: "13px" }}>{getSexLabel(detailItem.sex)}</span></div>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>生日：</span><span style={{ fontSize: "13px" }}>{detailItem.birthday || "-"}</span></div>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>手机号：</span><span style={{ fontSize: "13px" }}>{detailItem.phone || "-"}</span></div>
+            <div style={{ marginBottom: "12px" }}><span style={{ fontSize: "13px", color: s.text3 }}>邮箱：</span><span style={{ fontSize: "13px" }}>{detailItem.email || "-"}</span></div>
+            <div style={{ marginBottom: "20px" }}><span style={{ fontSize: "13px", color: s.text3 }}>注册时间：</span><span style={{ fontSize: "13px" }}>{detailItem.createTime || "-"}</span></div>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <button onClick={() => setDetailItem(null)} style={{ height: "36px", padding: "0 20px", border: `1px solid ${s.border}`, borderRadius: s.radius, background: s.white, cursor: "pointer" }}>关闭</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

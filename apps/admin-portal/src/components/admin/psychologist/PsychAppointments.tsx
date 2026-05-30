@@ -8,16 +8,49 @@ const s = {
   text: "#303133", text2: "#606266", text3: "#909399",
   border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
   radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-  statCardBg: "#fff",
 };
 
 interface Appointment {
-  id: number; visitorName: string; appointmentTime: string;
-  consultType: string; status: string;
+  id: number; orderNo: string; userId: number; psychologistId: number;
+  userName: string; userHead: string; userPhone: string;
+  serviceType: string; appointmentTime: string;
+  fee: number; status: number; payStatus: number;
+  rejectReason: string; videoLink: string; startTime: string; endTime: string;
+  ratingScore: number; ratingContent: string;
+  commissionRate: number; commissionAmount: number; psychologistIncome: number;
 }
 
 interface PageData {
   total: number; current: number; pages: number; records: Appointment[];
+}
+
+const STATUS_TABS = [
+  { value: "", label: "全部" },
+  { value: "0", label: "待审核" },
+  { value: "1", label: "已确认" },
+  { value: "2", label: "已拒绝" },
+  { value: "3", label: "进行中" },
+  { value: "4", label: "已完成" },
+  { value: "7", label: "待进行" },
+  { value: "8", label: "已评价" },
+];
+
+function getStatusLabel(st: number): string {
+  const map: Record<number, string> = { 0: "待审核", 1: "已确认", 2: "已拒绝", 3: "进行中", 4: "已完成", 5: "已取消", 6: "已爽约", 7: "待进行", 8: "已评价" };
+  return map[st] ?? String(st);
+}
+
+function getStatusColor(st: number): string {
+  if (st === 0 || st === 7) return s.orange;
+  if (st === 1 || st === 4 || st === 8) return s.green;
+  if (st === 2 || st === 5 || st === 6) return s.red;
+  if (st === 3) return s.primary;
+  return s.text3;
+}
+
+function getServiceLabel(t: string): string {
+  const map: Record<string, string> = { VIDEO: "视频", VOICE: "语音", TEXT: "文字", OFFLINE: "线下" };
+  return map[t] ?? t ?? "-";
 }
 
 export function PsychAppointments() {
@@ -26,32 +59,65 @@ export function PsychAppointments() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [size] = useState(10);
+  const [statusFilter, setStatusFilter] = useState("");
+  const [detailItem, setDetailItem] = useState<Appointment | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
-    httpClient.get<PageData>("/psychologist/admin/appointments", { query: { page: p, size } })
+    const query: Record<string, string | number | boolean | null | undefined> = { page: p, size };
+    if (statusFilter) query.status = statusFilter;
+    httpClient.get<PageData>("/psychologist/admin/appointments", { query })
       .then((res) => { setData(res); setPage(p); })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchData(1); }, []);
+  useEffect(() => { fetchData(1); }, [statusFilter]);
 
-  const handleConfirm = async (id: number) => {
-    try { await httpClient.post("/psychologist/admin/appointments/" + id + "/handle", {}, { query: { accepted: "true" } }); fetchData(page); }
+  const handleAccept = async (id: number) => {
+    try { await httpClient.post(`/psychologist/admin/appointments/${id}/handle`, {}, { query: { accepted: "true" } }); fetchData(page); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };
 
-  const handleCancel = async (id: number) => {
-    if (!confirm("确认取消该预约？")) return;
-    try { await httpClient.post("/psychologist/admin/appointments/" + id + "/handle", {}, { query: { accepted: "false" } }); fetchData(page); }
+  const handleReject = async (id: number) => {
+    const reason = prompt("请输入拒绝原因（可选）：");
+    if (reason === null) return;
+    try { await httpClient.post(`/psychologist/admin/appointments/${id}/handle`, {}, { query: { accepted: "false", rejectReason: reason || undefined } }); fetchData(page); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };
 
-  const statusTag = (status: string) => {
-    const color = status === "已确认" ? s.green : status === "已取消" ? s.red : s.orange;
-    const bg = status === "已确认" ? "#f0f9eb" : status === "已取消" ? "#fef0f0" : "#fdf6ec";
-    return (<span style={{ display: "inline-block", padding: "2px 8px", borderRadius: s.radius, backgroundColor: bg, color, fontSize: "12px", fontWeight: 500 }}>{status}</span>);
+  const handleSendLink = async (id: number) => {
+    const link = prompt("请输入视频链接或线下地址：");
+    if (link === null) return;
+    try {
+      const now = new Date();
+      const st = now.toISOString().slice(0, 16).replace("T", " ") + ":00";
+      const et = new Date(now.getTime() + 3600000).toISOString().slice(0, 16).replace("T", " ") + ":00";
+      await httpClient.post(`/psychologist/admin/appointments/${id}/video-link`, {}, { query: { videoLink: link, startTime: st, endTime: et } });
+      fetchData(page);
+    } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
+  };
+
+  const handleStart = async (id: number) => {
+    if (!confirm("确认开始咨询？")) return;
+    try { await httpClient.post(`/psychologist/admin/appointments/${id}/start`, {}, { query: { startTime: new Date().toISOString().slice(0, 16).replace("T", " ") + ":00" } }); fetchData(page); }
+    catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
+  };
+
+  const handleComplete = async (id: number) => {
+    if (!confirm("确认完成咨询？")) return;
+    try { await httpClient.post(`/psychologist/admin/appointments/${id}/complete`); fetchData(page); }
+    catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
+  };
+
+  const viewDetail = async (id: number) => {
+    setDetailLoading(true);
+    try {
+      const res = await httpClient.get<Appointment>(`/psychologist/admin/appointments/${id}/detail`);
+      setDetailItem(res);
+    } catch { /* ignore */ }
+    finally { setDetailLoading(false); }
   };
 
   const thStyle: React.CSSProperties = {
@@ -74,6 +140,19 @@ export function PsychAppointments() {
           </div>
         )}
 
+        <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", marginBottom: "16px" }}>
+          {STATUS_TABS.map((tab) => (
+            <button key={tab.value} onClick={() => { setStatusFilter(tab.value); }}
+              style={{
+                padding: "6px 14px", borderRadius: "16px", fontSize: "13px", border: "none", cursor: "pointer",
+                backgroundColor: statusFilter === tab.value ? s.primary : s.bg,
+                color: statusFilter === tab.value ? "#fff" : s.text2,
+              }}>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
         {loading ? (
           <div style={{ padding: "40px", textAlign: "center", color: s.text3 }}>加载中...</div>
         ) : (
@@ -81,33 +160,42 @@ export function PsychAppointments() {
             <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #ebeef5" }}>
               <thead>
                 <tr style={{ backgroundColor: "#f5f7fa" }}>
-                  <th style={thStyle}>ID</th>
-                  <th style={thStyle}>来访者</th>
-                  <th style={thStyle}>预约时间</th>
-                  <th style={thStyle}>咨询方式</th>
-                  <th style={thStyle}>状态</th>
-                  <th style={thStyle}>操作</th>
+                  {["ID", "来访者", "预约时间", "咨询方式", "费用", "状态", "操作"].map(h => <th key={h} style={thStyle}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {data.records.length === 0 ? (
-                  <tr><td colSpan={6} style={{ ...tdStyle, textAlign: "center", color: s.text3 }}>暂无数据</td></tr>
+                  <tr><td colSpan={7} style={{ ...tdStyle, textAlign: "center", color: s.text3 }}>暂无数据</td></tr>
                 ) : (
-                  data.records.map((row, i) => (
-                    <tr key={row.id} style={{ backgroundColor: i % 2 === 0 ? s.white : "#fafafa" }}>
+                  data.records.map((row) => (
+                    <tr key={row.id} style={{ backgroundColor: data.records.indexOf(row) % 2 === 0 ? s.white : "#fafafa" }}>
                       <td style={tdStyle}>{row.id}</td>
-                      <td style={tdStyle}>{row.visitorName}</td>
-                      <td style={tdStyle}>{row.appointmentTime}</td>
-                      <td style={tdStyle}>{row.consultType}</td>
-                      <td style={tdStyle}>{statusTag(row.status)}</td>
+                      <td style={tdStyle}>{row.userName || "-"}</td>
+                      <td style={tdStyle}>{row.appointmentTime || "-"}</td>
+                      <td style={tdStyle}>{getServiceLabel(row.serviceType)}</td>
+                      <td style={tdStyle}>¥{Number(row.fee || 0).toFixed(2)}</td>
                       <td style={tdStyle}>
-                        {row.status === "待确认" && (
+                        <span style={{ display: "inline-block", padding: "2px 8px", borderRadius: s.radius, color: getStatusColor(row.status), backgroundColor: getStatusColor(row.status) + "15", fontSize: "12px", fontWeight: 500 }}>
+                          {getStatusLabel(row.status)}
+                        </span>
+                      </td>
+                      <td style={tdStyle}>
+                        <button onClick={() => viewDetail(row.id)} style={{ color: s.text2, border: "none", background: "none", cursor: "pointer", marginRight: "6px" }}>详情</button>
+                        {row.status === 0 && (
                           <>
-                            <button onClick={() => handleConfirm(row.id)} style={{ color: s.green, border: "none", background: "none", cursor: "pointer", marginRight: "8px" }}>确认</button>
-                            <button onClick={() => handleCancel(row.id)} style={{ color: s.red, border: "none", background: "none", cursor: "pointer" }}>取消</button>
+                            <button onClick={() => handleAccept(row.id)} style={{ color: s.green, border: "none", background: "none", cursor: "pointer", marginRight: "6px" }}>接受</button>
+                            <button onClick={() => handleReject(row.id)} style={{ color: s.red, border: "none", background: "none", cursor: "pointer" }}>拒绝</button>
                           </>
                         )}
-                        {row.status !== "待确认" && <span style={{ color: s.text3, fontSize: "12px" }}>-</span>}
+                        {row.status === 1 && (
+                          <>
+                            <button onClick={() => handleSendLink(row.id)} style={{ color: s.primary, border: "none", background: "none", cursor: "pointer", marginRight: "6px" }}>发送链接</button>
+                            <button onClick={() => handleStart(row.id)} style={{ color: s.green, border: "none", background: "none", cursor: "pointer" }}>开始</button>
+                          </>
+                        )}
+                        {row.status === 3 && (
+                          <button onClick={() => handleComplete(row.id)} style={{ color: s.orange, border: "none", background: "none", cursor: "pointer" }}>完成</button>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -125,6 +213,39 @@ export function PsychAppointments() {
           </>
         )}
       </div>
+
+      {/* Detail Dialog */}
+      {detailItem && (
+        <div style={{ position: "fixed", inset: 0, backgroundColor: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 1000 }} onClick={() => setDetailItem(null)}>
+          <div style={{ backgroundColor: s.white, borderRadius: "8px", padding: "24px", width: "500px", maxHeight: "80vh", overflow: "auto" }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin: "0 0 20px", fontSize: "18px", color: s.text }}>预约详情</h3>
+            {detailLoading ? (
+              <div style={{ textAlign: "center", padding: "40px", color: s.text3 }}>加载中...</div>
+            ) : (
+              <>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>订单号：</span><span style={{ fontSize: "13px" }}>{detailItem.orderNo || "-"}</span></div>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>来访者：</span><span style={{ fontSize: "13px" }}>{detailItem.userName || "-"}</span></div>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>电话：</span><span style={{ fontSize: "13px" }}>{detailItem.userPhone || "-"}</span></div>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>预约时间：</span><span style={{ fontSize: "13px" }}>{detailItem.appointmentTime || "-"}</span></div>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>咨询方式：</span><span style={{ fontSize: "13px" }}>{getServiceLabel(detailItem.serviceType)}</span></div>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>费用：</span><span style={{ fontSize: "13px" }}>¥{Number(detailItem.fee || 0).toFixed(2)}</span></div>
+                <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>状态：</span><span style={{ fontSize: "13px", color: getStatusColor(detailItem.status) }}>{getStatusLabel(detailItem.status)}</span></div>
+                {detailItem.status === 8 && (
+                  <>
+                    <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>评分：</span><span style={{ fontSize: "13px" }}>{detailItem.ratingScore != null ? Number(detailItem.ratingScore).toFixed(1) : "-"}</span></div>
+                    <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>评价内容：</span><span style={{ fontSize: "13px" }}>{detailItem.ratingContent || "-"}</span></div>
+                    <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>平台抽成：</span><span style={{ fontSize: "13px" }}>{detailItem.commissionRate != null ? `${(Number(detailItem.commissionRate) * 100).toFixed(0)}%` : "-"}</span></div>
+                    <div style={{ marginBottom: "10px" }}><span style={{ fontSize: "13px", color: s.text3 }}>咨询师收入：</span><span style={{ fontSize: "13px" }}>¥{Number(detailItem.psychologistIncome || 0).toFixed(2)}</span></div>
+                  </>
+                )}
+              </>
+            )}
+            <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "20px" }}>
+              <button onClick={() => setDetailItem(null)} style={{ height: "36px", padding: "0 20px", border: `1px solid ${s.border}`, borderRadius: s.radius, background: s.white, cursor: "pointer" }}>关闭</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
