@@ -41,10 +41,9 @@ export function PatientArchives() {
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
     httpClient.get<PageData>("/doctor/patients", { query: { page: p, size } })
-      .then((res) => setData(res))
+      .then((res) => { setData(res); setPage(p); })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
-    setPage(p);
   };
 
   useEffect(() => { fetchData(1); }, []);

@@ -33,17 +33,21 @@ export function ConsultationIncomeDetail() {
             </tr>
           </thead>
           <tbody>
-            {data.records.map((row, i) => (
+            {data.records.length === 0 ? (
+              <tr><td colSpan={7} style={{ padding:"40px", textAlign:"center", color:s.text3, fontSize:"13px" }}>暂无数据</td></tr>
+            ) : (
+              data.records.map((row, i) => (
               <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.psychologistName as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.userName as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.duration as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{(row.amount as number)?.toFixed(2)}</td>
+                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{Number(row.amount || 0).toFixed(2)}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{(row.status as number)===1?"已结算":"未结算"}</td>
               </tr>
-            ))}
+            ))
+            )}
           </tbody>
         </table>
         <div style={{ display:"flex", justifyContent:"flex-end", marginTop:"16px", gap:"8px", alignItems:"center" }}>

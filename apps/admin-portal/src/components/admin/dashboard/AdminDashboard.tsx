@@ -83,9 +83,7 @@ export function AdminDashboard() {
       .get<AdminOverview>("/stats/admin/overview")
       .then(setData)
       .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error("Failed to load admin overview:", msg);
-        setError(msg);
+        setError(err instanceof Error ? err.message : "Unknown error");
       })
       .finally(() => setLoading(false));
   }, []);

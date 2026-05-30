@@ -23,24 +23,29 @@ export function ArticleEditor() {
   const role = (user?.role as number) ?? undefined;
 
   useEffect(() => {
+    let cancelled = false;
     if (id) {
       setLoading(true);
-      httpClient.get<Record<string,unknown>>(`/content/article/${id}`).then((data) => setForm({
-        title: (data.title as string) || "",
-        content: (data.content as string) || "",
-        summary: (data.summary as string) || "",
-        coverImage: (data.coverImage as string) || "",
-        tags: (data.tags as string) || "",
-        status: (data.status as number) ?? 1,
-      })).catch(() => {}).finally(() => setLoading(false));
+      httpClient.get<Record<string,unknown>>(`/content/article/${id}`).then((data) => {
+        if (cancelled) return;
+        setForm({
+          title: (data.title as string) || "",
+          content: (data.content as string) || "",
+          summary: (data.summary as string) || "",
+          coverImage: (data.coverImage as string) || "",
+          tags: (data.tags as string) || "",
+          status: (data.status as number) ?? 1,
+        });
+      }).catch(() => {}).finally(() => { if (!cancelled) setLoading(false); });
     }
+    return () => { cancelled = true; };
   }, [id]);
 
   const handleSave = async () => {
     if (!form.title || !(form.title as string).trim()) { alert("请输入文章标题"); return; }
     setSaving(true);
     try {
-      const payload = { ...form, role };
+      const payload = { ...form, role: role };
       if (isEdit) {
         await httpClient.put("/content/article", payload);
       } else {

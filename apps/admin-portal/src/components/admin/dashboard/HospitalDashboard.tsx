@@ -85,9 +85,7 @@ export function HospitalDashboard() {
       .get<HospitalOverview>("/stats/hospital/overview")
       .then(setData)
       .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error("Failed to load hospital overview:", msg);
-        setError(msg);
+        setError(err instanceof Error ? err.message : "Unknown error");
       })
       .finally(() => setLoading(false));
   }, []);

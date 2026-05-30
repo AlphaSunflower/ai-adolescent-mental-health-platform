@@ -13,7 +13,7 @@ const s = {
 
 interface Complaint {
   id: number; complainantName: string; respondentName: string;
-  content: string; status: string; createTime: string;
+  content: string; status: number; createTime: string;
 }
 
 interface PageData {
@@ -44,10 +44,10 @@ export function HospitalComplaints() {
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };
 
-  const statusTag = (status: string) => {
-    const color = status === "已处理" ? s.green : status === "处理中" ? s.orange : s.red;
-    const bg = status === "已处理" ? "#f0f9eb" : status === "处理中" ? "#fdf6ec" : "#fef0f0";
-    return (<span style={{ display: "inline-block", padding: "2px 8px", borderRadius: s.radius, backgroundColor: bg, color, fontSize: "12px", fontWeight: 500 }}>{status ?? "待处理"}</span>);
+  const statusTag = (status: number) => {
+    if (status === 1) return (<span style={{ display: "inline-block", padding: "2px 8px", borderRadius: s.radius, backgroundColor: "#f0f9eb", color: s.green, fontSize: "12px", fontWeight: 500 }}>已处理</span>);
+    if (status === 2) return (<span style={{ display: "inline-block", padding: "2px 8px", borderRadius: s.radius, backgroundColor: "#fef0f0", color: s.red, fontSize: "12px", fontWeight: 500 }}>已驳回</span>);
+    return (<span style={{ display: "inline-block", padding: "2px 8px", borderRadius: s.radius, backgroundColor: "#fdf6ec", color: s.orange, fontSize: "12px", fontWeight: 500 }}>待处理</span>);
   };
 
   const thStyle: React.CSSProperties = {
@@ -97,10 +97,10 @@ export function HospitalComplaints() {
                       <td style={{ ...tdStyle, maxWidth: "200px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{row.content ?? "-"}</td>
                       <td style={tdStyle}>{statusTag(row.status)}</td>
                       <td style={tdStyle}>
-                        {row.status !== "已处理" && (
+                        {row.status !== 1 && (
                           <button onClick={() => handleProcess(row.id)} style={{ color: s.primary, border: "none", background: "none", cursor: "pointer" }}>处理</button>
                         )}
-                        {row.status === "已处理" && <span style={{ color: s.text3, fontSize: "12px" }}>已完成</span>}
+                        {row.status === 1 && <span style={{ color: s.text3, fontSize: "12px" }}>已完成</span>}
                       </td>
                     </tr>
                   ))

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
 
 const s = {
@@ -24,22 +24,19 @@ export function PsychIncome() {
   const [data, setData] = useState<PageData>({ total: 0, current: 1, pages: 1, records: [], totalIncome: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [size] = useState(10);
 
-  const fetchData = (p: number) => {
+  const fetchData = useCallback(() => {
     setLoading(true); setError(null);
     httpClient.get<Record<string,unknown>>("/psychologist/admin/dashboard/stats")
       .then((res) => {
         const details = (res.incomeDetails || res.details || []) as IncomeRecord[];
         setData({ total: details.length, current: 1, pages: 1, records: details, totalIncome: (res.totalIncome || res.todayIncome || 0) as number });
-        setPage(1);
       })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
-  };
+  }, []);
 
-  useEffect(() => { fetchData(1); }, []);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
   const statusTag = (status: string) => {
     const color = status === "已结算" ? s.green : s.orange;
@@ -109,11 +106,6 @@ export function PsychIncome() {
             </table>
             <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "16px", gap: "8px", alignItems: "center" }}>
               <span style={{ fontSize: "13px", color: s.text2 }}>共 {data.total} 条</span>
-              <button onClick={() => fetchData(page - 1)} disabled={page <= 1}
-                style={{ padding: "6px 12px", border: "1px solid " + s.border, borderRadius: s.radius, background: s.white, cursor: page <= 1 ? "not-allowed" : "pointer", opacity: page <= 1 ? 0.5 : 1 }}>上一页</button>
-              <span style={{ fontSize: "13px", color: s.text2 }}>{page} / {data.pages}</span>
-              <button onClick={() => fetchData(page + 1)} disabled={page >= data.pages}
-                style={{ padding: "6px 12px", border: "1px solid " + s.border, borderRadius: s.radius, background: s.white, cursor: page >= data.pages ? "not-allowed" : "pointer", opacity: page >= data.pages ? 0.5 : 1 }}>下一页</button>
             </div>
           </>
         )}

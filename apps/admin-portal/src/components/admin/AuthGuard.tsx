@@ -26,8 +26,12 @@ export function AuthGuard({ children, allowedRoles, allowPsychologist = false }:
       router.replace("/login");
       return;
     }
-    const role = (user as Record<string, unknown>).role as number ?? 1;
+    const role = (user as Record<string, unknown>).role as number | undefined;
     const isPsychologist = (user as Record<string, unknown>).isPsychologist === 1;
+    if (role === undefined || role === null) {
+      router.replace("/login");
+      return;
+    }
     const hasRole = allowedRoles.includes(role);
     const hasPsych = allowPsychologist && isPsychologist;
     if (!hasRole && !hasPsych) {

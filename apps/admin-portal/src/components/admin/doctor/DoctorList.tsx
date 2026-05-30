@@ -16,7 +16,7 @@ export function DoctorList() {
   const [search, setSearch] = useState("");
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Record<string,unknown>|null>(null);
-  const [form, setForm] = useState<Record<string,unknown>>({ realName: "", title: "", departmentId: null, introduction: "", consultationEnabled: false });
+  const [form, setForm] = useState<Record<string,unknown>>({ realName: "", title: "", departmentId: "", introduction: "", consultationEnabled: false });
 
   const fetchData = useCallback(async (page = 1) => {
     try {
@@ -27,7 +27,7 @@ export function DoctorList() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const openAdd = () => { setEditingItem(null); setForm({ realName: "", title: "", departmentId: null, introduction: "", consultationEnabled: false }); setDialogVisible(true); };
+  const openAdd = () => { setEditingItem(null); setForm({ realName: "", title: "", departmentId: "", introduction: "", consultationEnabled: false }); setDialogVisible(true); };
   const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({ ...item }); setDialogVisible(true); };
 
   const handleSave = async () => {

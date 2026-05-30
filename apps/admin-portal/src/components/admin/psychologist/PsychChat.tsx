@@ -16,7 +16,7 @@ interface Conversation {
 }
 
 interface Message {
-  id: number; senderId: number; content: string; createTime: string; contentType: string;
+  id: number; senderType: string; content: string; createTime: string; contentType: string;
 }
 
 function getStatusLabel(st: number): string {
@@ -34,16 +34,6 @@ export function PsychChat() {
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const [psychologistId, setPsychologistId] = useState<number>(0);
-
-  useEffect(() => {
-    httpClient.get<Record<string, unknown>>("/psychologist/admin/me")
-      .then((res) => {
-        const psy = (res.psychologist as Record<string, unknown>) || res;
-        setPsychologistId((psy.id as number) || 0);
-      })
-      .catch(() => {});
-  }, []);
 
   const extractUserName = (c: Record<string, unknown>): string => {
     if (c.userName) return String(c.userName);
@@ -73,7 +63,7 @@ export function PsychChat() {
           status: c.status as number,
           lastMessage: (c.lastMessage as string) || (c.userProblems as string) || "",
           lastTime: (c.lastTime as string) || (c.createTime as string) || "",
-        })).filter((c) => c.status !== 4 && c.status !== 8) : [];
+        })) : [];
         setConversations(convs);
       })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
@@ -159,11 +149,11 @@ export function PsychChat() {
               ) : (
                 messages.map((msg) => (
                   <div key={msg.id} style={{
-                    display: "flex", justifyContent: msg.senderId === psychologistId ? "flex-end" : "flex-start", marginBottom: "12px",
+                    display: "flex", justifyContent: msg.senderType === "psychologist" ? "flex-end" : "flex-start", marginBottom: "12px",
                   }}>
                     <div style={{
                       maxWidth: "70%", padding: "10px 14px", borderRadius: "12px",
-                      backgroundColor: msg.senderId === psychologistId ? s.primary + "10" : s.bg,
+                      backgroundColor: msg.senderType === "psychologist" ? s.primary + "10" : s.bg,
                       color: s.text, fontSize: "13px", lineHeight: 1.5, wordBreak: "break-word",
                     }}>
                       {msg.content}

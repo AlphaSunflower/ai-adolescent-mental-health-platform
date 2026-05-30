@@ -35,7 +35,7 @@ export function AuditManager() {
 
   const handleReject = async (id: unknown) => {
     const reason = prompt("请输入拒绝/驳回原因:");
-    if (!reason) return;
+    if (!reason) { alert("请填写拒绝原因"); return; }
     if (tab === "article") {
       try { await httpClient.post(`/article/audit/${id}`, { action: 2, reason }); fetchData(); } catch { /* ignore */ }
     } else {

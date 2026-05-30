@@ -83,9 +83,7 @@ export function DoctorDashboard() {
       .get<DoctorOverview>("/stats/doctor/overview")
       .then(setData)
       .catch((err: unknown) => {
-        const msg = err instanceof Error ? err.message : "Unknown error";
-        console.error("Failed to load doctor overview:", msg);
-        setError(msg);
+        setError(err instanceof Error ? err.message : "Unknown error");
       })
       .finally(() => setLoading(false));
   }, []);

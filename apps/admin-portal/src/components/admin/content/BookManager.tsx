@@ -56,9 +56,21 @@ export function BookManager() {
 
   const fetchComments = async (page = 1) => {
     if (!currentBookId) return;
+    fetchCommentsForBook(currentBookId, page);
+  };
+
+  const handleViewComments = (row: Record<string,unknown>) => {
+    const bookId = row.id as number;
+    setCurrentBookId(bookId);
+    setCurrentBookTitle(row.title as string);
+    setCommentVisible(true);
+    fetchCommentsForBook(bookId, 1);
+  };
+
+  const fetchCommentsForBook = async (bookId: number, page = 1) => {
     setCommentLoading(true);
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>(`/book/${currentBookId}/comment/list`, { query: { page, size: 10 } });
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>(`/book/${bookId}/comment/list`, { query: { page, size: 10 } });
       setComments(res.records);
       setCommentTotal(res.total);
       setCommentPage(page);
@@ -66,22 +78,14 @@ export function BookManager() {
     finally { setCommentLoading(false); }
   };
 
-  const handleViewComments = (row: Record<string,unknown>) => {
-    setCurrentBookId(row.id as number);
-    setCurrentBookTitle(row.title as string);
-    setCommentVisible(true);
-    setTimeout(() => fetchComments(1), 0);
-  };
-
   const handleDeleteComment = async (commentId: unknown) => {
     if (!confirm("确认删除该评论？")) return;
     try {
       await httpClient.delete(`/admin/book/comment/${commentId}`);
       fetchComments(commentPage);
-      // Decrease comment count locally
       setData(prev => ({
         ...prev,
-        records: prev.records.map(r => r.id === currentBookId ? { ...r, commentCount: Math.max(0, ((r.commentCount as number) || 1) - 1) } : r),
+        records: prev.records.map(r => r.id === currentBookId ? { ...r, commentCount: Math.max(0, ((r.commentCount as number) ?? 0) - 1) } : r),
       }));
     } catch { /* ignore */ }
   };

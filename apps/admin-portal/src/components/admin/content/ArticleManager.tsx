@@ -58,10 +58,10 @@ export function ArticleManager() {
   const fetchData = useCallback(async (page = 1) => {
     setLoading(true); setError(null);
     try {
-      const query: Record<string, string | number | boolean | null | undefined> = { page, size: 20, keyword: search };
+      const query: Record<string, string | number | boolean | null | undefined> = { page, size: 20, title: search };
       if (role !== undefined) query.role = role;
       const res = await httpClient.get<PageResult<Record<string, unknown>>>("/content/admin/articles", { query });
-      if (res.records) res.records.sort((a, b) => Number(b.id) - Number(a.id));
+      if (res.records) res.records = [...res.records].sort((a, b) => Number(b.id) - Number(a.id));
       setData(res);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "加载文章列表失败"); }
     finally { setLoading(false); }

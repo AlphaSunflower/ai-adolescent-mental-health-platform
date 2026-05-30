@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { httpClient } from "@/lib/api-admin";
-import { getStoredUser } from "@/lib/session";
+import { getToken } from "@/lib/session";
 
 const s = {
   primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
@@ -33,8 +33,7 @@ export function PsychProfile() {
   const [onlineStatus, setOnlineStatus] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const token = getStoredUser<Record<string, unknown>>();
-  const authToken = token ? (token.token as string) : "";
+  const authToken = getToken() || "";
 
   const fetchProfile = () => {
     setLoading(true); setError(null);
@@ -84,14 +83,9 @@ export function PsychProfile() {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("/api/common/upload", { method: "POST", body: formData, headers: { Authorization: "Bearer " + authToken } });
-      const json = await res.json();
-      if (json.code === 200 && json.data) {
-        setProfile({ ...profile, headPath: json.data as string });
-        setSuccessMsg("头像上传成功");
-      } else {
-        setError(json.message || "上传失败");
-      }
+      const url = await httpClient.post<string>("/common/upload", formData);
+      setProfile({ ...profile, headPath: url });
+      setSuccessMsg("头像上传成功");
     } catch { setError("上传失败，请重试"); }
     finally { setUploading(false); }
   };
@@ -212,7 +206,7 @@ export function PsychProfile() {
           </div>
           <div style={{ gridColumn: "1 / -1" }}>
             <label style={labelStyle}>擅长语言</label>
-            <input value={profile.languages} onChange={(e) => setProfile({ ...profile, languages: e.target.value })} style={inputStyle} placeholder="如：中文、英语" />
+            <input value={profile.languages} onChange={(e) => setProfile({ ...profile, languages: e.target.value })} style={inputStyle} placeholder="如：中文,英语" />
           </div>
           <div>
             <label style={labelStyle}>线下地区</label>
