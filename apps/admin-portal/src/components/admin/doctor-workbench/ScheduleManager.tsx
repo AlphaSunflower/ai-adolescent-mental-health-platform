@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { httpClient } from "@/lib/api-admin";
-import { getStoredUser } from "@/lib/session";
 
 const s = {
   primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
@@ -35,11 +34,16 @@ export function ScheduleManager() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const user = getStoredUser<Record<string, unknown>>();
-  const doctorId = user?.doctorId as number | undefined;
+  const [doctorId, setDoctorId] = useState<number | null>(null);
+
+  useEffect(() => {
+    httpClient.get<Record<string, unknown>>("/doctor/me")
+      .then((res) => setDoctorId(res.doctorId as number))
+      .catch(() => { setError("无法获取医生信息"); setLoading(false); });
+  }, []);
 
   const fetchSchedules = () => {
-    if (!doctorId) { setError("无法获取医生信息"); setLoading(false); return; }
+    if (!doctorId) return;
     setLoading(true); setError(null);
     const now = new Date();
     const startDate = now.toISOString().slice(0, 10);
@@ -52,7 +56,7 @@ export function ScheduleManager() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { fetchSchedules(); }, []);
+  useEffect(() => { if (doctorId) fetchSchedules(); }, [doctorId]);
 
   return (
     <div style={{ padding: "20px", backgroundColor: s.bg, minHeight: "100%" }}>

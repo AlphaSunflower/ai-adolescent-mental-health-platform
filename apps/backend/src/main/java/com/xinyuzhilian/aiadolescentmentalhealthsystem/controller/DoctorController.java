@@ -3,11 +3,16 @@ package com.xinyuzhilian.aiadolescentmentalhealthsystem.controller;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.annotation.CurrentUserId;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.common.PageResult;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.common.Result;
+import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.pojo.DoctorProfile;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.pojo.User;
+import com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.DoctorProfileMapper;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 医生端控制器
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class DoctorController {
 
     private final IUserService userService;
+    private final DoctorProfileMapper doctorProfileMapper;
 
     /**
      * 分页查询我的患者列表
@@ -36,5 +42,27 @@ public class DoctorController {
             @CurrentUserId Long doctorId) {
         
         return Result.success(userService.getPatientsByDoctorId(doctorId, page, size));
+    }
+
+    /**
+     * 获取当前登录医生的基本信息
+     *
+     * @param userId 当前登录用户ID
+     * @return 医生基本信息（doctorId, realName, title, hospitalId, departmentId）
+     */
+    @GetMapping("/me")
+    @PreAuthorize("hasRole('2')")
+    public Result<Map<String, Object>> getMyProfile(@CurrentUserId Long userId) {
+        DoctorProfile profile = doctorProfileMapper.selectById(userId);
+        if (profile == null) {
+            return Result.error("未找到医生档案");
+        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("doctorId", profile.getUserId());
+        result.put("realName", profile.getRealName());
+        result.put("title", profile.getTitle());
+        result.put("hospitalId", profile.getHospitalId());
+        result.put("departmentId", profile.getDepartmentId());
+        return Result.success(result);
     }
 }
