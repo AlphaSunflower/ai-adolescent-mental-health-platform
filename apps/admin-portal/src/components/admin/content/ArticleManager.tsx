@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
+import { getStoredUser } from "@/lib/session";
 
 const s = {
   primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
@@ -14,13 +15,18 @@ type PageResult<T> = { total: number; records: T[]; current: number; size: numbe
 export function ArticleManager() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
   const [search, setSearch] = useState("");
+  const user = getStoredUser<Record<string,unknown>>();
+  const role = (user?.role as number) ?? undefined;
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/content/admin/articles", { query: { page, size: 20, keyword: search } });
+      const query: Record<string, string | number | boolean | null | undefined> = { page, size: 20, keyword: search };
+      if (role !== undefined) query.role = role;
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/content/admin/articles", { query });
+      if (res.records) res.records.sort((a, b) => Number(b.id) - Number(a.id));
       setData(res);
     } catch { /* ignore */ }
-  }, [search]);
+  }, [search, role]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 

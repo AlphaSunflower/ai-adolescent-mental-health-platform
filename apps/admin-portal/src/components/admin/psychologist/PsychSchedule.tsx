@@ -26,7 +26,12 @@ export function PsychSchedule() {
 
   const fetchSchedules = () => {
     setLoading(true); setError(null);
-    httpClient.get<ScheduleSlot[]>("/psychologist/schedule/list")
+    const now = new Date();
+    const startDate = now.toISOString().slice(0, 10);
+    const end = new Date(now);
+    end.setDate(end.getDate() + 6);
+    const endDate = end.toISOString().slice(0, 10);
+    httpClient.get<ScheduleSlot[]>("/psychologist/admin/schedules", { query: { startDate, endDate } })
       .then(setSchedules)
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));

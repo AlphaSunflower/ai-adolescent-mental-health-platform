@@ -7,8 +7,11 @@ import { httpClient } from "@/lib/api-admin";
 interface HospitalOverview {
   hospitalId: number;
   hospitalName: string;
+  totalPatients: number;
   patientCount: number;
+  totalDoctors: number;
   doctorCount: number;
+  totalAppointments: number;
   consultationCount: number;
   feedbackCount: number;
   monthlyConsultations: number[];
@@ -61,7 +64,7 @@ function StatCard({ label, value, color, icon }: StatCardProps) {
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: "14px", color: "#909399", marginBottom: "4px" }}>{label}</div>
         <div style={{ fontSize: "28px", fontWeight: 700, color: "#303133", lineHeight: 1.2 }}>
-          {value.toLocaleString()}
+          {(value ?? 0).toLocaleString()}
         </div>
       </div>
     </div>
@@ -179,9 +182,9 @@ export function HospitalDashboard() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "16px" }}>
-        <StatCard label="患者总数" value={d.patientCount} color="#409eff" icon="患" />
-        <StatCard label="医生数量" value={d.doctorCount} color="#67c23a" icon="医" />
-        <StatCard label="咨询总数" value={d.consultationCount} color="#e6a23c" icon="询" />
+        <StatCard label="患者总数" value={d.totalPatients ?? d.patientCount} color="#409eff" icon="患" />
+        <StatCard label="医生数量" value={d.totalDoctors ?? d.doctorCount} color="#67c23a" icon="医" />
+        <StatCard label="咨询总数" value={d.totalAppointments ?? d.consultationCount} color="#e6a23c" icon="询" />
         <StatCard label="反馈数量" value={d.feedbackCount} color="#f56c6c" icon="反" />
       </div>
 

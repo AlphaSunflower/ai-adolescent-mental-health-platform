@@ -8,6 +8,7 @@ interface DoctorOverview {
   doctorName: string;
   title: string;
   hospitalName: string;
+  totalPatients: number;
   patientCount: number;
   todayAppointments: number;
   pendingAppointments: number;
@@ -61,7 +62,7 @@ function StatCard({ label, value, color, icon }: StatCardProps) {
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: "14px", color: "#909399", marginBottom: "4px" }}>{label}</div>
         <div style={{ fontSize: "28px", fontWeight: 700, color: "#303133", lineHeight: 1.2 }}>
-          {value.toLocaleString()}
+          {(value ?? 0).toLocaleString()}
         </div>
       </div>
     </div>
@@ -192,7 +193,7 @@ export function DoctorDashboard() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "16px" }}>
-        <StatCard label="患者总数" value={d.patientCount} color="#409eff" icon="患" />
+        <StatCard label="患者总数" value={d.totalPatients ?? d.patientCount} color="#409eff" icon="患" />
         <StatCard label="今日预约" value={d.todayAppointments} color="#67c23a" icon="今" />
         <StatCard label="待处理预约" value={d.pendingAppointments} color="#e6a23c" icon="待" />
         <StatCard label="已完成预约" value={d.completedAppointments} color="#f56c6c" icon="完" />

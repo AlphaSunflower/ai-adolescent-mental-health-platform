@@ -12,13 +12,16 @@ const s = {
 };
 
 interface Profile {
-  realName: string; title: string; specialty: string;
-  introduction: string; avatar: string; qualifications: string;
+  realName: string; headPath: string; sex: number; introduction: string;
+  yearsExperience: number; consultationPrice: number; offlinePrice: number;
+  educationBackground: string; trainingExperience: string;
 }
 
 export function PsychProfile() {
   const [profile, setProfile] = useState<Profile>({
-    realName: "", title: "", specialty: "", introduction: "", avatar: "", qualifications: "",
+    realName: "", headPath: "", sex: 0, introduction: "",
+    yearsExperience: 0, consultationPrice: 0, offlinePrice: 0,
+    educationBackground: "", trainingExperience: "",
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,8 +29,18 @@ export function PsychProfile() {
   const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
-    httpClient.get<Profile>("/psychologist/profile")
-      .then((p) => { setProfile(p); })
+    httpClient.get<Record<string,unknown>>("/psychologist/admin/profile")
+      .then((p) => { setProfile({
+        realName: (p.realName as string) || "",
+        headPath: (p.headPath as string) || "",
+        sex: (p.sex as number) ?? 0,
+        introduction: (p.introduction as string) || "",
+        yearsExperience: (p.yearsExperience as number) || 0,
+        consultationPrice: (p.consultationPrice as number) || 0,
+        offlinePrice: (p.offlinePrice as number) || 0,
+        educationBackground: (p.educationBackground as string) || "",
+        trainingExperience: (p.trainingExperience as string) || "",
+      }); })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
   }, []);
@@ -35,7 +48,7 @@ export function PsychProfile() {
   const handleSave = async () => {
     setSaving(true); setSuccessMsg("");
     try {
-      await httpClient.put("/psychologist/profile", profile);
+      await httpClient.put("/psychologist/admin/profile", profile);
       setSuccessMsg("保存成功");
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
     finally { setSaving(false); }
@@ -68,12 +81,14 @@ export function PsychProfile() {
             <input value={profile.realName} onChange={(e) => setProfile({ ...profile, realName: e.target.value })} style={inputStyle} />
           </div>
           <div>
-            <label style={labelStyle}>职称</label>
-            <input value={profile.title} onChange={(e) => setProfile({ ...profile, title: e.target.value })} style={inputStyle} />
+            <label style={labelStyle}>性别</label>
+            <div style={{ display:"flex", gap:"16px" }}>
+              {[{v:1,l:"男"},{v:2,l:"女"},{v:0,l:"未知"}].map(o => <label key={o.v} style={{ fontSize:"13px", cursor:"pointer" }}><input type="radio" checked={profile.sex===o.v} onChange={() => setProfile({...profile, sex:o.v})} /> {o.l}</label>)}
+            </div>
           </div>
           <div>
-            <label style={labelStyle}>擅长领域</label>
-            <input value={profile.specialty} onChange={(e) => setProfile({ ...profile, specialty: e.target.value })} style={inputStyle} placeholder="例如：青少年心理、情绪管理" />
+            <label style={labelStyle}>头像地址</label>
+            <input value={profile.headPath} onChange={(e) => setProfile({ ...profile, headPath: e.target.value })} style={inputStyle} placeholder="https://..." />
           </div>
           <div>
             <label style={labelStyle}>个人简介</label>
@@ -81,13 +96,25 @@ export function PsychProfile() {
               style={{ width: "100%", padding: "8px 12px", border: "1px solid " + s.border, borderRadius: s.radius, fontSize: "13px", boxSizing: "border-box", resize: "vertical" }} />
           </div>
           <div>
-            <label style={labelStyle}>头像地址</label>
-            <input value={profile.avatar} onChange={(e) => setProfile({ ...profile, avatar: e.target.value })} style={inputStyle} placeholder="https://..." />
+            <label style={labelStyle}>从业年限</label>
+            <input type="number" value={profile.yearsExperience} onChange={(e) => setProfile({ ...profile, yearsExperience: Number(e.target.value)||0 })} style={inputStyle} />
           </div>
           <div>
-            <label style={labelStyle}>资质证书</label>
-            <textarea value={profile.qualifications} onChange={(e) => setProfile({ ...profile, qualifications: e.target.value })} rows={3}
-              style={{ width: "100%", padding: "8px 12px", border: "1px solid " + s.border, borderRadius: s.radius, fontSize: "13px", boxSizing: "border-box", resize: "vertical" }} placeholder="描述您的专业资质和证书" />
+            <label style={labelStyle}>咨询价格</label>
+            <input type="number" value={profile.consultationPrice} onChange={(e) => setProfile({ ...profile, consultationPrice: Number(e.target.value)||0 })} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>线下价格</label>
+            <input type="number" value={profile.offlinePrice} onChange={(e) => setProfile({ ...profile, offlinePrice: Number(e.target.value)||0 })} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>教育背景</label>
+            <input value={profile.educationBackground} onChange={(e) => setProfile({ ...profile, educationBackground: e.target.value })} style={inputStyle} />
+          </div>
+          <div>
+            <label style={labelStyle}>培训经历</label>
+            <textarea value={profile.trainingExperience} onChange={(e) => setProfile({ ...profile, trainingExperience: e.target.value })} rows={3}
+              style={{ width: "100%", padding: "8px 12px", border: "1px solid " + s.border, borderRadius: s.radius, fontSize: "13px", boxSizing: "border-box", resize: "vertical" }} />
           </div>
         </div>
 

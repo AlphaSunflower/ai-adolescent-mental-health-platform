@@ -29,8 +29,12 @@ export function PsychIncome() {
 
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
-    httpClient.get<PageData>("/psychologist/income/list", { query: { page: p, size } })
-      .then((res) => { setData(res); setPage(p); })
+    httpClient.get<Record<string,unknown>>("/psychologist/admin/dashboard/stats")
+      .then((res) => {
+        const details = (res.incomeDetails || res.details || []) as IncomeRecord[];
+        setData({ total: details.length, current: 1, pages: 1, records: details, totalIncome: (res.totalIncome || res.todayIncome || 0) as number });
+        setPage(1);
+      })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
   };

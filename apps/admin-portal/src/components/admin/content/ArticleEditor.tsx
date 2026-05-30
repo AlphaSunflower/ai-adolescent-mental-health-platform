@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
+import { getStoredUser } from "@/lib/session";
 
 const s = {
   primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
@@ -15,23 +16,37 @@ export function ArticleEditor() {
   const id = params?.id as string | undefined;
   const isEdit = !!id;
   const [form, setForm] = useState<Record<string,unknown>>({ title: "", content: "", summary: "", coverImage: "", tags: "", status: 1 });
+  const [loading, setLoading] = useState(false);
+  const user = getStoredUser<Record<string,unknown>>();
+  const role = (user?.role as number) ?? undefined;
 
   useEffect(() => {
     if (id) {
-      httpClient.get<Record<string,unknown>>(`/content/article/${id}`).then(setForm).catch(() => {});
+      setLoading(true);
+      httpClient.get<Record<string,unknown>>(`/content/article/${id}`).then((data) => setForm({
+        title: (data.title as string) || "",
+        content: (data.content as string) || "",
+        summary: (data.summary as string) || "",
+        coverImage: (data.coverImage as string) || "",
+        tags: (data.tags as string) || "",
+        status: (data.status as number) ?? 1,
+      })).catch(() => {}).finally(() => setLoading(false));
     }
   }, [id]);
 
   const handleSave = async () => {
     try {
+      const payload = { ...form, role };
       if (isEdit) {
-        await httpClient.put("/content/article", form);
+        await httpClient.put("/content/article", payload);
       } else {
-        await httpClient.post("/content/article", form);
+        await httpClient.post("/content/article", payload);
       }
       router.push("/admin/content/articles");
     } catch { /* ignore */ }
   };
+
+  if (loading) return <div style={{ padding:"40px", textAlign:"center", color:s.text3 }}>加载中...</div>;
 
   return (
     <div style={{ padding:"20px", backgroundColor:s.bg, minHeight:"100%" }}>

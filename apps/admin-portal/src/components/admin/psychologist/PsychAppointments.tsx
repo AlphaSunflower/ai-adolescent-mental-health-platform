@@ -29,7 +29,7 @@ export function PsychAppointments() {
 
   const fetchData = (p: number) => {
     setLoading(true); setError(null);
-    httpClient.get<PageData>("/psychologist/appointments", { query: { page: p, size } })
+    httpClient.get<PageData>("/psychologist/admin/appointments", { query: { page: p, size } })
       .then((res) => { setData(res); setPage(p); })
       .catch((err: unknown) => { setError(err instanceof Error ? err.message : "Unknown error"); })
       .finally(() => setLoading(false));
@@ -38,13 +38,13 @@ export function PsychAppointments() {
   useEffect(() => { fetchData(1); }, []);
 
   const handleConfirm = async (id: number) => {
-    try { await httpClient.put("/psychologist/appointments/" + id, { status: "已确认" }); fetchData(page); }
+    try { await httpClient.post("/psychologist/admin/appointments/" + id + "/handle", {}, { query: { accepted: "true" } }); fetchData(page); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };
 
   const handleCancel = async (id: number) => {
     if (!confirm("确认取消该预约？")) return;
-    try { await httpClient.put("/psychologist/appointments/" + id, { status: "已取消" }); fetchData(page); }
+    try { await httpClient.post("/psychologist/admin/appointments/" + id + "/handle", {}, { query: { accepted: "false" } }); fetchData(page); }
     catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
   };
 

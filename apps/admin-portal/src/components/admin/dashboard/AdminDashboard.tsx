@@ -62,7 +62,7 @@ function StatCard({ label, value, color, icon }: StatCardProps) {
       <div style={{ minWidth: 0 }}>
         <div style={{ fontSize: "14px", color: "#909399", marginBottom: "4px" }}>{label}</div>
         <div style={{ fontSize: "28px", fontWeight: 700, color: "#303133", lineHeight: 1.2 }}>
-          {value.toLocaleString()}
+          {(value ?? 0).toLocaleString()}
         </div>
       </div>
     </div>
@@ -156,7 +156,7 @@ export function AdminDashboard() {
         <StatCard label="用户总数" value={d.totalUsers} color="#409eff" icon="用" />
         <StatCard label="本月新增" value={d.monthlyNewUsers} color="#67c23a" icon="新" />
         <StatCard label="医院数量" value={d.totalHospitals} color="#e6a23c" icon="院" />
-        <StatCard label="咨询师数量" value={d.totalDoctors + d.totalPsychologists} color="#f56c6c" icon="咨" />
+        <StatCard label="咨询师数量" value={(d.totalDoctors ?? 0) + (d.totalPsychologists ?? 0)} color="#f56c6c" icon="咨" />
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: "16px", marginBottom: "16px" }}>
