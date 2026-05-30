@@ -38,6 +38,22 @@ export function PsychChat() {
   const user = getStoredUser<Record<string, unknown>>();
   const currentUserId = (user?.id as number) || 0;
 
+  const extractUserName = (c: Record<string, unknown>): string => {
+    if (c.userName) return String(c.userName);
+    if (c.userNickname) return String(c.userNickname);
+    try {
+      const info = typeof c.userBasicInfo === "string" ? JSON.parse(c.userBasicInfo as string) : c.userBasicInfo;
+      if (info && typeof info === "object") {
+        const r = info as Record<string, unknown>;
+        if (r.name) return String(r.name);
+        if (r.nickname) return String(r.nickname);
+        if (r.realName) return String(r.realName);
+      }
+    } catch { /* ignore */ }
+    if (c.userProblems) return String(c.userProblems).slice(0, 15);
+    return "用户" + String(c.userId || "");
+  };
+
   const fetchConversations = () => {
     setLoading(true); setError(null);
     httpClient.get<Record<string, unknown>[]>("/psychologist/message/conversations")
@@ -45,11 +61,11 @@ export function PsychChat() {
         const convs: Conversation[] = Array.isArray(raw) ? raw.map((c) => ({
           appointmentId: c.appointmentId as number,
           userId: c.userId as number,
-          userName: (c.userName as string) || (c.nickname as string) || ("用户" + String(c.userId || "")),
+          userName: extractUserName(c),
           serviceType: c.serviceType as string,
           status: c.status as number,
-          lastMessage: (c.lastMessage as string) || "",
-          lastTime: (c.lastTime as string) || (c.updateTime as string) || "",
+          lastMessage: (c.lastMessage as string) || (c.userProblems as string) || "",
+          lastTime: (c.lastTime as string) || (c.createTime as string) || "",
         })) : [];
         setConversations(convs);
       })
