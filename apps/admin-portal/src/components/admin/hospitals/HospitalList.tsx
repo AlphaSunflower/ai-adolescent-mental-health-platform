@@ -15,23 +15,26 @@ export function HospitalList() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Record<string,unknown>|null>(null);
-  const [form, setForm] = useState<Record<string,unknown>>({ name: "", address: "", phone: "" });
+  const [form, setForm] = useState<Record<string,unknown>>({ name: "", address: "", contactPhone: "" });
 
   const fetchData = useCallback(async (page = 1) => {
     setLoading(true);
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/hospitals", { query: { page, size: 20, keyword: search } });
+      const query: Record<string, string | number | boolean | null | undefined> = { page, size: 20, name: search || undefined };
+      if (statusFilter !== "") query.status = Number(statusFilter);
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/hospitals", { query });
       setData(res);
     } catch { /* ignore */ }
     finally { setLoading(false); }
-  }, [search]);
+  }, [search, statusFilter]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const openAdd = () => { setEditingItem(null); setForm({ name: "", address: "", phone: "" }); setDialogVisible(true); };
-  const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({...item, name: (item.name as string) || "", address: (item.address as string) || "", phone: (item.phone as string) || ""}); setDialogVisible(true); };
+  const openAdd = () => { setEditingItem(null); setForm({ name: "", address: "", contactPhone: "" }); setDialogVisible(true); };
+  const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({...item, name: (item.name as string) || "", address: (item.address as string) || "", contactPhone: (item.contactPhone as string) || ""}); setDialogVisible(true); };
 
   const handleSave = async () => {
     try {
@@ -47,7 +50,7 @@ export function HospitalList() {
 
   const handleDelete = async (id: unknown) => {
     if (!confirm("确认删除？")) return;
-    try { await httpClient.delete(`/admin/hospitals/${id}`); fetchData(); } catch { /* ignore */ }
+    try { await httpClient.delete(`/admin/hospital/${id}`); fetchData(); } catch { /* ignore */ }
   };
 
   return (
@@ -55,6 +58,12 @@ export function HospitalList() {
       <div style={{ backgroundColor: s.white, borderRadius: "8px", boxShadow: s.shadow, padding: "20px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "20px" }}>
           <div style={{ display: "flex", gap: "10px" }}>
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              style={{ height:"36px", padding:"0 8px", border:`1px solid ${s.border}`, borderRadius:s.radius, fontSize:"13px", color:s.text2 }}>
+              <option value="">全部状态</option>
+              <option value="1">正常</option>
+              <option value="0">禁用</option>
+            </select>
             <input placeholder="搜索医院..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key === "Enter" && fetchData()}
               style={{ height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, width:"240px", outline:"none" }} />
             <button onClick={() => fetchData()} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>搜索</button>
@@ -74,7 +83,7 @@ export function HospitalList() {
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.name as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.address as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.phone as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.contactPhone as string}</td>
                 <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
                   <button onClick={() => openEdit(row)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button>
                   <button onClick={() => handleDelete(row.id)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button>
@@ -98,7 +107,7 @@ export function HospitalList() {
             <h3 style={{ margin:"0 0 20px", fontSize:"18px", color:s.text }}>{editingItem ? "编辑医院" : "新增医院"}</h3>
             <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>医院名称</label><input value={form.name as string} onChange={(e) => setForm({...form, name:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
             <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>地址</label><input value={form.address as string} onChange={(e) => setForm({...form, address:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-            <div style={{ marginBottom:"20px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>联系电话</label><input value={form.phone as string} onChange={(e) => setForm({...form, phone:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
+            <div style={{ marginBottom:"20px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>联系电话</label><input value={form.contactPhone as string} onChange={(e) => setForm({...form, contactPhone:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
             <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
               <button onClick={() => setDialogVisible(false)} style={{ height:"36px", padding:"0 20px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
               <button onClick={handleSave} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>保存</button>

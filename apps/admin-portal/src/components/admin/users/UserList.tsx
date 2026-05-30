@@ -15,16 +15,19 @@ type PageResult<T> = { total: number; records: T[]; current: number; size: numbe
 export function UserList() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("");
   const [dialogVisible, setDialogVisible] = useState(false);
   const [editingItem, setEditingItem] = useState<Record<string,unknown>|null>(null);
   const [form, setForm] = useState<Record<string,unknown>>({ username:"", nickname:"", role:1, email:"", status:1 });
 
   const fetchData = useCallback(async (page = 1) => {
     try {
-      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/users", { query: { page, size: 20, keyword: search } });
+      const query: Record<string, string | number | boolean | null | undefined> = { page, size: 20, username: search || undefined };
+      if (statusFilter !== "") query.status = Number(statusFilter);
+      const res = await httpClient.get<PageResult<Record<string,unknown>>>("/admin/users", { query });
       setData(res);
     } catch { /* ignore */ }
-  }, [search]);
+  }, [search, statusFilter]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -49,6 +52,12 @@ export function UserList() {
       <div style={{ backgroundColor:s.white, borderRadius:"8px", boxShadow:s.shadow, padding:"20px" }}>
         <div style={{ display:"flex", justifyContent:"space-between", marginBottom:"20px" }}>
           <div style={{ display:"flex", gap:"10px" }}>
+            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+              style={{ height:"36px", padding:"0 8px", border:`1px solid ${s.border}`, borderRadius:s.radius, fontSize:"13px", color:s.text2 }}>
+              <option value="">全部状态</option>
+              <option value="1">正常</option>
+              <option value="0">禁用</option>
+            </select>
             <input placeholder="搜索用户..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key==="Enter"&&fetchData()}
               style={{ height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, width:"240px", outline:"none" }} />
             <button onClick={() => fetchData()} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>搜索</button>

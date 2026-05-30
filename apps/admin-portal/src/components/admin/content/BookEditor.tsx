@@ -11,13 +11,20 @@ export function BookEditor() {
   const params = useParams();
   const id = params?.id as string | undefined;
   const isEdit = !!id;
-  const [form, setForm] = useState({ title: "", author: "", isbn: "", description: "", coverImage: "", category: "" });
+  const [form, setForm] = useState({ title: "", coverUrl: "", description: "", address: "", sortOrder: 0, status: 1 });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (id) {
       setLoading(true);
-      httpClient.get<Record<string,unknown>>("/admin/book/" + id).then((data) => setForm(data as typeof form)).catch(() => {}).finally(() => setLoading(false));
+      httpClient.get<Record<string,unknown>>("/admin/book/" + id).then((data) => setForm({
+        title: (data.title as string) || "",
+        coverUrl: (data.coverUrl as string) || "",
+        description: (data.description as string) || "",
+        address: (data.address as string) || "",
+        sortOrder: (data.sortOrder as number) || 0,
+        status: (data.status as number) ?? 1,
+      })).catch(() => {}).finally(() => setLoading(false));
     }
   }, [id]);
 
@@ -40,11 +47,11 @@ export function BookEditor() {
       <div style={{ backgroundColor:s.white, borderRadius:"8px", boxShadow:"0 2px 12px rgba(0,0,0,0.06)", padding:"20px", maxWidth:"700px" }}>
         <h3 style={{ margin:"0 0 20px", fontSize:"18px", color:s.text }}>{isEdit ? "编辑书籍" : "新增书籍"}</h3>
         <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>书名</label><input value={form.title} onChange={(e) => setForm({...form, title:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>作者</label><input value={form.author} onChange={(e) => setForm({...form, author:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>ISBN</label><input value={form.isbn} onChange={(e) => setForm({...form, isbn:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>分类</label><input value={form.category} onChange={(e) => setForm({...form, category:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>封面图片URL</label><input value={form.coverImage} onChange={(e) => setForm({...form, coverImage:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>描述</label><textarea value={form.description} onChange={(e) => setForm({...form, description:e.target.value})} rows={4} style={{ width:"100%", padding:"8px 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box", resize:"vertical" }} /></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>封面图片URL</label><input value={form.coverUrl} onChange={(e) => setForm({...form, coverUrl:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>简介</label><textarea value={form.description} onChange={(e) => setForm({...form, description:e.target.value})} rows={4} style={{ width:"100%", padding:"8px 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box", resize:"vertical" }} /></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>跳转地址</label><input value={form.address} onChange={(e) => setForm({...form, address:e.target.value})} placeholder="https://" style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>排序权重</label><input type="number" value={form.sortOrder} onChange={(e) => setForm({...form, sortOrder: parseInt(e.target.value)||0})} style={{ width:"120px", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>状态</label><div style={{ display:"flex", alignItems:"center", gap:"8px" }}><button onClick={() => setForm({...form, status: form.status===1?0:1})} style={{ width:"44px", height:"24px", borderRadius:"12px", border:"none", backgroundColor: form.status===1?"#67c23a":"#c0c4cc", position:"relative", cursor:"pointer" }}><span style={{ display:"block", width:"18px", height:"18px", borderRadius:"50%", background:"#fff", position:"absolute", top:"3px", left: form.status===1?"23px":"3px", transition:"left 0.2s" }} /></button><span style={{ fontSize:"13px", color:s.text2 }}>{form.status===1?"上架":"下架"}</span></div></div>
         <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
           <button onClick={() => router.back()} style={{ height:"36px", padding:"0 20px", border:"1px solid " + s.border, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
           <button onClick={handleSave} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>保存</button>
