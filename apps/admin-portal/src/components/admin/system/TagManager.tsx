@@ -38,7 +38,11 @@ export function TagManager() {
     const newStatus = (row.status as number) === 1 ? 0 : 1;
     try {
       await httpClient.put(`/article/tag/${row.id}`, { ...row, status: newStatus });
-      fetchData();
+      // Update local state (backend filters status=1 so re-fetch would lose disabled tags)
+      setData(prev => ({
+        ...prev,
+        records: prev.records.map(r => r.id === row.id ? { ...r, status: newStatus } : r),
+      }));
     } catch { /* ignore */ }
   };
 
