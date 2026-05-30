@@ -193,6 +193,9 @@ export function PsychAppointments() {
                             <button onClick={() => handleStart(row.id)} style={{ color: s.green, border: "none", background: "none", cursor: "pointer" }}>开始</button>
                           </>
                         )}
+                        {row.status === 7 && (
+                          <button onClick={() => handleStart(row.id)} style={{ color: s.green, border: "none", background: "none", cursor: "pointer" }}>开始</button>
+                        )}
                         {row.status === 3 && (
                           <button onClick={() => handleComplete(row.id)} style={{ color: s.orange, border: "none", background: "none", cursor: "pointer" }}>完成</button>
                         )}
