@@ -17,6 +17,7 @@ env:
   IMAGE_TAG: ${{ github.sha }}
   BACKEND_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-backend
   WEB_CLIENT_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-web-client
+  ADMIN_PORTAL_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-admin-portal
 
 jobs:
   deploy:
@@ -30,6 +31,7 @@ jobs:
       JAVA_OPTS: ${{ vars.JAVA_OPTS }}
       BACKEND_PORT: ${{ vars.BACKEND_PORT }}
       WEB_CLIENT_PORT: ${{ vars.WEB_CLIENT_PORT }}
+      ADMIN_PORTAL_PORT: ${{ vars.ADMIN_PORTAL_PORT }}
       DB_MYSQL_HOST: ${{ vars.DB_MYSQL_HOST }}
       DB_MYSQL_PORT: ${{ vars.DB_MYSQL_PORT }}
       DB_MYSQL_DATABASE: ${{ vars.DB_MYSQL_DATABASE }}
@@ -115,6 +117,18 @@ jobs:
           cache-from: type=gha,scope=web-client
           cache-to: type=gha,scope=web-client,mode=max
 
+      - name: Build and push admin-portal image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/admin-portal/Dockerfile
+          push: true
+          tags: ${{ env.ADMIN_PORTAL_IMAGE }}:${{ env.IMAGE_TAG }}
+          build-args: |
+            BACKEND_URL=${{ env.BACKEND_URL }}
+          cache-from: type=gha,scope=admin-portal
+          cache-to: type=gha,scope=admin-portal,mode=max
+
       - name: Configure SSH
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
@@ -164,6 +178,7 @@ jobs:
               "JAVA_OPTS",
               "BACKEND_PORT",
               "WEB_CLIENT_PORT",
+              "ADMIN_PORTAL_PORT",
               "DB_MYSQL_HOST",
               "DB_MYSQL_PORT",
               "DB_MYSQL_DATABASE",
@@ -201,11 +216,12 @@ jobs:
           PY
 
           remote_env=$(
-            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q GHCR_USERNAME=%q' \
+            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q ADMIN_PORTAL_IMAGE=%q GHCR_USERNAME=%q' \
               "$DEPLOY_PATH" \
               "$IMAGE_TAG" \
               "$BACKEND_IMAGE:$IMAGE_TAG" \
               "$WEB_CLIENT_IMAGE:$IMAGE_TAG" \
+              "$ADMIN_PORTAL_IMAGE:$IMAGE_TAG" \
               "$GHCR_USERNAME"
           )
 
@@ -245,7 +261,7 @@ jobs:
           cd "\$DEPLOY_PATH"
 
           chmod 600 .env.production
-          export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE
+          export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE ADMIN_PORTAL_IMAGE
           retry 3 10 docker compose --env-file .env.production -f deploy/docker-compose.prod.yml pull
           docker compose --env-file .env.production -f deploy/docker-compose.prod.yml up -d --remove-orphans
           REMOTE_SCRIPT
