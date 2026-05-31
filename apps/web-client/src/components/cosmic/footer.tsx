@@ -77,7 +77,6 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex flex-wrap items-center gap-x-1 gap-y-1">
                 <FileText className="size-3 shrink-0 text-cosmic-blue" />
-                <span>主体备案号：</span>
                 <a
                   href="https://beian.miit.gov.cn/"
                   target="_blank"

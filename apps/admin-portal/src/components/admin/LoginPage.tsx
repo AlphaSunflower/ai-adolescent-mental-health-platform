@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { adminApi } from "@/lib/api-admin";
 import { saveSession } from "@/lib/session";
 import { getRoleDashboardPath } from "@/lib/role-utils";
+import { FilingFooter } from "./FilingFooter";
 
 /* ---------- Element Plus design tokens ---------- */
 const tokens = {
@@ -122,24 +123,33 @@ export function LoginPage() {
     <div
       style={{
         display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
+        flexDirection: "column",
         minHeight: "100vh",
         background:
           "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
       }}
     >
-      {/* Card */}
-      <div
+      <main
         style={{
-          width: "420px",
-          padding: "32px 24px 24px",
-          background: tokens.bgColor,
-          borderRadius: tokens.borderRadius,
-          boxShadow: tokens.shadow,
+          flex: 1,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "40px 16px 24px",
           boxSizing: "border-box",
         }}
       >
+        {/* Card */}
+        <div
+          style={{
+            width: "420px",
+            padding: "32px 24px 24px",
+            background: tokens.bgColor,
+            borderRadius: tokens.borderRadius,
+            boxShadow: tokens.shadow,
+            boxSizing: "border-box",
+          }}
+        >
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "32px" }}>
           <h1
@@ -402,7 +412,9 @@ export function LoginPage() {
             {loading ? "登录中..." : "登 录"}
           </button>
         </form>
-      </div>
+        </div>
+      </main>
+      <FilingFooter variant="dark" />
     </div>
   );
 }
