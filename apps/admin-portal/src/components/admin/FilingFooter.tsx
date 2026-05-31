@@ -2,6 +2,15 @@ type FilingFooterProps = {
   variant?: "light" | "dark";
 };
 
+const s = {
+  colorTextDisabled: "#909399",
+  colorTextDark: "rgba(255, 255, 255, 0.72)",
+  colorBgBase: "#fff",
+  colorBgTransparent: "transparent",
+  borderColorBase: "#ebeef5",
+  borderNone: "none",
+};
+
 export function FilingFooter({ variant = "light" }: FilingFooterProps) {
   const isDark = variant === "dark";
 
@@ -13,9 +22,9 @@ export function FilingFooter({ variant = "light" }: FilingFooterProps) {
         textAlign: "center",
         fontSize: "12px",
         lineHeight: 1.5,
-        color: isDark ? "rgba(255, 255, 255, 0.72)" : "#909399",
-        backgroundColor: isDark ? "transparent" : "#fff",
-        borderTop: isDark ? "none" : "1px solid #ebeef5",
+        color: isDark ? s.colorTextDark : s.colorTextDisabled,
+        backgroundColor: isDark ? s.colorBgTransparent : s.colorBgBase,
+        borderTop: isDark ? s.borderNone : `1px solid ${s.borderColorBase}`,
       }}
     >
       <a
