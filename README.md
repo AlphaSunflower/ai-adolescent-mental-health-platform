@@ -1,15 +1,17 @@
 # 青少年心理健康 AI 平台（ai-adolescent-mental-health-platform）
 
-本仓库是一套面向青少年心理健康场景的 AI 辅助平台，包含 AI 问诊助手「小艾」、真人心理咨询、心理量表评估、心理内容库、医院与心理咨询师目录等业务域，多端覆盖 Web 管理后台、Android 客户端与微信小程序。
+本仓库是一套面向青少年心理健康场景的 AI 辅助平台，包含 AI 问诊助手「小艾」、真人心理咨询、心理量表评估、心理内容库、医院与心理咨询师目录等业务域，多端覆盖 Web 用户端、Web 管理端、Android 客户端与微信小程序。
 
-仓库采用 `pnpm + Turborepo` 组织成 monorepo，不同技术栈（Java / Vue / Kotlin / WeChat MiniProgram）共存于 `apps/*` 下，由根目录统一编排与依赖锁定。
+仓库采用 `pnpm + Turborepo` 组织成 monorepo，不同技术栈（Java / Next.js / Vue / Kotlin / WeChat MiniProgram）共存于 `apps/*` 下，由根目录统一编排与依赖锁定。
 
 ## 架构总览
 
 | 端 | 技术栈 | 工作区 | 对外角色 |
 | --- | --- | --- | --- |
 | 后端 API | Spring Boot 3.5.9 / Java 17 | `apps/backend` | 所有客户端共享的核心服务 |
-| 管理后台 | Vue 3 + Vite + Element Plus | `apps/web-admin` | 运营/心理咨询师/管理员使用 |
+| Web 用户端（当前） | Next.js 16 / React 19 / Tailwind CSS 4 | `apps/web-client` | 面向青少年及家长用户 |
+| Web 管理端（当前） | Next.js 16 / React 19 / TypeScript | `apps/admin-portal` | 运营/医院/医生/心理咨询师/管理员使用 |
+| 旧版 Web 用户端 + 管理端 | Vue 3 + Vite + Element Plus | `apps/web-admin` | 旧版本端，保留作历史代码与迁移参考 |
 | Android 客户端 | Kotlin / AGP 8.12 | `apps/android` | 面向青少年及家长用户 |
 | 微信小程序 | 原生微信小程序 | `apps/wechat-miniapp` | 面向青少年及家长用户 |
 | 微信云函数 | Node.js + wx-server-sdk | `apps/wechat-functions` | 小程序的 Serverless 后端 |
@@ -33,7 +35,9 @@
 .
 ├── apps
 │   ├── backend          # Spring Boot 后端服务
-│   ├── web-admin        # Vue 3 管理后台
+│   ├── web-client       # 当前 Web 用户端（Next.js）
+│   ├── admin-portal     # 当前 Web 管理端（Next.js）
+│   ├── web-admin        # 旧版 Vue 3 用户端 + 管理端
 │   ├── android          # Android 客户端
 │   ├── wechat-miniapp   # 微信小程序
 │   └── wechat-functions # 微信云函数
@@ -65,13 +69,16 @@ pnpm dev
 ```bash
 pnpm dev:backend      # 等价：pnpm --filter @ai-adolescent-mental-health/backend dev
 pnpm dev:web-client   # 等价：pnpm --filter @ai-adolescent-mental-health/web-client dev
-pnpm dev:web-admin    # 等价：pnpm --filter @ai-adolescent-mental-health/web-admin dev
+pnpm --filter @ai-adolescent-mental-health/admin-portal dev
+pnpm dev:web-admin    # 旧版 Vue 用户端 + 管理端，仅在维护旧端时使用
 ```
 
 对应各 app 的命令约定（由 `scripts/run-workspace-bin.cjs` 桥接）：
 
 - 后端：`pnpm dev` → `mvnw spring-boot:run`，`pnpm build` → `mvnw clean package -DskipTests`
-- 管理后台：`pnpm dev` → `vite`，`pnpm build` → `vite build`
+- Web 用户端：`pnpm dev` → `next dev --port 3100`，`pnpm build` → `next build`
+- Web 管理端：`pnpm dev` → `next dev --port 3101`，`pnpm build` → `next build`
+- 旧版 Web 用户端 + 管理端：`pnpm dev` → `vite`，`pnpm build` → `vite build`
 - Android：`pnpm build` → `gradlew build`，`pnpm test` → `gradlew test`
 - 小程序 / 云函数：无 CLI 构建，打印提示信息
 
@@ -84,14 +91,18 @@ pnpm dev:web-admin    # 等价：pnpm --filter @ai-adolescent-mental-health/web-
 | `pnpm test` | 先构建依赖再运行测试 |
 | `pnpm typecheck` | 对支持的工作区执行类型检查 |
 | `pnpm clean` | 清理各工作区产物及根目录 `.turbo` |
-| `pnpm dev:backend` / `pnpm dev:web-client` / `pnpm dev:web-admin` | 单独启动后端 / web-client / 管理后台开发 |
+| `pnpm dev:backend` / `pnpm dev:web-client` | 单独启动后端 / 当前 Web 用户端开发 |
+| `pnpm --filter @ai-adolescent-mental-health/admin-portal dev` | 单独启动当前 Web 管理端开发 |
+| `pnpm dev:web-admin` | 单独启动旧版 Vue 用户端 + 管理端，仅维护旧端时使用 |
 | `pnpm test:backend` / `pnpm test:android` | 只跑后端 / Android 测试 |
-| `pnpm typecheck:web-admin` | 只跑管理后台类型检查 |
+| `pnpm --filter @ai-adolescent-mental-health/admin-portal typecheck` | 只跑当前 Web 管理端类型检查 |
+| `pnpm typecheck:web-admin` | 只跑旧版 Vue 用户端 + 管理端类型检查 |
 
 通过 `--filter` 还可以精确到任何工作区：
 
 ```bash
-pnpm --filter @ai-adolescent-mental-health/web-admin build
+pnpm --filter @ai-adolescent-mental-health/web-client build
+pnpm --filter @ai-adolescent-mental-health/admin-portal build
 pnpm --filter @ai-adolescent-mental-health/backend test
 ```
 
@@ -129,7 +140,7 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 - **Android SDK 未就绪**：在 `apps/android/local.properties` 写入 `sdk.dir=<你的 Android SDK 路径>`（Android Studio 首次打开会自动生成，不要入库）。
 - **小程序没有 CLI 构建**：`apps/wechat-miniapp` 的 `pnpm build` 只是打印提示。实际开发请用微信开发者工具打开该目录；云函数上传见 `apps/wechat-miniapp/uploadCloudFunction.sh`。
 - **云函数如何部署**：`apps/wechat-functions` 依赖由根 `pnpm-lock.yaml` 管理，无需在子目录单独 `npm install`。代码变更后，通过微信开发者工具或上述脚本上传至云开发环境。
-- **首次 `pnpm dev` 报端口占用**：后端默认 `server.port=8080`，前端 Vite 默认 `5173`，请先确认占用情况。
+- **首次 `pnpm dev` 报端口占用**：后端默认 `server.port=8080`，当前 Web 用户端默认 `3100`，当前 Web 管理端默认 `3101`，旧版 Vue 用户端 + 管理端 Vite 默认 `5173`，请先确认占用情况。
 
 ## 分支与协作
 
@@ -148,6 +159,8 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 - 面向 AI 编码助手（Claude Code / Codex / Cursor 等）的上下文速查：[AGENTS.md](AGENTS.md)
 - 各 app 单独的 AI 指引：
   - [apps/backend/AGENTS.md](apps/backend/AGENTS.md)
+  - [apps/web-client/AGENTS.md](apps/web-client/AGENTS.md)
+  - [apps/admin-portal/AGENTS.md](apps/admin-portal/AGENTS.md)
   - [apps/web-admin/AGENTS.md](apps/web-admin/AGENTS.md)
   - [apps/android/AGENTS.md](apps/android/AGENTS.md)
   - [apps/wechat-miniapp/AGENTS.md](apps/wechat-miniapp/AGENTS.md)
