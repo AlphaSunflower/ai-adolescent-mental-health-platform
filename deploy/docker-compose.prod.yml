@@ -64,6 +64,24 @@ services:
     networks:
       - app
 
+  admin-portal:
+    image: ${ADMIN_PORTAL_IMAGE:-ghcr.io/a-words/ai-adolescent-mental-health-admin-portal:${IMAGE_TAG:-local}}
+    build:
+      context: ..
+      dockerfile: apps/admin-portal/Dockerfile
+      args:
+        BACKEND_URL: ${BACKEND_URL:?BACKEND_URL is required}
+    restart: unless-stopped
+    environment:
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
+    ports:
+      - "${ADMIN_PORTAL_PORT:-3101}:3101"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - app
+
 networks:
   app:
     driver: bridge
