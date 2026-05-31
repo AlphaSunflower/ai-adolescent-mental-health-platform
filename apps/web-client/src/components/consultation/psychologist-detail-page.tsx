@@ -81,16 +81,25 @@ export function PsychologistDetailPage() {
       const dayStart = formatDateStr(date);
       const dayEnd = formatDateStr(date);
       const raw = await api.psychologist.schedule(Number(id), dayStart, dayEnd);
-      const mapped: ScheduleSlot[] = (raw as Record<string, unknown>[]).map((s) => ({
-        id: Number(s.id),
-        date: String(s.scheduleDate ?? s.date ?? ""),
-        timeSlot: String(s.timeSlot ?? ""),
-        startTime: String(s.startTime ?? ""),
-        endTime: String(s.endTime ?? ""),
-        bookedCount: Number(s.bookedCount ?? 0),
-        maxAppointments: Number(s.maxAppointments ?? 0),
-        status: Number(s.status ?? 0),
-      }));
+      const mapped: ScheduleSlot[] = [];
+      for (const day of (raw as Record<string, unknown>[])) {
+        const dayDate = String(day.date ?? "");
+        const slots = day.slots as Record<string, unknown>[] | undefined;
+        if (slots && Array.isArray(slots)) {
+          for (const s of slots) {
+            mapped.push({
+              id: Number(s.id),
+              date: String(s.scheduleDate ?? dayDate),
+              timeSlot: String(s.timeSlot ?? ""),
+              startTime: String(s.startTime ?? ""),
+              endTime: String(s.endTime ?? ""),
+              bookedCount: Number(s.bookedCount ?? 0),
+              maxAppointments: Number(s.maxAppointments ?? 0),
+              status: Number(s.status ?? 0),
+            });
+          }
+        }
+      }
       setSchedules(mapped);
     } catch {
       setSchedules([]);

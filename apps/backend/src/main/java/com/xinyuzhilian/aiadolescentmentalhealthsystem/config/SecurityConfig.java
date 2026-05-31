@@ -78,7 +78,7 @@ public class SecurityConfig {
                         // WebSocket 放行
                         .requestMatchers("/ws/omni-realtime").permitAll()
                         // 登录注册相关放行
-                        .requestMatchers("/user/login", "/user/register", "/user/login/wx",
+                        .requestMatchers("/admin/login", "/user/login", "/user/register", "/user/login/wx",
                                 "/user/login/wx/gzh/callback",
                                 "/user/wx/status",
                                 "/user/wx/email/send",

@@ -1,0 +1,38 @@
+{
+  "name": "@ai-adolescent-mental-health/admin-portal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --port 3101",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf .next"
+  },
+  "dependencies": {
+    "@ai-adolescent-mental-health/api-client": "workspace:*",
+    "@ai-adolescent-mental-health/config": "workspace:*",
+    "@ai-adolescent-mental-health/domain": "workspace:*",
+    "@ai-adolescent-mental-health/ui": "workspace:*",
+    "@element-plus/icons-vue": "^2.3.2",
+    "@uiw/react-md-editor": "^4.1.0",
+    "dayjs": "^1.11.19",
+    "echarts": "^6.0.0",
+    "element-plus": "^2.13.2",
+    "next": "^16.2.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "sonner": "^2.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.4",
+    "rimraf": "^6",
+    "typescript": "^5"
+  }
+}

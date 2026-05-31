@@ -140,6 +140,7 @@ public class AdminController {
      * @param adminId        当前登录管理员ID
      * @return 医生列表分页结果
      */
+    @PreAuthorize("hasAnyRole('3','4')")
     @GetMapping("/hospital/doctors")
     public Result<PageResult<DoctorDTO>> getMyHospitalDoctors(
             @RequestParam(defaultValue = "1") Integer page,
@@ -162,6 +163,7 @@ public class AdminController {
      * @param adminId        当前登录管理员ID
      * @return 操作结果
      */
+    @PreAuthorize("hasAnyRole('3','4')")
     @PostMapping("/hospital/doctor")
     public Result<String> saveDoctor(@RequestBody DoctorDTO doctorDTO, @CurrentUserId Long adminId) {
         try {
@@ -172,6 +174,7 @@ public class AdminController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('3','4')")
     @PutMapping("/hospital/doctor/{id}/consultation-switch")
     public Result<String> updateDoctorConsultationSwitch(
             @PathVariable Long id,
@@ -192,6 +195,7 @@ public class AdminController {
      * @param id 医生用户ID
      * @return 操作结果
      */
+    @PreAuthorize("hasAnyRole('3','4')")
     @DeleteMapping("/hospital/doctor/{id}")
     public Result<String> deleteDoctor(@PathVariable Long id) {
         hospitalService.deleteDoctor(id);
