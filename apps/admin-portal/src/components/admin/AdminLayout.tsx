@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminHeader } from "./AdminHeader";
+import { FilingFooter } from "./FilingFooter";
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -34,6 +35,8 @@ export function AdminLayout({ children, role, isPsychologist }: AdminLayoutProps
         }}>
           {children}
         </main>
+
+        <FilingFooter />
       </div>
     </div>
   );

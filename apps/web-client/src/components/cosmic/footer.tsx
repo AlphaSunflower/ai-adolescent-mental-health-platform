@@ -75,9 +75,16 @@ export function Footer() {
               备案信息
             </h4>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-center gap-1">
+              <li className="flex flex-wrap items-center gap-x-1 gap-y-1">
                 <FileText className="size-3 shrink-0 text-cosmic-blue" />
-                京ICP备 202500001号-1
+                <a
+                  href="https://beian.miit.gov.cn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-cosmic-blue transition-colors"
+                >
+                  粤ICP备2025440449号
+                </a>
               </li>
               <li className="flex items-center gap-1">
                 <Shield className="size-3 shrink-0 text-cosmic-blue" />
