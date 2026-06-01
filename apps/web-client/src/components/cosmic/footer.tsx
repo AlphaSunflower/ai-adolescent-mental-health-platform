@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Phone, Mail, MapPin, Clock, Shield, FileText, Stamp, Medal } from "lucide-react";
+import { Phone, Mail, MapPin, Clock, FileText } from "lucide-react";
 import { useFeedbackDialog } from "@/components/feedback/feedback-dialog";
 
 export function Footer() {
@@ -87,16 +87,8 @@ export function Footer() {
                 </a>
               </li>
               <li className="flex items-center gap-1">
-                <Shield className="size-3 shrink-0 text-cosmic-blue" />
-                京公网安备 11010802030001号
-              </li>
-              <li className="flex items-center gap-1">
-                <Medal className="size-3 shrink-0 text-cosmic-blue" />
-                互联网信息服务许可证
-              </li>
-              <li className="flex items-center gap-1">
-                <Stamp className="size-3 shrink-0 text-cosmic-blue" />
-                心理健康服务备案号：XLJK2025001
+                <MapPin className="size-3 shrink-0 text-cosmic-blue" />
+                备案地区：广东省
               </li>
             </ul>
           </div>
