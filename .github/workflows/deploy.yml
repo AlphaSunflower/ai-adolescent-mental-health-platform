@@ -265,17 +265,38 @@ jobs:
           echo "Generated deploy/.env.production ($(wc -l < "$env_file") lines)"
 
       - name: Configure SSH
+        timeout-minutes: 2
         run: |
           set -euo pipefail
 
-          : "${DEPLOY_HOST:?Missing DEPLOY_HOST}"
-          : "${DEPLOY_SSH_KEY:?Missing DEPLOY_SSH_KEY}"
-          : "${DEPLOY_USER:?Missing DEPLOY_USER}"
+          echo "Testing connectivity to ${DEPLOY_HOST}:${DEPLOY_PORT:-22}..."
+
+          # 测试服务器是否可达
+          if ! timeout 10 bash -c "echo >/dev/tcp/${DEPLOY_HOST}/${DEPLOY_PORT:-22}" 2>/dev/null; then
+            echo "::error::Cannot reach ${DEPLOY_HOST}:${DEPLOY_PORT:-22}. Check firewall/network."
+            exit 1
+          fi
 
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "${DEPLOY_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+          # keyscan 带重试
+          for i in 1 2 3; do
+            if ssh-keyscan -T 10 -p "${DEPLOY_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null; then
+              echo "SSH host key added."
+              break
+            fi
+            echo "ssh-keyscan attempt $i failed, retrying..."
+            sleep 3
+          done
+
+          # 验证连接
+          if ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" -o ConnectTimeout=10 -o StrictHostKeyChecking=yes "$DEPLOY_USER@$DEPLOY_HOST" "echo 'SSH OK'" 2>&1; then
+            echo "SSH connection verified."
+          else
+            echo "::warning::SSH connection test failed — deploy will attempt anyway."
+          fi
 
       - name: Deploy to server
         env:
