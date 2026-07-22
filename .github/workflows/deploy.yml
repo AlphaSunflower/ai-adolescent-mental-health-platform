@@ -147,37 +147,56 @@ jobs:
       - name: Validate required secrets and vars
         run: |
           set -euo pipefail
+
+          # === 核心必需（部署失败如果没有这些） ===
+          required=(
+            BACKEND_URL
+            NEXT_PUBLIC_WS_BASE_URL
+            DEPLOY_HOST
+            DEPLOY_USER
+            DEPLOY_SSH_KEY
+            DEPLOY_PATH
+            DB_MYSQL_USERNAME
+            DB_MYSQL_PASSWORD
+            JWT_SECRET
+          )
+
           missing=""
-
-          check() { if [ -z "${!1:-}" ]; then missing="$missing  $1\n"; fi; }
-
-          check BACKEND_URL
-          check NEXT_PUBLIC_WS_BASE_URL
-          check DB_MYSQL_HOST
-          check DB_MYSQL_USERNAME
-          check DB_MYSQL_PASSWORD
-          check DB_REDIS_HOST
-          check JWT_SECRET
-          check DASHSCOPE_API_KEY
-          check WX_APP_ID
-          check WX_APP_SECRET
-          check WX_GZH_APP_ID
-          check WX_GZH_SECRET
-          check ALIYUN_OSS_ENDPOINT
-          check ALIYUN_OSS_ACCESS_KEY_ID
-          check ALIYUN_OSS_ACCESS_KEY_SECRET
-          check ALIYUN_OSS_BUCKET_NAME
-          check MAIL_HOST
-          check MAIL_PORT
-          check MAIL_USERNAME
-          check MAIL_PASSWORD
+          for key in "${required[@]}"; do
+            if [ -z "${!key:-}" ]; then missing="$missing  $key\n"; fi
+          done
 
           if [ -n "$missing" ]; then
-            echo "::error::Missing required secrets/vars:$missing"
+            printf '%b' "::error::Missing REQUIRED secrets/vars:\n$missing"
             exit 1
           fi
 
-          echo "All required secrets and variables are present."
+          # === 可选服务（缺少时 warn 但不阻断部署） ===
+          optional=(
+            DASHSCOPE_API_KEY
+            WX_APP_ID
+            WX_APP_SECRET
+            WX_GZH_APP_ID
+            WX_GZH_SECRET
+            WX_GZH_CALLBACK_BASE_URL
+            ALIYUN_OSS_ENDPOINT
+            ALIYUN_OSS_ACCESS_KEY_ID
+            ALIYUN_OSS_ACCESS_KEY_SECRET
+            ALIYUN_OSS_BUCKET_NAME
+            MAIL_HOST
+            MAIL_PORT
+            MAIL_USERNAME
+            MAIL_PASSWORD
+            DB_REDIS_PASSWORD
+          )
+
+          for key in "${optional[@]}"; do
+            if [ -z "${!key:-}" ]; then
+              echo "::warning::Optional secret/var '$key' is empty — related feature will be disabled"
+            fi
+          done
+
+          echo "Core required secrets and variables are present."
 
       - name: Generate .env.production
         run: |
