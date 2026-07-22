@@ -15,74 +15,25 @@ concurrency:
 
 env:
   IMAGE_TAG: ${{ github.sha }}
-  BACKEND_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-backend
-  WEB_CLIENT_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-web-client
-  ADMIN_PORTAL_IMAGE: ghcr.io/a-words/ai-adolescent-mental-health-admin-portal
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health-backend
+  WEB_CLIENT_IMAGE: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health-web-client
+  ADMIN_PORTAL_IMAGE: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health-admin-portal
 
 jobs:
-  deploy:
-    name: Build, push, and deploy
+  # ===== 构建 & 推送镜像 =====
+  build:
+    name: Build and push images
     runs-on: ubuntu-latest
-    environment: production
-    env:
-      BACKEND_URL: ${{ vars.BACKEND_URL }}
-      NEXT_PUBLIC_WS_BASE_URL: ${{ vars.NEXT_PUBLIC_WS_BASE_URL }}
-      SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
-      JAVA_OPTS: ${{ vars.JAVA_OPTS }}
-      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
-      WEB_CLIENT_PORT: ${{ vars.WEB_CLIENT_PORT }}
-      ADMIN_PORTAL_PORT: ${{ vars.ADMIN_PORTAL_PORT }}
-      DB_MYSQL_HOST: ${{ vars.DB_MYSQL_HOST }}
-      DB_MYSQL_PORT: ${{ vars.DB_MYSQL_PORT }}
-      DB_MYSQL_DATABASE: ${{ vars.DB_MYSQL_DATABASE }}
-      DB_MYSQL_USERNAME: ${{ secrets.DB_MYSQL_USERNAME || vars.DB_MYSQL_USERNAME }}
-      DB_MYSQL_PASSWORD: ${{ secrets.DB_MYSQL_PASSWORD }}
-      DB_REDIS_HOST: ${{ vars.DB_REDIS_HOST }}
-      DB_REDIS_PORT: ${{ vars.DB_REDIS_PORT }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
-      WX_APP_ID: ${{ secrets.WX_APP_ID || vars.WX_APP_ID }}
-      WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
-      WX_GZH_APP_ID: ${{ secrets.WX_GZH_APP_ID || vars.WX_GZH_APP_ID }}
-      WX_GZH_SECRET: ${{ secrets.WX_GZH_SECRET }}
-      WX_GZH_CALLBACK_BASE_URL: ${{ vars.WX_GZH_CALLBACK_BASE_URL }}
-      ALIYUN_OSS_ENDPOINT: ${{ vars.ALIYUN_OSS_ENDPOINT }}
-      ALIYUN_OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_OSS_ACCESS_KEY_ID }}
-      ALIYUN_OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_OSS_ACCESS_KEY_SECRET }}
-      ALIYUN_OSS_BUCKET_NAME: ${{ vars.ALIYUN_OSS_BUCKET_NAME }}
-      MAIL_HOST: ${{ vars.MAIL_HOST }}
-      MAIL_PORT: ${{ vars.MAIL_PORT }}
-      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME || vars.MAIL_USERNAME }}
-      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+    outputs:
+      image_tag: ${{ env.IMAGE_TAG }}
+      backend_image: ${{ env.BACKEND_IMAGE }}
+      web_client_image: ${{ env.WEB_CLIENT_IMAGE }}
+      admin_portal_image: ${{ env.ADMIN_PORTAL_IMAGE }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Validate production config
-        run: |
-          set -euo pipefail
-
-          : "${BACKEND_URL:?Missing production environment variable BACKEND_URL}"
-          : "${NEXT_PUBLIC_WS_BASE_URL:?Missing production environment variable NEXT_PUBLIC_WS_BASE_URL}"
-          : "${DB_MYSQL_HOST:?Missing production environment variable DB_MYSQL_HOST}"
-          : "${DB_MYSQL_USERNAME:?Missing production environment secret or variable DB_MYSQL_USERNAME}"
-          : "${DB_MYSQL_PASSWORD:?Missing production environment secret DB_MYSQL_PASSWORD}"
-          : "${DB_REDIS_HOST:?Missing production environment variable DB_REDIS_HOST}"
-          : "${JWT_SECRET:?Missing production environment secret JWT_SECRET}"
-          : "${DASHSCOPE_API_KEY:?Missing production environment secret DASHSCOPE_API_KEY}"
-          : "${WX_APP_ID:?Missing production environment secret or variable WX_APP_ID}"
-          : "${WX_APP_SECRET:?Missing production environment secret WX_APP_SECRET}"
-          : "${WX_GZH_APP_ID:?Missing production environment secret or variable WX_GZH_APP_ID}"
-          : "${WX_GZH_SECRET:?Missing production environment secret WX_GZH_SECRET}"
-          : "${ALIYUN_OSS_ENDPOINT:?Missing production environment variable ALIYUN_OSS_ENDPOINT}"
-          : "${ALIYUN_OSS_ACCESS_KEY_ID:?Missing production environment secret ALIYUN_OSS_ACCESS_KEY_ID}"
-          : "${ALIYUN_OSS_ACCESS_KEY_SECRET:?Missing production environment secret ALIYUN_OSS_ACCESS_KEY_SECRET}"
-          : "${ALIYUN_OSS_BUCKET_NAME:?Missing production environment variable ALIYUN_OSS_BUCKET_NAME}"
-          : "${MAIL_HOST:?Missing production environment variable MAIL_HOST}"
-          : "${MAIL_PORT:?Missing production environment variable MAIL_PORT}"
-          : "${MAIL_USERNAME:?Missing production environment secret or variable MAIL_USERNAME}"
-          : "${MAIL_PASSWORD:?Missing production environment secret MAIL_PASSWORD}"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -90,7 +41,7 @@ jobs:
       - name: Log in to GHCR
         uses: docker/login-action@v3
         with:
-          registry: ghcr.io
+          registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
@@ -100,7 +51,9 @@ jobs:
           context: .
           file: apps/backend/Dockerfile
           push: true
-          tags: ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.BACKEND_IMAGE }}:latest
           cache-from: type=gha,scope=backend
           cache-to: type=gha,scope=backend,mode=max
 
@@ -110,10 +63,12 @@ jobs:
           context: .
           file: apps/web-client/Dockerfile
           push: true
-          tags: ${{ env.WEB_CLIENT_IMAGE }}:${{ env.IMAGE_TAG }}
+          tags: |
+            ${{ env.WEB_CLIENT_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.WEB_CLIENT_IMAGE }}:latest
           build-args: |
-            BACKEND_URL=${{ env.BACKEND_URL }}
-            NEXT_PUBLIC_WS_BASE_URL=${{ env.NEXT_PUBLIC_WS_BASE_URL }}
+            BACKEND_URL=${{ vars.BACKEND_URL }}
+            NEXT_PUBLIC_WS_BASE_URL=${{ vars.NEXT_PUBLIC_WS_BASE_URL }}
           cache-from: type=gha,scope=web-client
           cache-to: type=gha,scope=web-client,mode=max
 
@@ -123,11 +78,155 @@ jobs:
           context: .
           file: apps/admin-portal/Dockerfile
           push: true
-          tags: ${{ env.ADMIN_PORTAL_IMAGE }}:${{ env.IMAGE_TAG }}
+          tags: |
+            ${{ env.ADMIN_PORTAL_IMAGE }}:${{ env.IMAGE_TAG }}
+            ${{ env.ADMIN_PORTAL_IMAGE }}:latest
           build-args: |
-            BACKEND_URL=${{ env.BACKEND_URL }}
+            BACKEND_URL=${{ vars.BACKEND_URL }}
           cache-from: type=gha,scope=admin-portal
           cache-to: type=gha,scope=admin-portal,mode=max
+
+  # ===== 部署到服务器 =====
+  deploy:
+    name: Deploy to server
+    runs-on: ubuntu-latest
+    needs: build
+    environment: production
+
+    env:
+      IMAGE_TAG: ${{ needs.build.outputs.image_tag }}
+      BACKEND_IMAGE: ${{ needs.build.outputs.backend_image }}
+      WEB_CLIENT_IMAGE: ${{ needs.build.outputs.web_client_image }}
+      ADMIN_PORTAL_IMAGE: ${{ needs.build.outputs.admin_portal_image }}
+      # ---- 应用配置 ----
+      SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
+      BACKEND_URL: ${{ vars.BACKEND_URL }}
+      NEXT_PUBLIC_WS_BASE_URL: ${{ vars.NEXT_PUBLIC_WS_BASE_URL }}
+      # ---- 端口 ----
+      BACKEND_PORT: ${{ vars.BACKEND_PORT }}
+      WEB_CLIENT_PORT: ${{ vars.WEB_CLIENT_PORT }}
+      ADMIN_PORTAL_PORT: ${{ vars.ADMIN_PORTAL_PORT }}
+      # ---- MySQL ----
+      DB_MYSQL_HOST: ${{ vars.DB_MYSQL_HOST }}
+      DB_MYSQL_PORT: ${{ vars.DB_MYSQL_PORT }}
+      DB_MYSQL_DATABASE: ${{ vars.DB_MYSQL_DATABASE }}
+      DB_MYSQL_USERNAME: ${{ secrets.DB_MYSQL_USERNAME || vars.DB_MYSQL_USERNAME }}
+      DB_MYSQL_PASSWORD: ${{ secrets.DB_MYSQL_PASSWORD }}
+      # ---- Redis ----
+      DB_REDIS_HOST: ${{ vars.DB_REDIS_HOST }}
+      DB_REDIS_PORT: ${{ vars.DB_REDIS_PORT }}
+      DB_REDIS_PASSWORD: ${{ secrets.DB_REDIS_PASSWORD || vars.DB_REDIS_PASSWORD || '' }}
+      # ---- JWT ----
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      # ---- AI ----
+      DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      # ---- 微信 ----
+      WX_APP_ID: ${{ secrets.WX_APP_ID || vars.WX_APP_ID }}
+      WX_APP_SECRET: ${{ secrets.WX_APP_SECRET }}
+      WX_GZH_APP_ID: ${{ secrets.WX_GZH_APP_ID || vars.WX_GZH_APP_ID }}
+      WX_GZH_SECRET: ${{ secrets.WX_GZH_SECRET }}
+      WX_GZH_CALLBACK_BASE_URL: ${{ vars.WX_GZH_CALLBACK_BASE_URL }}
+      # ---- 阿里云 OSS ----
+      ALIYUN_OSS_ENDPOINT: ${{ vars.ALIYUN_OSS_ENDPOINT }}
+      ALIYUN_OSS_ACCESS_KEY_ID: ${{ secrets.ALIYUN_OSS_ACCESS_KEY_ID }}
+      ALIYUN_OSS_ACCESS_KEY_SECRET: ${{ secrets.ALIYUN_OSS_ACCESS_KEY_SECRET }}
+      ALIYUN_OSS_BUCKET_NAME: ${{ vars.ALIYUN_OSS_BUCKET_NAME }}
+      # ---- 邮件 ----
+      MAIL_HOST: ${{ vars.MAIL_HOST }}
+      MAIL_PORT: ${{ vars.MAIL_PORT }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME || vars.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      # ---- RabbitMQ（可选）----
+      RABBITMQ_USER: ${{ vars.RABBITMQ_USER || 'guest' }}
+      RABBITMQ_PASS: ${{ secrets.RABBITMQ_PASS || 'guest' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets and vars
+        run: |
+          set -euo pipefail
+          missing=""
+
+          check() { if [ -z "${!1:-}" ]; then missing="$missing  $1\n"; fi; }
+
+          check BACKEND_URL
+          check NEXT_PUBLIC_WS_BASE_URL
+          check DB_MYSQL_HOST
+          check DB_MYSQL_USERNAME
+          check DB_MYSQL_PASSWORD
+          check DB_REDIS_HOST
+          check JWT_SECRET
+          check DASHSCOPE_API_KEY
+          check WX_APP_ID
+          check WX_APP_SECRET
+          check WX_GZH_APP_ID
+          check WX_GZH_SECRET
+          check ALIYUN_OSS_ENDPOINT
+          check ALIYUN_OSS_ACCESS_KEY_ID
+          check ALIYUN_OSS_ACCESS_KEY_SECRET
+          check ALIYUN_OSS_BUCKET_NAME
+          check MAIL_HOST
+          check MAIL_PORT
+          check MAIL_USERNAME
+          check MAIL_PASSWORD
+
+          if [ -n "$missing" ]; then
+            echo "::error::Missing required secrets/vars:$missing"
+            exit 1
+          fi
+
+          echo "All required secrets and variables are present."
+
+      - name: Generate .env.production
+        run: |
+          set -euo pipefail
+
+          env_file="deploy/.env.production"
+          cat > "$env_file" <<'ENVEOF'
+          # 由 GitHub Actions 自动生成，请勿手动修改
+          SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+          JAVA_OPTS=${JAVA_OPTS:--Xmx512m}
+          BACKEND_URL=${BACKEND_URL}
+          NEXT_PUBLIC_WS_BASE_URL=${NEXT_PUBLIC_WS_BASE_URL}
+          BACKEND_PORT=${BACKEND_PORT:-8080}
+          WEB_CLIENT_PORT=${WEB_CLIENT_PORT:-3100}
+          ADMIN_PORTAL_PORT=${ADMIN_PORTAL_PORT:-3101}
+          DB_MYSQL_HOST=${DB_MYSQL_HOST}
+          DB_MYSQL_PORT=${DB_MYSQL_PORT:-3306}
+          DB_MYSQL_DATABASE=${DB_MYSQL_DATABASE:-xinyuzhilian}
+          DB_MYSQL_USERNAME=${DB_MYSQL_USERNAME}
+          DB_MYSQL_PASSWORD=${DB_MYSQL_PASSWORD}
+          DB_REDIS_HOST=${DB_REDIS_HOST}
+          DB_REDIS_PORT=${DB_REDIS_PORT:-6379}
+          DB_REDIS_PASSWORD=${DB_REDIS_PASSWORD:-}
+          JWT_SECRET=${JWT_SECRET}
+          DASHSCOPE_API_KEY=${DASHSCOPE_API_KEY}
+          WX_APP_ID=${WX_APP_ID}
+          WX_APP_SECRET=${WX_APP_SECRET}
+          WX_GZH_APP_ID=${WX_GZH_APP_ID}
+          WX_GZH_SECRET=${WX_GZH_SECRET}
+          WX_GZH_CALLBACK_BASE_URL=${WX_GZH_CALLBACK_BASE_URL}
+          ALIYUN_OSS_ENDPOINT=${ALIYUN_OSS_ENDPOINT}
+          ALIYUN_OSS_ACCESS_KEY_ID=${ALIYUN_OSS_ACCESS_KEY_ID}
+          ALIYUN_OSS_ACCESS_KEY_SECRET=${ALIYUN_OSS_ACCESS_KEY_SECRET}
+          ALIYUN_OSS_BUCKET_NAME=${ALIYUN_OSS_BUCKET_NAME}
+          MAIL_HOST=${MAIL_HOST}
+          MAIL_PORT=${MAIL_PORT}
+          MAIL_USERNAME=${MAIL_USERNAME}
+          MAIL_PASSWORD=${MAIL_PASSWORD}
+          RABBITMQ_USER=${RABBITMQ_USER:-guest}
+          RABBITMQ_PASS=${RABBITMQ_PASS:-guest}
+          ENVEOF
+
+          # 替换变量引用为实际值
+          while IFS= read -r line; do
+            eval "echo \"$line\""
+          done < "$env_file" > "$env_file.tmp"
+          mv "$env_file.tmp" "$env_file"
+
+          echo "Generated deploy/.env.production ($(wc -l < "$env_file") lines)"
 
       - name: Configure SSH
         env:
@@ -147,7 +246,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -p "${DEPLOY_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-      - name: Deploy on server
+      - name: Deploy to server
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
@@ -161,107 +260,107 @@ jobs:
           : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
           : "${DEPLOY_PATH:?Missing DEPLOY_PATH secret}"
           : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
-          : "${GHCR_TOKEN:?Missing GHCR_TOKEN}"
-          : "${GHCR_USERNAME:?Missing GHCR_USERNAME}"
 
-          prod_env_file="$(mktemp)"
-          trap 'rm -f "$prod_env_file"' EXIT
-          chmod 600 "$prod_env_file"
-          python3 - "$prod_env_file" <<'PY'
-          import os
-          import sys
+          echo "::group::Upload files to server"
+          # 确保目标目录存在
+          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
+            "mkdir -p $DEPLOY_PATH/deploy $DEPLOY_PATH/infra/sql"
 
-          keys = [
-              "BACKEND_URL",
-              "NEXT_PUBLIC_WS_BASE_URL",
-              "SPRING_PROFILES_ACTIVE",
-              "JAVA_OPTS",
-              "BACKEND_PORT",
-              "WEB_CLIENT_PORT",
-              "ADMIN_PORTAL_PORT",
-              "DB_MYSQL_HOST",
-              "DB_MYSQL_PORT",
-              "DB_MYSQL_DATABASE",
-              "DB_MYSQL_USERNAME",
-              "DB_MYSQL_PASSWORD",
-              "DB_REDIS_HOST",
-              "DB_REDIS_PORT",
-              "JWT_SECRET",
-              "DASHSCOPE_API_KEY",
-              "WX_APP_ID",
-              "WX_APP_SECRET",
-              "WX_GZH_APP_ID",
-              "WX_GZH_SECRET",
-              "WX_GZH_CALLBACK_BASE_URL",
-              "ALIYUN_OSS_ENDPOINT",
-              "ALIYUN_OSS_ACCESS_KEY_ID",
-              "ALIYUN_OSS_ACCESS_KEY_SECRET",
-              "ALIYUN_OSS_BUCKET_NAME",
-              "MAIL_HOST",
-              "MAIL_PORT",
-              "MAIL_USERNAME",
-              "MAIL_PASSWORD",
-          ]
+          # 上传文件
+          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" \
+            deploy/.env.production \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/.env.production"
 
-          with open(sys.argv[1], "w", encoding="utf-8") as env_file:
-              for key in keys:
-                  value = os.environ.get(key, "")
-                  escaped = (
-                      value.replace("\\", "\\\\")
-                      .replace("\n", "\\n")
-                      .replace('"', '\\"')
-                      .replace("$", "\\$")
-                  )
-                  env_file.write(f'{key}="{escaped}"\n')
-          PY
+          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" \
+            deploy/docker-compose.prod.yml \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy/docker-compose.prod.yml"
 
-          remote_env=$(
-            printf 'DEPLOY_PATH=%q IMAGE_TAG=%q BACKEND_IMAGE=%q WEB_CLIENT_IMAGE=%q ADMIN_PORTAL_IMAGE=%q GHCR_USERNAME=%q' \
-              "$DEPLOY_PATH" \
-              "$IMAGE_TAG" \
-              "$BACKEND_IMAGE:$IMAGE_TAG" \
-              "$WEB_CLIENT_IMAGE:$IMAGE_TAG" \
-              "$ADMIN_PORTAL_IMAGE:$IMAGE_TAG" \
-              "$GHCR_USERNAME"
-          )
+          # 上传 SQL 初始化脚本（如果存在）
+          if ls infra/sql/*.sql 1>/dev/null 2>&1; then
+            scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" \
+              infra/sql/*.sql \
+              "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/infra/sql/"
+          fi
 
-          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<'REMOTE_PREP'
-          set -euo pipefail
-          mkdir -p "$DEPLOY_PATH/deploy"
-          REMOTE_PREP
+          echo "::endgroup::"
 
-          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" "$prod_env_file" "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/.env.production"
-          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" deploy/docker-compose.prod.yml "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy/docker-compose.prod.yml"
-
-          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" "$remote_env bash -s" <<REMOTE_SCRIPT
+          echo "::group::Pull images and restart services"
+          ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" bash -s <<REMOTE
           set -euo pipefail
 
-          printf '%s' '$GHCR_TOKEN' | docker login ghcr.io -u "\$GHCR_USERNAME" --password-stdin
+          # GHCR 登录
+          printf '%s' '${GHCR_TOKEN}' | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
           trap 'docker logout ghcr.io >/dev/null 2>&1 || true' EXIT
 
-          retry() {
-            max_attempts="\$1"
-            delay_seconds="\$2"
-            shift 2
+          cd "${DEPLOY_PATH}"
 
-            attempt=1
-            until "\$@"; do
-              status="\$?"
-              if [ "\$attempt" -ge "\$max_attempts" ]; then
-                return "\$status"
+          # 导出镜像变量供 docker compose 使用
+          export IMAGE_TAG="${IMAGE_TAG}"
+          export BACKEND_IMAGE="${BACKEND_IMAGE}:${IMAGE_TAG}"
+          export WEB_CLIENT_IMAGE="${WEB_CLIENT_IMAGE}:${IMAGE_TAG}"
+          export ADMIN_PORTAL_IMAGE="${ADMIN_PORTAL_IMAGE}:${IMAGE_TAG}"
+
+          # 拉取新镜像
+          echo "Pulling images..."
+          docker compose --env-file .env.production -f deploy/docker-compose.prod.yml pull
+
+          # 滚动更新（保持旧容器运行直到新容器就绪）
+          echo "Deploying services..."
+          docker compose --env-file .env.production -f deploy/docker-compose.prod.yml up -d --remove-orphans
+
+          # 清理旧镜像
+          echo "Pruning old images..."
+          docker image prune -af --filter "until=24h" || true
+          REMOTE
+          echo "::endgroup::"
+
+      - name: Health check
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          BACKEND_URL: ${{ vars.BACKEND_URL }}
+        run: |
+          set -euo pipefail
+
+          echo "Waiting for services to become healthy (max 120s)..."
+
+          check_http() {
+            local url="$1"
+            local name="$2"
+            local attempt=1
+            local max_attempts=24
+
+            while [ $attempt -le $max_attempts ]; do
+              if ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
+                "curl -sfo /dev/null -w '%{http_code}' '$url'" 2>/dev/null | grep -qE '^(200|301|302|401|403)$'; then
+                echo "  ✓ $name is healthy ($url)"
+                return 0
               fi
-
-              echo "Command failed with exit code \$status. Retrying in \$delay_seconds seconds... (\$attempt/\$max_attempts)" >&2
-              sleep "\$delay_seconds"
-              attempt="\$((attempt + 1))"
+              echo "  ... waiting for $name ($attempt/$max_attempts)"
+              sleep 5
+              attempt=$((attempt + 1))
             done
+            echo "::warning::$name health check failed after ${max_attempts} attempts"
+            return 1
           }
 
-          mkdir -p "\$DEPLOY_PATH"
-          cd "\$DEPLOY_PATH"
+          check_http "http://localhost:${BACKEND_PORT:-8080}/actuator/health" "backend"
+          check_http "http://localhost:${WEB_CLIENT_PORT:-3100}" "web-client"
+          check_http "http://localhost:${ADMIN_PORTAL_PORT:-3101}" "admin-portal"
 
-          chmod 600 .env.production
-          export IMAGE_TAG BACKEND_IMAGE WEB_CLIENT_IMAGE ADMIN_PORTAL_IMAGE
-          retry 3 10 docker compose --env-file .env.production -f deploy/docker-compose.prod.yml pull
-          docker compose --env-file .env.production -f deploy/docker-compose.prod.yml up -d --remove-orphans
-          REMOTE_SCRIPT
+          echo "All services are responding!"
+
+      - name: Deploy summary
+        if: always()
+        run: |
+          echo "### 🚀 Deploy Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Item | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Commit | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Branch | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Image tag | \`${{ needs.build.outputs.image_tag }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Backend image | \`${{ needs.build.outputs.backend_image }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Web client image | \`${{ needs.build.outputs.web_client_image }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Admin portal image | \`${{ needs.build.outputs.admin_portal_image }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Deploy status | ${{ job.status }} |" >> "$GITHUB_STEP_SUMMARY"

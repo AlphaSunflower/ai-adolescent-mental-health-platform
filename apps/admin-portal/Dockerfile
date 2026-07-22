@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.7
 
+# ===== Stage 1: Dependencies =====
 FROM node:24-bookworm-slim AS deps
 
 ENV PNPM_HOME="/pnpm"
@@ -17,6 +18,7 @@ RUN --mount=type=cache,id=pnpm-store,target=/pnpm/store \
   pnpm config set store-dir /pnpm/store \
   && pnpm install --frozen-lockfile --filter @ai-adolescent-mental-health/admin-portal...
 
+# ===== Stage 2: Build =====
 FROM node:24-bookworm-slim AS build
 
 ENV PNPM_HOME="/pnpm"
@@ -35,9 +37,10 @@ COPY --from=deps /workspace/apps/admin-portal/node_modules ./apps/admin-portal/n
 COPY --from=deps /workspace/packages ./packages
 COPY . .
 
-RUN test -n "$BACKEND_URL"
+RUN test -n "$BACKEND_URL" || (echo "ERROR: BACKEND_URL build-arg is required" >&2 && exit 1)
 RUN pnpm --filter @ai-adolescent-mental-health/admin-portal build
 
+# ===== Stage 3: Runtime =====
 FROM node:24-bookworm-slim AS runtime
 
 ENV NODE_ENV=production
@@ -58,5 +61,8 @@ COPY --from=build --chown=nextjs:nodejs /workspace/apps/admin-portal/public ./ap
 USER nextjs
 
 EXPOSE 3101
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=30s \
+  CMD wget -qO- http://localhost:3101/api/health || exit 1
 
 CMD ["node", "apps/admin-portal/server.js"]
