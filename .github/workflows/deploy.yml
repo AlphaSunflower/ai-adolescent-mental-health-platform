@@ -23,6 +23,7 @@ jobs:
   build:
     name: Build and push images
     runs-on: ubuntu-latest
+    environment: production
     outputs:
       image_tag: ${{ env.IMAGE_TAG }}
       backend_image: ${{ steps.images.outputs.backend_image }}
