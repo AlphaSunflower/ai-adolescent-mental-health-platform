@@ -28,15 +28,17 @@ WORKDIR /app
 # 从构建阶段复制 JAR
 COPY --from=build /workspace/apps/backend/target/app.jar ./app.jar
 
-# 创建日志目录
-RUN mkdir -p /app/logs && chown -R app:app /app
+# 创建日志目录 + 安装健康检查依赖
+RUN apk add --no-cache curl \
+  && mkdir -p /app/logs \
+  && chown -R app:app /app
 
 USER app
 
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=60s \
-  CMD wget -qO- http://localhost:8080/actuator/health || exit 1
+  CMD curl -fsS http://localhost:8080/actuator/health || exit 1
 
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
