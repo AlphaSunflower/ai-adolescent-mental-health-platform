@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ASYNC, DispatcherType.ERROR).permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/health", "/api/health").permitAll()
+                        .requestMatchers("/health", "/api/health", "/actuator/health").permitAll()
                         // WebSocket 放行
                         .requestMatchers("/ws/omni-realtime").permitAll()
                         // 登录注册相关放行
