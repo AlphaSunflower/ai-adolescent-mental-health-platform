@@ -16,9 +16,7 @@ concurrency:
 env:
   IMAGE_TAG: ${{ github.sha }}
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health-backend
-  WEB_CLIENT_IMAGE: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health-web-client
-  ADMIN_PORTAL_IMAGE: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health-admin-portal
+  IMAGE_NAME_PREFIX: ghcr.io/${{ github.repository_owner }}/ai-adolescent-mental-health
 
 jobs:
   # ===== 构建 & 推送镜像 =====
@@ -27,9 +25,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ env.IMAGE_TAG }}
-      backend_image: ${{ env.BACKEND_IMAGE }}
-      web_client_image: ${{ env.WEB_CLIENT_IMAGE }}
-      admin_portal_image: ${{ env.ADMIN_PORTAL_IMAGE }}
+      backend_image: ${{ steps.images.outputs.backend_image }}
+      web_client_image: ${{ steps.images.outputs.web_client_image }}
+      admin_portal_image: ${{ steps.images.outputs.admin_portal_image }}
 
     steps:
       - name: Checkout
@@ -44,6 +42,18 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set lowercase image names (GHCR requires lowercase)
+        id: images
+        run: |
+          owner_lower=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          prefix="ghcr.io/${owner_lower}/ai-adolescent-mental-health"
+          echo "BACKEND_IMAGE=${prefix}-backend" >> $GITHUB_ENV
+          echo "WEB_CLIENT_IMAGE=${prefix}-web-client" >> $GITHUB_ENV
+          echo "ADMIN_PORTAL_IMAGE=${prefix}-admin-portal" >> $GITHUB_ENV
+          echo "backend_image=${prefix}-backend" >> $GITHUB_OUTPUT
+          echo "web_client_image=${prefix}-web-client" >> $GITHUB_OUTPUT
+          echo "admin_portal_image=${prefix}-admin-portal" >> $GITHUB_OUTPUT
 
       - name: Build and push backend image
         uses: docker/build-push-action@v6
