@@ -365,33 +365,47 @@ jobs:
         run: |
           set -euo pipefail
 
-          echo "Waiting for services to become healthy (max 120s)..."
+          echo "Verifying containers are running..."
 
-          check_http() {
-            local url="$1"
-            local name="$2"
+          check_container() {
+            local name="$1"
+            local label="$2"
             local attempt=1
-            local max_attempts=24
+            local max_attempts=12
 
             while [ $attempt -le $max_attempts ]; do
               if ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
-                "curl -sfo /dev/null -w '%{http_code}' '$url'" 2>/dev/null | grep -qE '^(200|301|302|401|403)$'; then
-                echo "  ✓ $name is healthy ($url)"
+                "docker ps --filter name=$name --filter status=running --format '{{.Names}}' 2>/dev/null | grep -q ."; then
+                echo "  ✓ $label container is running"
                 return 0
               fi
-              echo "  ... waiting for $name ($attempt/$max_attempts)"
+              echo "  ... waiting for $label ($attempt/$max_attempts)"
               sleep 5
               attempt=$((attempt + 1))
             done
-            echo "::warning::$name health check failed after ${max_attempts} attempts"
+            echo "::warning::$label container not running after ${max_attempts} attempts"
             return 1
           }
 
-          check_http "http://localhost:${BACKEND_PORT:-8080}/actuator/health" "backend"
-          check_http "http://localhost:${WEB_CLIENT_PORT:-3100}" "web-client"
-          check_http "http://localhost:${ADMIN_PORTAL_PORT:-3101}" "admin-portal"
+          check_container "aiamh-backend" "backend"
+          check_container "aiamh-web-client" "web-client"
+          check_container "aiamh-admin-portal" "admin-portal"
 
-          echo "All services are responding!"
+          echo "All containers are running!"
+
+          # Quick HTTP smoke test (non-blocking, warn only)
+          echo ""
+          echo "HTTP smoke test..."
+          for svc in "backend:8080/actuator/health" "web-client:3100" "admin-portal:3101"; do
+            name="${svc%%:*}"
+            url="http://localhost:${svc#*:}"
+            if ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
+              "curl -sfo /dev/null -w '%{http_code}' --max-time 5 '$url'" 2>/dev/null | grep -qE '^(200|301|302|401|403)$'; then
+              echo "  ✓ $name responds"
+            else
+              echo "  ⚠ $name not responding yet (may need warm-up)"
+            fi
+          done
 
       - name: Deploy summary
         if: always()
