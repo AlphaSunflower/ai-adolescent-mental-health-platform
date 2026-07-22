@@ -23,8 +23,8 @@ RUN cd apps/backend && ./mvnw clean package -DskipTests -B -q
 # ===== Stage 2: Runtime =====
 FROM eclipse-temurin:17-jre-alpine AS runtime
 
-RUN addgroup --system --gid 1001 app \
-  && adduser --system --uid 1001 --gid app app
+RUN addgroup -S -g 1001 app 2>/dev/null || true \
+  && adduser -S -u 1001 -G app app
 
 WORKDIR /app
 
