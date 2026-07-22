@@ -109,6 +109,12 @@ jobs:
       BACKEND_IMAGE: ${{ needs.build.outputs.backend_image }}
       WEB_CLIENT_IMAGE: ${{ needs.build.outputs.web_client_image }}
       ADMIN_PORTAL_IMAGE: ${{ needs.build.outputs.admin_portal_image }}
+      # ---- 部署目标 ----
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
       # ---- 应用配置 ----
       SPRING_PROFILES_ACTIVE: ${{ vars.SPRING_PROFILES_ACTIVE }}
       BACKEND_URL: ${{ vars.BACKEND_URL }}
