@@ -5,11 +5,7 @@ import { useRouter } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 import * as echarts from "echarts";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s, tokens } from "@/lib/design-tokens";
 
 function fmtMoney(n: unknown): string {
   const num = Number(n) || 0;
@@ -56,8 +52,8 @@ export function PlatformIncome() {
           xAxis: { type: "category", boundaryGap: false, data: dates },
           yAxis: { type: "value", axisLabel: { formatter: "¥{value}" } },
           series: [
-            { name: "平台抽成", type: "line", smooth: true, data: commissionData, areaStyle: { color: "rgba(64,158,255,0.1)" }, itemStyle: { color: "#409eff" } },
-            { name: "咨询流水", type: "line", smooth: true, data: consultationData, areaStyle: { color: "rgba(103,194,58,0.1)" }, itemStyle: { color: "#67c23a" } },
+            { name: "平台抽成", type: "line", smooth: true, data: commissionData, areaStyle: { color: "rgba(64,158,255,0.1)" }, itemStyle: { color: tokens.primary } },
+            { name: "咨询流水", type: "line", smooth: true, data: consultationData, areaStyle: { color: "rgba(103,194,58,0.1)" }, itemStyle: { color: tokens.success } },
           ],
         });
         trendChart.current = tc;

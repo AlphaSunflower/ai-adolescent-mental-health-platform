@@ -350,6 +350,7 @@ function mapLibraryItem(value: unknown, type: LibraryItemType): LibraryItem {
     readTime: type === "课程" ? "课程" : type === "书籍" ? "章节导读" : "阅读",
     views: asNumber(data.view_count ?? data.viewCount ?? data.views),
     coverUrl: asString(data.coverUrl ?? data.cover_url ?? data.cover ?? data.image, ""),
+    linkUrl: asString(data.mediaUrl ?? data.media_url, "") || undefined,
   };
 }
 
@@ -801,14 +802,14 @@ export async function streamAiChat(
   options: HttpClientOptions,
   sessionId: number,
   content: string,
-  onChunk: (chunk: string) => void,
+  onChunk: (chunk: string, type?: "content" | "reasoning") => void,
 ) {
   const token = options.getToken?.();
   const response = await fetch(`${options.baseURL.replace(/\/$/, "")}/ai/chat`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}`, token } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
     body: JSON.stringify({ sessionId, message: content }),
   });
@@ -832,11 +833,29 @@ export async function streamAiChat(
     buffer = lines.pop() ?? "";
     for (const line of lines) {
       const data = line.replace(/^data: ?/, "");
-      if (data) onChunk(data);
+      if (!data) continue;
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.type && parsed.content) {
+          onChunk(parsed.content, parsed.type);
+        }
+      } catch {
+        // Legacy: plain text chunk
+        onChunk(data, "content");
+      }
     }
   }
   if (buffer) {
     const data = buffer.replace(/^data: ?/, "");
-    if (data) onChunk(data);
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        if (parsed.type && parsed.content) {
+          onChunk(parsed.content, parsed.type);
+        }
+      } catch {
+        onChunk(data, "content");
+      }
+    }
   }
 }

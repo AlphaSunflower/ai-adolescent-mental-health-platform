@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { getToken, getStoredUser } from "@/lib/session";
 import { getRoleDashboardPath } from "@/lib/role-utils";
+import { tokens } from "@/lib/design-tokens";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -43,7 +44,7 @@ export function AuthGuard({ children, allowedRoles, allowPsychologist = false }:
 
   if (!authorized) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", color: "#909399", fontSize: "14px" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", color: tokens.textSecondary, fontSize: "14px" }}>
         加载中...
       </div>
     );

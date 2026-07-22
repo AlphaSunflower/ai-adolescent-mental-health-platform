@@ -4,10 +4,6 @@ server:
   port: 8080
 
 spring:
-  config:
-    import:
-      - optional:file:.env[.properties]
-      - optional:file:apps/backend/.env[.properties]
   application:
     name: AIAdolescentMentalHealthSystem
   mvc:
@@ -17,14 +13,14 @@ spring:
     resources:
       add-mappings: false
   datasource:
-    url: jdbc:mysql://${DB_MYSQL_HOST}:${DB_MYSQL_PORT}/${DB_MYSQL_DATABASE}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+    url: jdbc:mysql://${DB_MYSQL_HOST:127.0.0.1}:${DB_MYSQL_PORT:3306}/${DB_MYSQL_DATABASE:xinyuzhilian}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_MYSQL_USERNAME}
-    password: ${DB_MYSQL_PASSWORD}
+    username: ${DB_MYSQL_USERNAME:root}
+    password: ${DB_MYSQL_PASSWORD:}
   data:
     redis:
-      host: ${DB_REDIS_HOST}
-      port: ${DB_REDIS_PORT}
+      host: ${DB_REDIS_HOST:127.0.0.1}
+      port: ${DB_REDIS_PORT:6379}
 
   websocket:
     max-text-message-buffer-size: 5242880
@@ -43,13 +39,13 @@ logging:
 
 aliyun:
   oss:
-    endpoint: ${ALIYUN_OSS_ENDPOINT}
-    accessKeyId: ${ALIYUN_OSS_ACCESS_KEY_ID}
-    accessKeySecret: ${ALIYUN_OSS_ACCESS_KEY_SECRET}
-    bucketName: ${ALIYUN_OSS_BUCKET_NAME}
+    endpoint: ${ALIYUN_OSS_ENDPOINT:}
+    accessKeyId: ${ALIYUN_OSS_ACCESS_KEY_ID:}
+    accessKeySecret: ${ALIYUN_OSS_ACCESS_KEY_SECRET:}
+    bucketName: ${ALIYUN_OSS_BUCKET_NAME:}
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:ai-adolescent-mental-health-dev-secret-key-2024}
   expiration: 86400000
   issuer: "AIAdolescentMentalHealthSystem"
   rememberExpiration: 2592000000

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { tokens } from "@/lib/design-tokens";
 
 interface QuickAction {
   label: string;
@@ -14,25 +15,25 @@ const QUICK_ACTIONS: QuickAction[] = [
     label: "查看预约",
     description: "查看和管理您的咨询预约",
     path: "/psychologist-admin/appointments",
-    color: "#409eff",
+    color: tokens.primary,
   },
   {
     label: "排班管理",
     description: "设置您的可预约时间段",
     path: "/psychologist-admin/schedule",
-    color: "#67c23a",
+    color: tokens.success,
   },
   {
     label: "收入查看",
     description: "查看您的咨询收入明细",
     path: "/psychologist-admin/income",
-    color: "#e6a23c",
+    color: tokens.warning,
   },
   {
     label: "在线咨询",
     description: "进入在线咨询会话",
     path: "/psychologist-admin/chat",
-    color: "#f56c6c",
+    color: tokens.danger,
   },
 ];
 
@@ -51,10 +52,10 @@ export function PsychWorkbench() {
         marginBottom: "16px",
         backgroundImage: "linear-gradient(135deg, #409eff08 0%, #67c23a08 100%)",
       }}>
-        <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 600, color: "#303133" }}>
+        <h2 style={{ margin: 0, fontSize: "22px", fontWeight: 600, color: tokens.textPrimary }}>
           欢迎来到咨询师工作台
         </h2>
-        <p style={{ margin: "8px 0 0 0", fontSize: "14px", color: "#909399", lineHeight: 1.6 }}>
+        <p style={{ margin: "8px 0 0 0", fontSize: "14px", color: tokens.textSecondary, lineHeight: 1.6 }}>
           在这里您可以管理预约、查看收入、进行在线咨询等操作
         </p>
       </div>
@@ -104,8 +105,8 @@ export function PsychWorkbench() {
               {action.label.charAt(0)}
             </span>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: "16px", fontWeight: 600, color: "#303133" }}>{action.label}</div>
-              <div style={{ fontSize: "13px", color: "#909399", marginTop: "4px" }}>{action.description}</div>
+              <div style={{ fontSize: "16px", fontWeight: 600, color: tokens.textPrimary }}>{action.label}</div>
+              <div style={{ fontSize: "13px", color: tokens.textSecondary, marginTop: "4px" }}>{action.description}</div>
             </div>
             <svg
               width="16" height="16" viewBox="0 0 24 24"

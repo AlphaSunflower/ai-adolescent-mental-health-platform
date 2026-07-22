@@ -10,7 +10,7 @@
 - 技术栈：Spring Boot 3.5.9、Java 17、Maven Wrapper、MyBatis-Plus、Sa-Token、Redis、RabbitMQ、WebSocket
 - 入口类：`com.xinyuzhilian.aiadolescentmentalhealthsystem.AiAdolescentMentalHealthSystemApplication`
 - 默认端口：`8080`（见 `application.yml` 的 `server.port`）
-- 激活 profile：默认 `test`（见 `spring.profiles.active`）
+- 激活 profile：`application.yml` 中无默认 profile；本地开发使用 `local`（见 `application-local.yml`），部署环境通过 `SPRING_PROFILES_ACTIVE` 环境变量指定
 
 ## 二、包结构（按业务域划分）
 
@@ -45,8 +45,9 @@ pnpm --filter @ai-adolescent-mental-health/backend clean
 ## 四、配置与环境变量
 
 - 主配置：`src/main/resources/application.yml`
-- 不提交 Profile 配置：`application-dev.yml`、`application-test.yml`、`application-local.yml` 等由本地 `.env` 或 CI/CD 环境变量替代。
-- 所有敏感项通过 `${ENV_VAR}` 注入；本地真实值可写在忽略提交的 `apps/backend/.env`，缺少必需变量时应让应用启动失败。
+- Profile 配置：`application-local.yml`（本地开发，已加入 `.gitignore`）；`application-dev.yml`、`application-test.yml` 等不提交，由 CI/CD 环境变量替代。
+- **dotenv 支持**：项目使用 `me.paulschwarz:springboot3-dotenv` 自动加载 `.env` 文件中的变量。类路径或工作目录下的 `.env` 会在 Spring 启动早期被注入为 PropertySource，无需手动 `spring.config.import`。
+- **默认值策略**：基础设施变量（`DB_MYSQL_HOST`/`PORT`、`DB_REDIS_HOST`/`PORT`）在 `application.yml` 中使用 `${VAR:default}` 语法提供合理回退值；OSS 等可选服务使用空字符串回退；密钥类变量（`JWT_SECRET`、API keys）在 `application-local.yml` 中有开发用占位值，生产环境必须通过环境变量或 `.env` 注入。
 - 关键变量：`DB_MYSQL_*`、`DB_REDIS_*`、`ALIYUN_OSS_*`、`JWT_SECRET`、`DASHSCOPE_API_KEY`、`WX_APP_ID`、`WX_APP_SECRET`、`WX_GZH_APP_ID`、`WX_GZH_SECRET`、`WX_GZH_CALLBACK_BASE_URL`、`MAIL_*`。
 - MySQL 库名通过 `DB_MYSQL_DATABASE` 配置；schema 变更需同步 `infra/sql/`。
 
@@ -64,7 +65,7 @@ pnpm --filter @ai-adolescent-mental-health/backend clean
 
 - MySQL 8+，库 `xinyuzhilian`，已导入 `infra/sql/` 下脚本
 - Redis 6+ 运行于 `localhost:6379`
-- 如触及消息业务：RabbitMQ 运行于 `localhost:5672`（`guest:guest`）
+- RabbitMQ（可选）：如触及消息业务需运行于 `localhost:5672`（`guest:guest`）；本地开发默认禁用 RabbitMQ 自动连接（`application-local.yml` 中 `spring.rabbitmq.listener.simple.auto-startup: false`）
 
 ## 七、测试约束
 

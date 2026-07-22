@@ -6,14 +6,13 @@ import Link from "next/link";
 import {
   ArrowLeft, Star, MapPin, Clock, Heart, Calendar, Medal,
   Users, MessageCircle, Video, Phone, CheckCircle2, Sparkles,
-  BookOpen, GraduationCap, Award, ChevronDown, X, Building2, Loader2
+  BookOpen, GraduationCap, Award, ChevronDown, Building2, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import type { Psychologist } from "@/lib/types";
 
@@ -65,9 +64,7 @@ export function PsychologistDetailPage() {
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("intro");
   const [isFavorite, setIsFavorite] = useState(false);
-  const [bookingOpen, setBookingOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<string | null>(null);
-  const [description, setDescription] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const [schedules, setSchedules] = useState<ScheduleSlot[]>([]);
@@ -123,11 +120,39 @@ export function PsychologistDetailPage() {
     fetchData();
   }, [id]);
 
-  // Auto-load today's schedules on mount
   useEffect(() => {
     if (id) fetchSchedules(new Date());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  const handleBook = async () => {
+    if (!selectedScheduleId) {
+      toast.error("请先选择预约时段");
+      return;
+    }
+    if (!p) return;
+    setSubmitting(true);
+    try {
+      const svc = selectedService
+        ? services.find((s) => s.type === selectedService)
+        : services[0];
+      const isOffline = svc?.type === "offline";
+      await api.appointment.create({
+        psychologistId: p.id,
+        scheduleId: selectedScheduleId,
+        serviceType: isOffline ? "OFFLINE" : "video",
+        description: "",
+      });
+      toast.success("预约成功");
+      setSelectedService(null);
+      setSelectedScheduleId(null);
+      setSchedules([]);
+    } catch {
+      toast.error("预约失败，请重试");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -268,7 +293,7 @@ export function PsychologistDetailPage() {
             <Button
               variant="primary"
               size="default"
-              onClick={() => { setTab("services"); setBookingOpen(true); }}
+              onClick={() => setTab("services")}
             >
               <Calendar className="mr-1 size-4" />
               立即预约
@@ -391,7 +416,7 @@ export function PsychologistDetailPage() {
               <Calendar className="size-5 text-cosmic-sky" />选择预约时间
             </h3>
 
-            {/* 7-day view — horizontal scroll on mobile, grid on sm+ */}
+            {/* 7-day view */}
             <div className="mb-6 flex gap-1.5 overflow-x-auto sm:grid sm:grid-cols-7 sm:gap-2 sm:overflow-visible">
               {Array.from({ length: 7 }).map((_, i) => {
                 const date = new Date();
@@ -466,7 +491,7 @@ export function PsychologistDetailPage() {
               <p className="mb-4 text-sm text-cosmic-dim">该日期暂无可用排班</p>
             ) : null}
 
-            {/* Selected service summary */}
+            {/* Selected service summary + direct book */}
             {(selectedService || selectedScheduleId) && (
               <div className="rounded-xl bg-cosmic-gold/10 border border-cosmic-gold/20 p-4 mb-4">
                 <div className="flex items-center justify-between">
@@ -485,118 +510,18 @@ export function PsychologistDetailPage() {
                       </span>
                     )}
                   </div>
-                  <Button variant="primary" size="xs" onClick={() => {
-                    if (!selectedScheduleId) {
-                      toast.error("请先选择预约时段");
-                      return;
-                    }
-                    setBookingOpen(true);
-                  }}>
-                    立即预约
+                  <Button
+                    variant="primary"
+                    size="xs"
+                    disabled={submitting || !selectedScheduleId}
+                    onClick={handleBook}
+                  >
+                    {submitting ? "预约中..." : "立即预约"}
                   </Button>
                 </div>
               </div>
             )}
           </div>
-
-          {/* Booking Dialog */}
-          <Dialog open={bookingOpen} onOpenChange={setBookingOpen}>
-            <DialogContent className="!max-w-lg">
-              <DialogTitle>填写预约信息</DialogTitle>
-              <div className="space-y-4">
-                <div className="rounded-lg bg-white/5 p-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar className="size-4 text-cosmic-sky" />
-                    <span className="text-cosmic-muted">咨询师：</span>
-                    <span className="text-white">{p.name}</span>
-                  </div>
-                  {selectedService && (
-                    <div className="mt-2 flex items-center gap-2 text-sm">
-                      <span className="text-cosmic-muted">服务：</span>
-                      <span className="text-white">
-                        {services.find((s) => s.type === selectedService)?.label}
-                      </span>
-                      <span className="ml-auto font-semibold text-cosmic-gold">
-                        ¥{services.find((s) => s.type === selectedService)?.price?.toFixed(0) ?? "0"}
-                      </span>
-                    </div>
-                  )}
-                  {selectedScheduleId && (() => {
-                    const sch = schedules.find((s) => s.id === selectedScheduleId);
-                    return sch ? (
-                      <div className="mt-2 flex items-center gap-2 text-sm">
-                        <span className="text-cosmic-muted">时段：</span>
-                        <span className="text-white">
-                          {sch.date} {timeSlotLabel(sch.timeSlot)} {sch.startTime?.slice(0, 5)}-{sch.endTime?.slice(0, 5)}
-                        </span>
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
-
-                <div>
-                  <label className="mb-1 block text-sm text-cosmic-muted">主要问题（必填）</label>
-                  <textarea
-                    rows={4}
-                    className="cosmic-input w-full rounded-xl px-4 py-3 text-sm resize-none"
-                    placeholder="请描述您希望咨询的主要问题..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  />
-                </div>
-
-                <p className="text-xs text-cosmic-dim">
-                  预约成功后，费用将从您的虚拟账户扣除。心理师接受预约后，会收到通知。
-                </p>
-
-                <DialogFooter>
-                  <DialogClose asChild>
-                    <Button variant="outline" size="sm" disabled={submitting}>取消</Button>
-                  </DialogClose>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    disabled={submitting || !description.trim() || !selectedScheduleId}
-                    onClick={async () => {
-                      if (!description.trim()) {
-                        toast.error("请填写主要问题");
-                        return;
-                      }
-                      if (!selectedScheduleId) {
-                        toast.error("请选择预约时段");
-                        return;
-                      }
-                      setSubmitting(true);
-                      try {
-                        const svc = selectedService
-                          ? services.find((s) => s.type === selectedService)
-                          : services[0];
-                        const isOffline = svc?.type === "offline";
-                        await api.appointment.create({
-                          psychologistId: p.id,
-                          scheduleId: selectedScheduleId,
-                          serviceType: isOffline ? "OFFLINE" : "video",
-                          description: description.trim(),
-                        });
-                        toast.success("预约成功");
-                        setBookingOpen(false);
-                        setDescription("");
-                        setSelectedService(null);
-                        setSelectedScheduleId(null);
-                        setSchedules([]);
-                      } catch {
-                        toast.error("预约失败，请重试");
-                      } finally {
-                        setSubmitting(false);
-                      }
-                    }}
-                  >
-                    {submitting ? "预约中..." : "确认预约"}
-                  </Button>
-                </DialogFooter>
-              </div>
-            </DialogContent>
-          </Dialog>
         </TabsContent>
 
         {/* Tab 5: 用户评价 */}

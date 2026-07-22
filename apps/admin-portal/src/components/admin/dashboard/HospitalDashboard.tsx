@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { tokens } from "@/lib/design-tokens";
 import * as echarts from "echarts";
 import { httpClient } from "@/lib/api-admin";
 
@@ -62,8 +63,8 @@ function StatCard({ label, value, color, icon }: StatCardProps) {
         {icon}
       </span>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: "14px", color: "#909399", marginBottom: "4px" }}>{label}</div>
-        <div style={{ fontSize: "28px", fontWeight: 700, color: "#303133", lineHeight: 1.2 }}>
+        <div style={{ fontSize: "14px", color: tokens.textSecondary, marginBottom: "4px" }}>{label}</div>
+        <div style={{ fontSize: "28px", fontWeight: 700, color: tokens.textPrimary, lineHeight: 1.2 }}>
           {(value ?? 0).toLocaleString()}
         </div>
       </div>
@@ -117,7 +118,7 @@ export function HospitalDashboard() {
           data: consultationData,
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: "#409eff" },
+              { offset: 0, color: tokens.primary },
               { offset: 1, color: "#a0cfff" },
             ]),
             borderRadius: [4, 4, 0, 0],
@@ -135,11 +136,11 @@ export function HospitalDashboard() {
   }, [data]);
 
   if (loading) {
-    return <div style={{ padding: "40px", textAlign: "center", color: "#909399" }}>加载中...</div>;
+    return <div style={{ padding: "40px", textAlign: "center", color: tokens.textSecondary }}>加载中...</div>;
   }
 
   if (error || !data) {
-    return <div style={{ padding: "40px", textAlign: "center", color: "#f56c6c" }}>数据加载失败: {error ?? "未知错误"}</div>;
+    return <div style={{ padding: "40px", textAlign: "center", color: tokens.danger }}>数据加载失败: {error ?? "未知错误"}</div>;
   }
 
   const d = data;
@@ -160,30 +161,30 @@ export function HospitalDashboard() {
           width: "48px",
           height: "48px",
           borderRadius: "12px",
-          backgroundColor: "#409eff18",
+          backgroundColor: tokens.primaryLight,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: "22px",
           fontWeight: 700,
-          color: "#409eff",
+          color: tokens.primary,
           flexShrink: 0,
         }}>
           院
         </span>
         <div>
-          <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 600, color: "#303133" }}>
+          <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 600, color: tokens.textPrimary }}>
             {d.hospitalName}
           </h2>
-          <div style={{ fontSize: "13px", color: "#909399", marginTop: "4px" }}>医院管理后台</div>
+          <div style={{ fontSize: "13px", color: tokens.textSecondary, marginTop: "4px" }}>医院管理后台</div>
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "16px" }}>
-        <StatCard label="患者总数" value={d.totalPatients ?? d.patientCount} color="#409eff" icon="患" />
-        <StatCard label="医生数量" value={d.totalDoctors ?? d.doctorCount} color="#67c23a" icon="医" />
-        <StatCard label="咨询总数" value={d.totalAppointments ?? d.consultationCount} color="#e6a23c" icon="询" />
-        <StatCard label="反馈数量" value={d.feedbackCount} color="#f56c6c" icon="反" />
+        <StatCard label="患者总数" value={d.totalPatients ?? d.patientCount} color={tokens.primary} icon="患" />
+        <StatCard label="医生数量" value={d.totalDoctors ?? d.doctorCount} color={tokens.success} icon="医" />
+        <StatCard label="咨询总数" value={d.totalAppointments ?? d.consultationCount} color={tokens.warning} icon="询" />
+        <StatCard label="反馈数量" value={d.feedbackCount} color={tokens.danger} icon="反" />
       </div>
 
       <div style={{
@@ -192,7 +193,7 @@ export function HospitalDashboard() {
         boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
         padding: "20px",
       }}>
-        <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 600, color: "#303133" }}>
+        <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 600, color: tokens.textPrimary }}>
           月度咨询量
         </h3>
         <div ref={chartRef} style={{ height: "400px", width: "100%" }} />

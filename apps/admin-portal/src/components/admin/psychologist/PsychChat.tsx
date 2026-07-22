@@ -2,21 +2,17 @@
 
 import { useState, useEffect, useRef } from "react";
 import { httpClient } from "@/lib/api-admin";
+import { getToken } from "@/lib/session";
 
-const s = {
-  primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
-  text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
-  radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 interface Conversation {
-  appointmentId: number; userId: number; userName: string;
+  appointmentId: number; userId: number; userName: string; psychologistId?: number;
   serviceType: string; status: number; lastMessage: string; lastTime: string;
 }
 
 interface Message {
-  id: number; senderType: string; content: string; createTime: string; contentType: string;
+  id: number; senderType: string; content: string; createTime: string; contentType: number;
 }
 
 function getStatusLabel(st: number): string {
@@ -32,8 +28,11 @@ export function PsychChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputText, setInputText] = useState("");
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const eventSourceRef = useRef<EventSource | null>(null);
 
+  const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
   const extractUserName = (c: Record<string, unknown>): string => {
     if (c.userName) return String(c.userName);
@@ -59,6 +58,7 @@ export function PsychChat() {
           appointmentId: c.appointmentId as number,
           userId: c.userId as number,
           userName: extractUserName(c),
+          psychologistId: c.psychologistId as number,
           serviceType: c.serviceType as string,
           status: c.status as number,
           lastMessage: (c.lastMessage as string) || (c.userProblems as string) || "",
@@ -71,10 +71,54 @@ export function PsychChat() {
   };
 
   const fetchMessages = (appointmentId: number) => {
-    httpClient.get<Message[]>(`/psychologist/admin/messages/${appointmentId}`)
-      .then((res) => setMessages(Array.isArray(res) ? res : []))
+    httpClient.get<Record<string, unknown>[]>(`/psychologist/admin/messages/${appointmentId}`)
+      .then((res) => {
+        setMessages(Array.isArray(res) ? res.map((m) => ({
+          id: m.id as number,
+          senderType: m.senderType as string,
+          content: m.content as string,
+          createTime: m.createTime as string,
+          contentType: m.contentType as number,
+        })) : []);
+      })
       .catch(() => {});
   };
+
+  // SSE subscription for real-time messages
+  useEffect(() => {
+    if (!activeConv?.psychologistId) return;
+    const token = getToken();
+    const url = `${BASE_URL.replace(/\/$/, "")}/psychologist/message/stream/psychologist/${activeConv.psychologistId}?token=${token || ""}`;
+
+    const es = new EventSource(url);
+    eventSourceRef.current = es;
+
+    es.addEventListener("message", (event: MessageEvent) => {
+      try {
+        const raw = JSON.parse(event.data);
+        const msg: Message = {
+          id: raw.id as number,
+          senderType: (raw.senderId === activeConv.psychologistId) ? "psychologist" : "user",
+          content: raw.content as string,
+          createTime: raw.createTime as string,
+          contentType: raw.contentType as number,
+        };
+        setMessages((prev) => {
+          if (prev.some((m) => m.id === msg.id)) return prev;
+          return [...prev, msg];
+        });
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      } catch { /* ignore */ }
+    });
+
+    es.onerror = () => {
+      es.close();
+    };
+
+    return () => {
+      es.close();
+    };
+  }, [activeConv?.appointmentId, activeConv?.psychologistId]);
 
   useEffect(() => { fetchConversations(); }, []);
   useEffect(() => { if (activeConv) { fetchMessages(activeConv.appointmentId); } }, [activeConv]);
@@ -86,9 +130,38 @@ export function PsychChat() {
     try {
       await httpClient.post("/psychologist/admin/messages/send", { appointmentId: activeConv.appointmentId, content: inputText, type: "TEXT" });
       setInputText("");
-      fetchMessages(activeConv.appointmentId);
     } catch (err: unknown) { setError(err instanceof Error ? err.message : "Unknown error"); }
     finally { setSending(false); }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !activeConv) return;
+    if (file.size > 5 * 1024 * 1024) { setError("图片不能超过 5MB"); return; }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const token = getToken();
+      const res = await fetch(`${BASE_URL.replace(/\/$/, "")}/common/upload`, {
+        method: "POST",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: formData,
+      });
+      const data = await res.json() as { code: number; data: string; message?: string };
+      if (data.code === 200 && data.data) {
+        await httpClient.post("/psychologist/admin/messages/send", {
+          appointmentId: activeConv.appointmentId,
+          content: data.data,
+          type: "image",
+        });
+      } else {
+        setError("图片上传失败");
+      }
+    } catch {
+      setError("图片上传失败");
+    }
+    setUploading(false);
   };
 
   return (
@@ -156,7 +229,11 @@ export function PsychChat() {
                       backgroundColor: msg.senderType === "psychologist" ? s.primary + "10" : s.bg,
                       color: s.text, fontSize: "13px", lineHeight: 1.5, wordBreak: "break-word",
                     }}>
-                      {msg.content}
+                      {msg.contentType === 1 ? (
+                        <img src={msg.content} alt="" style={{ maxWidth: "100%", borderRadius: "8px" }} />
+                      ) : (
+                        msg.content
+                      )}
                       <div style={{ fontSize: "10px", color: s.text3, marginTop: "4px" }}>{msg.createTime}</div>
                     </div>
                   </div>
@@ -165,7 +242,25 @@ export function PsychChat() {
               <div ref={messagesEndRef} />
             </div>
 
-            <div style={{ padding: "12px 20px", borderTop: "1px solid " + s.border, display: "flex", gap: "10px" }}>
+            <div style={{ padding: "12px 20px", borderTop: "1px solid " + s.border, display: "flex", gap: "10px", alignItems: "center" }}>
+              {/* Image upload button */}
+              <label style={{
+                display: "flex", alignItems: "center", justifyContent: "center",
+                width: "36px", height: "36px", borderRadius: "50%",
+                border: "1px solid " + s.border, cursor: "pointer",
+                color: s.text3, opacity: uploading ? 0.5 : 1,
+              }} title="发送图片">
+                {uploading ? (
+                  <span style={{ fontSize: "12px" }}>⏳</span>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                  </svg>
+                )}
+                <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} style={{ display: "none" }} />
+              </label>
               <input value={inputText} onChange={(e) => setInputText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
                 placeholder="输入消息..."

@@ -189,15 +189,24 @@ public class AiConsultationServiceImpl implements IAiConsultationService {
                             try {
                                 JSONObject json = JSON.parseObject(data);
                                 if (json.containsKey("choices")) {
-                                    // OpenAI format
                                     JSONObject choice = json.getJSONArray("choices").getJSONObject(0);
                                     if (choice.containsKey("delta")) {
                                         JSONObject delta = choice.getJSONObject("delta");
+                                        
+                                        // reasoning_content (思考过程)
+                                        if (delta.containsKey("reasoning_content")) {
+                                            String reasoning = delta.getString("reasoning_content");
+                                            if (reasoning != null && !reasoning.isEmpty()) {
+                                                emitter.send("{\"type\":\"reasoning\",\"content\":" + JSON.toJSONString(reasoning) + "}");
+                                            }
+                                        }
+                                        
+                                        // content (正式回复)
                                         if (delta.containsKey("content")) {
                                             String content = delta.getString("content");
-                                            if (content != null) {
+                                            if (content != null && !content.isEmpty()) {
                                                 fullContent.append(content);
-                                                emitter.send(content);
+                                                emitter.send("{\"type\":\"content\",\"content\":" + JSON.toJSONString(content) + "}");
                                             }
                                         }
                                     }

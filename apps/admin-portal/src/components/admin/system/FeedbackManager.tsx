@@ -3,11 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", warning: "#e6a23c", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
@@ -63,28 +59,28 @@ export function FeedbackManager() {
           <div style={{ padding:"40px", textAlign:"center", color:s.text3 }}>加载中...</div>
         ) : (
           <>
-            <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
               <thead>
-                <tr style={{ backgroundColor:"#f5f7fa" }}>
-                  {["ID","用户ID","反馈内容","状态","时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+                <tr style={{ backgroundColor:s.bg }}>
+                  {["ID","用户ID","反馈内容","状态","时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
                 </tr>
               </thead>
               <tbody>
                 {data.records.length === 0 ? (
-                  <tr><td colSpan={6} style={{ padding:"12px 8px", textAlign:"center", color:s.text3, fontSize:"13px", borderBottom:"1px solid #ebeef5" }}>暂无数据</td></tr>
+                  <tr><td colSpan={6} style={{ padding:"12px 8px", textAlign:"center", color:s.text3, fontSize:"13px", borderBottom:`1px solid ${s.border}` }}>暂无数据</td></tr>
                 ) : (
                   data.records.map((row, i) => (
-                    <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                      <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                      <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.userId as string}</td>
-                      <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px", maxWidth:"300px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.content as string}</td>
-                      <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+                    <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                      <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.id as string}</td>
+                      <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.userId as string}</td>
+                      <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px", maxWidth:"300px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.content as string}</td>
+                      <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>
                         <span style={{ display:"inline-block", padding:"2px 8px", borderRadius:s.radius, fontSize:"12px", fontWeight:500, color:getStatusColor(row.status as number), backgroundColor:getStatusColor(row.status as number)+"15" }}>
                           {getStatusLabel(row.status as number)}
                         </span>
                       </td>
-                      <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
-                      <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+                      <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.createTime as string}</td>
+                      <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}` }}>
                         {(row.status as number) !== 3 && (
                           <>
                             <button onClick={() => handleResolve(row.id)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>解决</button>

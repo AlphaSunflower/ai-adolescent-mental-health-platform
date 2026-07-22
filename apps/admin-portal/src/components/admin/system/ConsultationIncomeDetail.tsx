@@ -3,10 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
@@ -26,10 +23,10 @@ export function ConsultationIncomeDetail() {
     <div style={{ padding:"20px", backgroundColor:s.bg, minHeight:"100%" }}>
       <div style={{ backgroundColor:s.white, borderRadius:"8px", boxShadow:s.shadow, padding:"20px" }}>
         <h3 style={{ margin:"0 0 20px", fontSize:"18px", color:s.text }}>咨询收入明细</h3>
-        <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
           <thead>
-            <tr style={{ backgroundColor:"#f5f7fa" }}>
-              {["ID","咨询师","用户","时长(分钟)","金额","时间","状态"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+            <tr style={{ backgroundColor:s.bg }}>
+              {["ID","咨询师","用户","时长(分钟)","金额","时间","状态"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -37,14 +34,14 @@ export function ConsultationIncomeDetail() {
               <tr><td colSpan={7} style={{ padding:"40px", textAlign:"center", color:s.text3, fontSize:"13px" }}>暂无数据</td></tr>
             ) : (
               data.records.map((row, i) => (
-              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.psychologistName as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.userName as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.duration as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{Number(row.amount || 0).toFixed(2)}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{(row.status as number)===1?"已结算":"未结算"}</td>
+              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.id as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.psychologistName as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.userName as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.duration as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{Number(row.amount || 0).toFixed(2)}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.createTime as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{(row.status as number)===1?"已结算":"未结算"}</td>
               </tr>
             ))
             )}

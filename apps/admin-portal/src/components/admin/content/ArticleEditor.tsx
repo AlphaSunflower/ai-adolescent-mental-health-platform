@@ -6,10 +6,7 @@ import { httpClient } from "@/lib/api-admin";
 import { getStoredUser } from "@/lib/session";
 import MDEditor from "@uiw/react-md-editor";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", radius: "4px",
-};
+import { s } from "@/lib/design-tokens";
 
 export function ArticleEditor() {
   const router = useRouter();

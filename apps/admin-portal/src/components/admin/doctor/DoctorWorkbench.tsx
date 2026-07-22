@@ -2,11 +2,7 @@
 
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  white: "#fff", success: "#67c23a", warning: "#e6a23c", radius: "4px",
-  shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 export function DoctorWorkbench() {
   return (

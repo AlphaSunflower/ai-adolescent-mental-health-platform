@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getStoredUser, clearSession } from "@/lib/session";
+import { tokens } from "@/lib/design-tokens";
 
 export function AdminHeader() {
   const router = useRouter();
@@ -27,21 +28,22 @@ export function AdminHeader() {
     router.replace("/login");
   };
 
-  const mainBg = "#ffffff";
-  const borderColor = "#e4e7ed";
-  const textColor = "#606266";
-
   return (
     <div style={{
       display: "flex",
-      justifyContent: "flex-end",
+      justifyContent: "space-between",
       alignItems: "center",
       height: "100%",
-      padding: "0 20px",
-      backgroundColor: mainBg,
-      borderBottom: `1px solid ${borderColor}`,
-      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      padding: "0 24px",
+      backgroundColor: tokens.bgCard,
+      borderBottom: `1px solid ${tokens.border}`,
     }}>
+      {/* 左侧：面包屑占位 */}
+      <div style={{ fontSize: tokens.fontSizeSm, color: tokens.textSecondary }}>
+        心愈智联 · 管理后台
+      </div>
+
+      {/* 右侧：用户 */}
       <div ref={dropdownRef} style={{ position: "relative" }}>
         <button
           onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -49,25 +51,29 @@ export function AdminHeader() {
             display: "flex",
             alignItems: "center",
             gap: "8px",
-            padding: "6px 12px",
+            padding: "6px 10px",
             border: "none",
             background: "none",
             cursor: "pointer",
-            color: textColor,
-            fontSize: "14px",
-            borderRadius: "4px",
+            color: tokens.textRegular,
+            fontSize: tokens.fontSizeBase,
+            borderRadius: tokens.radiusMd,
+            transition: "background-color 0.15s",
           }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = tokens.bgHover; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
         >
+          {/* Avatar */}
           <span style={{
-            width: "32px",
-            height: "32px",
+            width: "30px",
+            height: "30px",
             borderRadius: "50%",
-            backgroundColor: "#409eff",
+            background: `linear-gradient(135deg, ${tokens.primary}, ${tokens.accent})`,
             color: "#fff",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "14px",
+            fontSize: "13px",
             fontWeight: 600,
             flexShrink: 0,
           }}>
@@ -77,8 +83,12 @@ export function AdminHeader() {
               (nickname || "管").charAt(0)
             )}
           </span>
-          <span>{nickname}</span>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="6 9 12 15 18 9" /></svg>
+          <span style={{ maxWidth: "100px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+            {nickname}
+          </span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ opacity: 0.5 }}>
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
         </button>
 
         {dropdownOpen && (
@@ -87,12 +97,13 @@ export function AdminHeader() {
             top: "100%",
             right: 0,
             marginTop: "4px",
-            backgroundColor: "#fff",
-            border: `1px solid ${borderColor}`,
-            borderRadius: "4px",
-            boxShadow: "0 2px 12px rgba(0,0,0,0.1)",
+            backgroundColor: tokens.bgCard,
+            border: `1px solid ${tokens.border}`,
+            borderRadius: tokens.radiusMd,
+            boxShadow: tokens.shadowLg,
             minWidth: "140px",
             zIndex: 2000,
+            overflow: "hidden",
           }}>
             <button
               onClick={() => {
@@ -107,10 +118,13 @@ export function AdminHeader() {
                 background: "none",
                 cursor: "pointer",
                 fontSize: "13px",
-                color: "#606266",
+                color: tokens.textRegular,
                 textAlign: "left",
-                borderBottom: `1px solid ${borderColor}`,
+                borderBottom: `1px solid ${tokens.borderLight}`,
+                transition: "background-color 0.1s",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = tokens.bgHover; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             >
               管理后台
             </button>
@@ -127,9 +141,12 @@ export function AdminHeader() {
                 background: "none",
                 cursor: "pointer",
                 fontSize: "13px",
-                color: "#f56c6c",
+                color: tokens.danger,
                 textAlign: "left",
+                transition: "background-color 0.1s",
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = tokens.dangerLight; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             >
               退出登录
             </button>

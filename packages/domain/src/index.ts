@@ -34,6 +34,12 @@ export type PatientContact = {
   relationship: string;
   sex: number;
   birthday: string;
+  /** 显示用：关系别名 */
+  relation?: string;
+  /** 显示用：年龄 */
+  age?: number;
+  /** 显示用：性别文字 */
+  gender?: string;
 };
 
 export type Psychologist = {
@@ -106,14 +112,21 @@ export type AiSession = {
   createTime: string;
 };
 
-export type AiMessageRole = "user" | "assistant";
+export type AiMessageRole = "user" | "assistant" | "reasoning";
 
 export type AiMessage = {
   id: number;
   role: AiMessageRole;
   content: string;
   createTime: string;
+  /** 思考过程（仅 assistant 消息，当 enableThinking=true 时） */
+  reasoning?: string;
 };
+
+/** SSE streaming chunk types */
+export type AiStreamChunk =
+  | { type: "content"; content: string }
+  | { type: "reasoning"; content: string };
 
 export type LibraryItemType = "文章" | "课程" | "书籍" | "社区";
 
@@ -128,6 +141,8 @@ export type LibraryItem = {
   readTime: string;
   views: number;
   coverUrl?: string;
+  /** 课程的外部链接（视频/音频 URL），文章无此字段 */
+  linkUrl?: string;
 };
 
 export type CarePlanStatus = "进行中" | "待开始" | "已完成";

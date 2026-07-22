@@ -300,11 +300,18 @@ export function HomePage() {
               </div>
             ) : recommendations.length ? (
               <div className="space-y-3">
-                {recommendations.map((item) => (
-                  <Link
-                    key={`${item.type}-${item.id}`}
-                    href={item.type === "书籍" ? `/library/book/${item.id}` : item.type === "社区" && item.authorId ? `/user/${item.authorId}/article/${item.id}` : `/library/article/${item.id}`}
-                  >
+                {recommendations.map((item) => {
+                  const isCourse = item.type === "课程";
+                  const isExternal = isCourse && !!item.linkUrl;
+                  const href = item.type === "书籍"
+                    ? `/library/book/${item.id}`
+                    : isExternal
+                      ? item.linkUrl!
+                      : item.type === "社区" && item.authorId
+                        ? `/user/${item.authorId}/article/${item.id}`
+                        : `/library/article/${item.id}`;
+
+                  const inner = (
                     <div className="group rounded-lg bg-white/5 p-3 transition-colors hover:bg-white/10">
                       <div className="flex items-center gap-2">
                         <Badge variant="secondary" className="text-xs shrink-0">{item.type}</Badge>
@@ -314,8 +321,21 @@ export function HomePage() {
                       </div>
                       <p className="mt-1 text-xs text-cosmic-muted line-clamp-2">{item.summary}</p>
                     </div>
-                  </Link>
-                ))}
+                  );
+
+                  if (isExternal) {
+                    return (
+                      <a key={`${item.type}-${item.id}`} href={item.linkUrl!} target="_blank" rel="noopener noreferrer">
+                        {inner}
+                      </a>
+                    );
+                  }
+                  return (
+                    <Link key={`${item.type}-${item.id}`} href={href}>
+                      {inner}
+                    </Link>
+                  );
+                })}
               </div>
             ) : (
               <div className="py-8 text-center text-xs text-cosmic-dim">暂无推荐内容</div>

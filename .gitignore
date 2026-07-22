@@ -41,3 +41,7 @@ apps/backend/src/main/resources/application-*.properties
 apps/backend/src/test/resources/application-*.yml
 apps/backend/src/test/resources/application-*.yaml
 apps/backend/src/test/resources/application-*.properties
+
+# Local tool artifacts
+.codegraph/
+.hermes/

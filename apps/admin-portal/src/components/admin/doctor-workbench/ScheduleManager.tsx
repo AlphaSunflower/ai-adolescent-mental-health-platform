@@ -3,12 +3,7 @@
 import { useState, useEffect } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
-  text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
-  radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 interface ScheduleDay {
   date: string; dayOfWeek: string; slots: ScheduleSlot[];

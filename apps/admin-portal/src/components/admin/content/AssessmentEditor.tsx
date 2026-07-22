@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 
-const s = { primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399", border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", radius: "4px" };
+import { s } from "@/lib/design-tokens";
 
 export function AssessmentEditor() {
   const router = useRouter();

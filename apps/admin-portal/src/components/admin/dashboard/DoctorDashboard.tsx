@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { tokens } from "@/lib/design-tokens";
 import * as echarts from "echarts";
 import { httpClient } from "@/lib/api-admin";
 
@@ -60,8 +61,8 @@ function StatCard({ label, value, color, icon }: StatCardProps) {
         {icon}
       </span>
       <div style={{ minWidth: 0 }}>
-        <div style={{ fontSize: "14px", color: "#909399", marginBottom: "4px" }}>{label}</div>
-        <div style={{ fontSize: "28px", fontWeight: 700, color: "#303133", lineHeight: 1.2 }}>
+        <div style={{ fontSize: "14px", color: tokens.textSecondary, marginBottom: "4px" }}>{label}</div>
+        <div style={{ fontSize: "28px", fontWeight: 700, color: tokens.textPrimary, lineHeight: 1.2 }}>
           {(value ?? 0).toLocaleString()}
         </div>
       </div>
@@ -114,14 +115,14 @@ export function DoctorDashboard() {
           type: "line",
           data: appointmentData,
           smooth: true,
-          lineStyle: { color: "#67c23a", width: 3 },
+          lineStyle: { color: tokens.success, width: 3 },
           areaStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
               { offset: 0, color: "rgba(103,194,58,0.35)" },
               { offset: 1, color: "rgba(103,194,58,0.02)" },
             ]),
           },
-          itemStyle: { color: "#67c23a" },
+          itemStyle: { color: tokens.success },
         },
       ],
     });
@@ -135,11 +136,11 @@ export function DoctorDashboard() {
   }, [data]);
 
   if (loading) {
-    return <div style={{ padding: "40px", textAlign: "center", color: "#909399" }}>加载中...</div>;
+    return <div style={{ padding: "40px", textAlign: "center", color: tokens.textSecondary }}>加载中...</div>;
   }
 
   if (error || !data) {
-    return <div style={{ padding: "40px", textAlign: "center", color: "#f56c6c" }}>数据加载失败: {error ?? "未知错误"}</div>;
+    return <div style={{ padding: "40px", textAlign: "center", color: tokens.danger }}>数据加载失败: {error ?? "未知错误"}</div>;
   }
 
   const d = data;
@@ -160,41 +161,41 @@ export function DoctorDashboard() {
           width: "48px",
           height: "48px",
           borderRadius: "12px",
-          backgroundColor: "#67c23a18",
+          backgroundColor: tokens.successLight,
           display: "inline-flex",
           alignItems: "center",
           justifyContent: "center",
           fontSize: "22px",
           fontWeight: 700,
-          color: "#67c23a",
+          color: tokens.success,
           flexShrink: 0,
         }}>
           医
         </span>
         <div>
-          <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 600, color: "#303133" }}>
+          <h2 style={{ margin: 0, fontSize: "20px", fontWeight: 600, color: tokens.textPrimary }}>
             {d.doctorName}
             <span style={{
               fontSize: "13px",
               fontWeight: 500,
-              color: "#909399",
+              color: tokens.textSecondary,
               marginLeft: "10px",
               padding: "2px 8px",
-              backgroundColor: "#f0f2f5",
+              backgroundColor: tokens.bgPage,
               borderRadius: "4px",
             }}>
               {d.title}
             </span>
           </h2>
-          <div style={{ fontSize: "13px", color: "#909399", marginTop: "4px" }}>{d.hospitalName}</div>
+          <div style={{ fontSize: "13px", color: tokens.textSecondary, marginTop: "4px" }}>{d.hospitalName}</div>
         </div>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "16px" }}>
-        <StatCard label="患者总数" value={d.totalPatients ?? d.patientCount} color="#409eff" icon="患" />
-        <StatCard label="今日预约" value={d.todayAppointments} color="#67c23a" icon="今" />
-        <StatCard label="待处理预约" value={d.pendingAppointments} color="#e6a23c" icon="待" />
-        <StatCard label="已完成预约" value={d.completedAppointments} color="#f56c6c" icon="完" />
+        <StatCard label="患者总数" value={d.totalPatients ?? d.patientCount} color={tokens.primary} icon="患" />
+        <StatCard label="今日预约" value={d.todayAppointments} color={tokens.success} icon="今" />
+        <StatCard label="待处理预约" value={d.pendingAppointments} color={tokens.warning} icon="待" />
+        <StatCard label="已完成预约" value={d.completedAppointments} color={tokens.danger} icon="完" />
       </div>
 
       <div style={{
@@ -203,7 +204,7 @@ export function DoctorDashboard() {
         boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
         padding: "20px",
       }}>
-        <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 600, color: "#303133" }}>
+        <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 600, color: tokens.textPrimary }}>
           月度预约趋势
         </h3>
         <div ref={chartRef} style={{ height: "400px", width: "100%" }} />

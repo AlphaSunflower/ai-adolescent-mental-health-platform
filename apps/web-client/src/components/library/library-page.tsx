@@ -217,20 +217,19 @@ export function LibraryPage() {
           ) : (
             <>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 min-w-0">
-                {items.map((item) => (
-                  <Link
-                    key={`${item.type}-${item.id}`}
-                    href={
-                      item.type === "书籍"
-                        ? `/library/book/${item.id}`
-                        : item.type === "社区" && item.authorId
-                          ? `/user/${item.authorId}/article/${item.id}`
-                          : `/library/article/${item.id}`
-                    }
-                    className="block min-w-0"
-                  >
+                {items.map((item) => {
+                  const isCourse = item.type === "课程";
+                  const isBook = item.type === "书籍";
+                  const isCommunity = item.type === "社区";
+                  const href = isBook
+                    ? `/library/book/${item.id}`
+                    : isCommunity && item.authorId
+                      ? `/user/${item.authorId}/article/${item.id}`
+                      : `/library/article/${item.id}`;
+                  const isExternal = isCourse && !!item.linkUrl;
+
+                  const cardContent = (
                     <div className="cosmic-card group cursor-pointer overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 w-full">
-                      {/* Cover image */}
                       {item.coverUrl && (
                         <div className="mb-4 overflow-hidden rounded-lg">
                           <img
@@ -240,13 +239,10 @@ export function LibraryPage() {
                           />
                         </div>
                       )}
-
-                      {/* Tags */}
                       <div className="mb-3 flex items-center gap-2">
                         <span className="cosmic-tag text-xs">{item.tag}</span>
                         <Badge variant="secondary" className="text-xs">{item.type}</Badge>
                       </div>
-
                       <h3 className="mb-2 font-semibold text-white group-hover:text-cosmic-nav-hover transition-colors line-clamp-2">
                         {item.title}
                       </h3>
@@ -265,8 +261,32 @@ export function LibraryPage() {
                         </span>
                       </div>
                     </div>
-                  </Link>
-                ))}
+                  );
+
+                  if (isExternal) {
+                    return (
+                      <a
+                        key={`${item.type}-${item.id}`}
+                        href={item.linkUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block min-w-0"
+                      >
+                        {cardContent}
+                      </a>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={`${item.type}-${item.id}`}
+                      href={href}
+                      className="block min-w-0"
+                    >
+                      {cardContent}
+                    </Link>
+                  );
+                })}
               </div>
 
               {/* Pagination */}

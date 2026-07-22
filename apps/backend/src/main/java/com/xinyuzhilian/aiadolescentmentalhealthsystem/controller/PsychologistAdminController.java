@@ -26,7 +26,9 @@ import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IPsychologistMess
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IPsychologistProfileAuditService;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IPsychologistScheduleService;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IPsychologistService;
+import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.impl.PsychologistMessageSseServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +47,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/psychologist/admin")
 @RequiredArgsConstructor
+@Slf4j
 public class PsychologistAdminController {
 
     private final IPsychologistService psychologistService;
@@ -58,6 +61,7 @@ public class PsychologistAdminController {
     private final PsychologistQualificationRelationMapper qualificationRelationMapper;
     private final PsychologistProfileAuditMapper profileAuditMapper;
     private final PsychologistWithdrawMapper withdrawMapper;
+    private final PsychologistMessageSseServiceImpl sseService;
     private final PsychologistServiceMapper serviceMapper;
     private final com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.PsychologistRatingMapper ratingMapper;
     private final com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.UserMapper userMapper;
@@ -921,6 +925,14 @@ public class PsychologistAdminController {
 
             PsychologistMessage message = messageService.sendMessage(
                     appointmentId, psychologistId, receiverId, content, contentType);
+
+            // 通过SSE广播消息给订阅者（用户端）
+            try {
+                sseService.broadcastToAppointment(appointmentId, message);
+                sseService.broadcastToPsychologist(appointment.getPsychologistId(), message);
+            } catch (Exception e) {
+                log.error("广播消息失败: {}", e.getMessage());
+            }
 
             Map<String, Object> result = new HashMap<>();
             result.put("id", message.getId());

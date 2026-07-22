@@ -3,13 +3,7 @@
 import { useState, useEffect } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
-  text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
-  radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-  statCardBg: "#fff",
-};
+import { s } from "@/lib/design-tokens";
 
 interface Feedback {
   id: number; userName: string; counselorName: string; rating: number;
@@ -47,10 +41,10 @@ export function HospitalFeedbackManager() {
 
   const thStyle: React.CSSProperties = {
     padding: "12px 8px", textAlign: "left" as const, fontSize: "13px",
-    color: s.text3, fontWeight: 600, borderBottom: "1px solid #ebeef5",
+    color: s.text3, fontWeight: 600, borderBottom: `1px solid ${s.border}`,
   };
   const tdStyle: React.CSSProperties = {
-    padding: "12px 8px", borderBottom: "1px solid #ebeef5", fontSize: "13px",
+    padding: "12px 8px", borderBottom: `1px solid ${s.border}`, fontSize: "13px",
   };
 
   return (
@@ -69,9 +63,9 @@ export function HospitalFeedbackManager() {
           <div style={{ padding: "40px", textAlign: "center", color: s.text3 }}>加载中...</div>
         ) : (
           <>
-            <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #ebeef5" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", border: `1px solid ${s.border}` }}>
               <thead>
-                <tr style={{ backgroundColor: "#f5f7fa" }}>
+                <tr style={{ backgroundColor: s.bg }}>
                   <th style={thStyle}>ID</th>
                   <th style={thStyle}>用户</th>
                   <th style={thStyle}>咨询师/医生</th>
@@ -85,7 +79,7 @@ export function HospitalFeedbackManager() {
                   <tr><td colSpan={6} style={{ ...tdStyle, textAlign: "center", color: s.text3 }}>暂无数据</td></tr>
                 ) : (
                   data.records.map((row, i) => (
-                    <tr key={row.id} style={{ backgroundColor: i % 2 === 0 ? s.white : "#fafafa" }}>
+                    <tr key={row.id} style={{ backgroundColor: i % 2 === 0 ? s.white : s.bg }}>
                       <td style={tdStyle}>{row.id}</td>
                       <td style={tdStyle}>{row.userName ?? "-"}</td>
                       <td style={tdStyle}>{row.counselorName ?? "-"}</td>

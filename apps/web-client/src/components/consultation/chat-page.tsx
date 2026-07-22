@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api, httpClient } from "@/lib/api";
+import { api } from "@/lib/api";
 import { getToken } from "@/lib/session";
 
 interface ChatMessage {
@@ -61,7 +61,7 @@ export function ConsultationChatPage() {
       }
       try {
         const msgs = (await api.chat.history(id)) as unknown as ChatMessage[];
-        setMessages(msgs.reverse());
+        setMessages(msgs);
       } catch { /* ignore */ }
       setLoading(false);
       scrollToBottom();
@@ -81,7 +81,7 @@ export function ConsultationChatPage() {
 
     const connect = () => {
       eventSource = new EventSource(url);
-      eventSource.onmessage = (event) => {
+      eventSource.addEventListener("message", (event: MessageEvent) => {
         try {
           const msg = JSON.parse(event.data) as ChatMessage;
           if (msg.contentType === 2) {
@@ -94,7 +94,7 @@ export function ConsultationChatPage() {
           }
           scrollToBottom();
         } catch { /* ignore */ }
-      };
+      });
       eventSource.onerror = () => {
         eventSource?.close();
         if (shouldReconnect && reconnectRef.current < maxReconnect) {
@@ -135,10 +135,13 @@ export function ConsultationChatPage() {
       const formData = new FormData();
       formData.append("file", file);
       const token = getToken();
-      const res = await httpClient.raw.post("/common/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data", ...(token ? { Authorization: `Bearer ${token}`, token } : {}) },
+      const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api").replace(/\/$/, "");
+      const res = await fetch(`${baseUrl}/common/upload`, {
+        method: "POST",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: formData,
       });
-      const data = res.data as { code: number; data: string; message?: string };
+      const data = await res.json() as { code: number; data: string; message?: string };
       if (data.code === 200 && data.data) {
         const id = Number(appointmentId);
         if (id && detail?.psychologistId) {

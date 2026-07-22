@@ -61,8 +61,8 @@ export function UserArticleDetailPage() {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
         <p className="text-lg text-cosmic-muted">文章不存在或已删除</p>
-        <Link href={`/user/${userId}`} className="mt-4 inline-block text-cosmic-sky hover:underline">
-          返回用户主页
+        <Link href="/library?tab=community" className="mt-4 inline-block text-cosmic-sky hover:underline">
+          返回心声广场
         </Link>
       </div>
     );
@@ -71,10 +71,10 @@ export function UserArticleDetailPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
       <Link
-        href={`/user/${userId}`}
+        href="/library?tab=community"
         className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
       >
-        <ArrowLeft className="size-4" /> 返回用户主页
+        <ArrowLeft className="size-4" /> 返回心声广场
       </Link>
 
       {/* Article header */}
@@ -82,13 +82,15 @@ export function UserArticleDetailPage() {
 
       {/* Author info */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="size-10 rounded-full bg-cosmic-blue/20 flex items-center justify-center">
-          {article.authorAvatar ? (
-            <img src={article.authorAvatar} alt="" className="size-10 rounded-full object-cover" />
-          ) : (
-            <User className="size-5 text-cosmic-sky" />
-          )}
-        </div>
+        <Link href={`/user/${userId}`} className="shrink-0">
+          <div className="size-10 rounded-full bg-cosmic-blue/20 flex items-center justify-center hover:ring-2 hover:ring-cosmic-sky/50 transition-all">
+            {article.authorAvatar ? (
+              <img src={article.authorAvatar} alt="" className="size-10 rounded-full object-cover" />
+            ) : (
+              <User className="size-5 text-cosmic-sky" />
+            )}
+          </div>
+        </Link>
         <div>
           <Link href={`/user/${userId}`} className="text-sm font-medium text-cosmic-header hover:text-cosmic-sky transition-colors">
             {article.authorName}

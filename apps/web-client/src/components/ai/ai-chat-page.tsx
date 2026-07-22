@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Bot, Send, Plus, Menu, X, Trash2 } from "lucide-react";
+import { Bot, Send, Plus, Menu, X, Trash2, ChevronDown, ChevronUp, Brain } from "lucide-react";
 import { toast } from "sonner";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
@@ -23,10 +25,18 @@ function sessionOptions() {
   };
 }
 
+/** Local message for rendering (includes streaming reasoning) */
+interface DisplayMessage extends AiMessage {
+  /** Streaming reasoning content (not persisted) */
+  reasoning?: string;
+  /** Reasoning section is expanded by user */
+  reasoningExpanded?: boolean;
+}
+
 export function AiChatPage() {
   const [sessions, setSessions] = useState<AiSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<number | null>(null);
-  const [messages, setMessages] = useState<AiMessage[]>([]);
+  const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -50,7 +60,6 @@ export function AiChatPage() {
   // Scroll to bottom when user sends a message or during streaming
   useEffect(() => {
     if (isInitialLoadRef.current && messages.length > 0 && !sending) {
-      // Initial messages loaded — scroll to top to show conversation start
       isInitialLoadRef.current = false;
       chatTopRef.current?.scrollIntoView();
       return;
@@ -95,17 +104,19 @@ export function AiChatPage() {
     const trimmed = input.trim();
     if (!trimmed || activeSessionId === null || sending) return;
 
-    const userMessage: AiMessage = {
+    const userMessage: DisplayMessage = {
       id: Date.now(),
       role: "user",
       content: trimmed,
       createTime: new Date().toISOString(),
     };
 
-    const assistantMessage: AiMessage = {
+    const assistantMessage: DisplayMessage = {
       id: Date.now() + 1,
       role: "assistant",
       content: "",
+      reasoning: "",
+      reasoningExpanded: true,
       createTime: new Date().toISOString(),
     };
 
@@ -115,17 +126,31 @@ export function AiChatPage() {
 
     try {
       let fullContent = "";
+      let fullReasoning = "";
       await streamAiChat(
         sessionOptions(),
         activeSessionId,
         trimmed,
-        (chunk) => {
-          fullContent += chunk;
-          setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantMessage.id ? { ...m, content: fullContent } : m
-            )
-          );
+        (chunk, type) => {
+          if (type === "reasoning") {
+            fullReasoning += chunk;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMessage.id
+                  ? { ...m, reasoning: fullReasoning }
+                  : m
+              )
+            );
+          } else {
+            fullContent += chunk;
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantMessage.id
+                  ? { ...m, content: fullContent }
+                  : m
+              )
+            );
+          }
         },
       );
     } catch {
@@ -141,6 +166,14 @@ export function AiChatPage() {
       e.preventDefault();
       handleSend();
     }
+  };
+
+  const toggleReasoning = (msgId: number) => {
+    setMessages((prev) =>
+      prev.map((m) =>
+        m.id === msgId ? { ...m, reasoningExpanded: !m.reasoningExpanded } : m
+      )
+    );
   };
 
   return (
@@ -248,16 +281,60 @@ export function AiChatPage() {
                       className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm ${
+                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                           msg.role === "user"
                             ? "cosmic-btn-primary"
                             : "cosmic-card border border-white/10"
                         }`}
                       >
+                        {/* Reasoning section (visible for assistant messages with reasoning) */}
+                        {msg.role === "assistant" && msg.reasoning && (
+                          <div className="mb-3 rounded-lg bg-amber-500/5 border border-amber-500/15 overflow-hidden">
+                            <button
+                              type="button"
+                              onClick={() => toggleReasoning(msg.id)}
+                              className="flex w-full items-center gap-2 px-3 py-2 text-xs text-amber-400/80 hover:bg-amber-500/10 transition-colors"
+                            >
+                              <Brain className="size-3.5" />
+                              <span className="flex-1 text-left font-medium">思考过程</span>
+                              {msg.reasoningExpanded !== false ? (
+                                <ChevronUp className="size-3.5" />
+                              ) : (
+                                <ChevronDown className="size-3.5" />
+                              )}
+                            </button>
+                            {(msg.reasoningExpanded !== false) && (
+                              <div className="px-3 pb-3 text-xs text-amber-400/60 whitespace-pre-wrap leading-relaxed">
+                                {msg.reasoning}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Message content */}
                         {msg.content ? (
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
+                          msg.role === "assistant" ? (
+                            <div className="prose prose-sm prose-invert max-w-none
+                              prose-headings:text-white prose-headings:font-semibold
+                              prose-p:text-cosmic-muted prose-p:leading-relaxed
+                              prose-strong:text-white prose-strong:font-semibold
+                              prose-a:text-cosmic-blue prose-a:no-underline hover:prose-a:underline
+                              prose-code:text-cosmic-gold prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-xs
+                              prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
+                              prose-blockquote:border-l-cosmic-blue/60 prose-blockquote:bg-white/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+                              prose-li:text-cosmic-muted
+                              prose-hr:border-white/10
+                              [&_*]:scroll-mt-24
+                            ">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {msg.content}
+                              </ReactMarkdown>
+                            </div>
+                          ) : (
+                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                          )
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-cosmic-dim">
+                          <span className="inline-flex items-center gap-1.5 text-cosmic-dim">
                             <span className="size-1.5 animate-pulse rounded-full bg-cosmic-gold" />
                             正在思考...
                           </span>

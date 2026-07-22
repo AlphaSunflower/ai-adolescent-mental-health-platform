@@ -1,14 +1,7 @@
+import { tokens } from "@/lib/design-tokens";
+
 type FilingFooterProps = {
   variant?: "light" | "dark";
-};
-
-const s = {
-  colorTextDisabled: "#909399",
-  colorTextDark: "rgba(255, 255, 255, 0.72)",
-  colorBgBase: "#fff",
-  colorBgTransparent: "transparent",
-  borderColorBase: "#ebeef5",
-  borderNone: "none",
 };
 
 export function FilingFooter({ variant = "light" }: FilingFooterProps) {
@@ -20,11 +13,11 @@ export function FilingFooter({ variant = "light" }: FilingFooterProps) {
         flexShrink: 0,
         padding: isDark ? "0 20px 18px" : "10px 20px",
         textAlign: "center",
-        fontSize: "12px",
+        fontSize: tokens.fontSizeXs,
         lineHeight: 1.5,
-        color: isDark ? s.colorTextDark : s.colorTextDisabled,
-        backgroundColor: isDark ? s.colorBgTransparent : s.colorBgBase,
-        borderTop: isDark ? s.borderNone : `1px solid ${s.borderColorBase}`,
+        color: isDark ? "rgba(255, 255, 255, 0.45)" : tokens.textDisabled,
+        backgroundColor: "transparent",
+        borderTop: isDark ? "none" : `1px solid ${tokens.borderLight}`,
       }}
     >
       <a

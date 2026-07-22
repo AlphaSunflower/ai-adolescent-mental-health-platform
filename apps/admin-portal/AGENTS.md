@@ -6,7 +6,7 @@
 
 - 包名：`@ai-adolescent-mental-health/admin-portal`
 - 技术栈：Next.js 16 + React 19 + TypeScript + ECharts + @uiw/react-md-editor
-- 样式：Element Plus 设计令牌通过内联 `s` 对象引用（不使用 Element Plus 组件库）
+- 样式：基于 `@/lib/design-tokens` 的「山林与琥珀」设计系统（潭绿主色 #3B7D7D + 暖琥珀强调 #C4956A），通过内联 `tokens` 对象引用
 - 端口：`3101`（`next dev --port 3101`）
 - 路由：App Router，无 middleware（角色守卫在 layout.tsx 中通过 AuthGuard 实现）
 - 构建：`output: "standalone"`，通过 Next.js rewrites 代理 `/api/*` → `BACKEND_URL`
@@ -79,14 +79,12 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 import { getStoredUser } from "@/lib/session";  // 需要 role 参数时
+import { tokens } from "@/lib/design-tokens";   // 新设计令牌（替代旧 `s` 对象）
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", warning: "#e6a23c", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+// 如需兼容旧代码，可使用 `import { s } from "@/lib/design-tokens";`
+// `s` 是 `tokens` 的扁平化别名，保持与旧代码的字段名一致。
 
 export function ResourceManager() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
@@ -123,6 +121,32 @@ const isEdit = !!id;
 // 保存: isEdit ? httpClient.put(...) : httpClient.post(...)
 // 取消: router.push("/admin/parent-route")  // 不要用 router.back()
 ```
+
+## 四点五、设计系统
+
+设计令牌统一从 `@/lib/design-tokens` 导入：
+
+```typescript
+import { tokens } from "@/lib/design-tokens";
+```
+
+核心色板：
+
+| 令牌 | 值 | 用途 |
+| --- | --- | --- |
+| `tokens.primary` | #3B7D7D 潭绿 | 主按钮、链接、激活态 |
+| `tokens.accent` | #C4956A 暖琥珀 | 强调按钮（如"新增"）、关键交互 |
+| `tokens.success` | #5B9A8B | 成功状态 |
+| `tokens.warning` | #D4A24E | 警告状态 |
+| `tokens.danger` | #C56C62 | 危险操作 |
+| `tokens.bgPage` | #F5F3F0 | 页面背景（暖石灰） |
+| `tokens.bgCard` | #FFFFFF | 卡片/表格容器 |
+| `tokens.textPrimary` | #2D2B28 | 主文字 |
+| `tokens.textSecondary` | #9C9690 | 辅助文字 |
+| `tokens.border` | #E0DCD7 | 边框 |
+| `tokens.sidebarBg` | #162E2E | 侧边栏背景 |
+
+兼容旧代码：`import { s } from "@/lib/design-tokens"` — `s` 是 `tokens` 的扁平别名 (`s.primary`, `s.text`, `s.bg` 等)，字段名与旧 `s` 对象一致，可直接替换。
 
 ## 五、关键约定
 

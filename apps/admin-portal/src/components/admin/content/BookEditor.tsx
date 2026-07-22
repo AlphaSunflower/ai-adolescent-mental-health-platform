@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { tokens } from "@/lib/design-tokens";
 import { useRouter, useParams } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 
-const s = { primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399", border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", radius: "4px" };
+import { s } from "@/lib/design-tokens";
 
 export function BookEditor() {
   const router = useRouter();
@@ -51,7 +52,7 @@ export function BookEditor() {
         <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>简介</label><textarea value={form.description} onChange={(e) => setForm({...form, description:e.target.value})} rows={4} style={{ width:"100%", padding:"8px 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box", resize:"vertical" }} /></div>
         <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>跳转地址</label><input value={form.address} onChange={(e) => setForm({...form, address:e.target.value})} placeholder="https://" style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
         <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>排序权重</label><input type="number" value={form.sortOrder} onChange={(e) => setForm({...form, sortOrder: parseInt(e.target.value)||0})} style={{ width:"120px", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>状态</label><div style={{ display:"flex", alignItems:"center", gap:"8px" }}><button onClick={() => setForm({...form, status: form.status===1?0:1})} style={{ width:"44px", height:"24px", borderRadius:"12px", border:"none", backgroundColor: form.status===1?"#67c23a":"#c0c4cc", position:"relative", cursor:"pointer" }}><span style={{ display:"block", width:"18px", height:"18px", borderRadius:"50%", background:"#fff", position:"absolute", top:"3px", left: form.status===1?"23px":"3px", transition:"left 0.2s" }} /></button><span style={{ fontSize:"13px", color:s.text2 }}>{form.status===1?"上架":"下架"}</span></div></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>状态</label><div style={{ display:"flex", alignItems:"center", gap:"8px" }}><button onClick={() => setForm({...form, status: form.status===1?0:1})} style={{ width:"44px", height:"24px", borderRadius:"12px", border:"none", backgroundColor: form.status===1?tokens.success:"#c0c4cc", position:"relative", cursor:"pointer" }}><span style={{ display:"block", width:"18px", height:"18px", borderRadius:"50%", background:"#fff", position:"absolute", top:"3px", left: form.status===1?"23px":"3px", transition:"left 0.2s" }} /></button><span style={{ fontSize:"13px", color:s.text2 }}>{form.status===1?"上架":"下架"}</span></div></div>
         <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
           <button onClick={() => router.back()} style={{ height:"36px", padding:"0 20px", border:"1px solid " + s.border, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
           <button onClick={handleSave} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>保存</button>

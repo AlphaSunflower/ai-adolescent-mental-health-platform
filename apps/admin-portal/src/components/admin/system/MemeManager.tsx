@@ -3,19 +3,22 @@
 import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
+
+/** 将字符串中的 \\n 转为实际换行 */
+function unescapeNewlines(s: string): string {
+  return String(s).replace(/\\n/g, "\n");
+}
 
 export function MemeManager() {
   const [data, setData] = useState<PageResult<Record<string,unknown>>>({ total:0, records:[], current:1, size:20, pages:0 });
   const [dialogVisible, setDialogVisible] = useState(false);
+  const [detailVisible, setDetailVisible] = useState(false);
+  const [detailItem, setDetailItem] = useState<Record<string,unknown>|null>(null);
   const [editingItem, setEditingItem] = useState<Record<string,unknown>|null>(null);
-  const [form, setForm] = useState<Record<string,unknown>>({ title: "", content: "", imageUrl: "" });
+  const [form, setForm] = useState<Record<string,unknown>>({ meme: "", explain: "" });
 
   const fetchData = useCallback(async (page = 1) => {
     try {
@@ -26,15 +29,16 @@ export function MemeManager() {
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const openAdd = () => { setEditingItem(null); setForm({ title: "", content: "", imageUrl: "" }); setDialogVisible(true); };
-  const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({ ...item }); setDialogVisible(true); };
+  const openAdd = () => { setEditingItem(null); setForm({ meme: "", explain: "" }); setDialogVisible(true); };
+  const openEdit = (item: Record<string,unknown>) => { setEditingItem(item); setForm({ meme: unescapeNewlines(item.meme as string), explain: unescapeNewlines(item.explain as string) }); setDialogVisible(true); };
+  const openDetail = (item: Record<string,unknown>) => { setDetailItem(item); setDetailVisible(true); };
 
   const handleSave = async () => {
     try {
       if (editingItem) {
-        await httpClient.post("/meme/admin/update", { id: editingItem.id, ...form });
+        await httpClient.post("/meme/admin/update", { id: editingItem.id, meme: form.meme, explain: form.explain });
       } else {
-        await httpClient.post("/meme/admin/save", form);
+        await httpClient.post("/meme/admin/save", { meme: form.meme, explain: form.explain });
       }
       setDialogVisible(false);
       fetchData();
@@ -53,21 +57,20 @@ export function MemeManager() {
           <h3 style={{ margin:0, fontSize:"18px", color:s.text }}>热梗管理</h3>
           <button onClick={openAdd} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>新增热梗</button>
         </div>
-        <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
           <thead>
-            <tr style={{ backgroundColor:"#f5f7fa" }}>
-              {["ID","标题","内容","图片","创建时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+            <tr style={{ backgroundColor:s.bg }}>
+              {["ID","梗","解释","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {data.records.map((row, i) => (
-              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.title as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px", maxWidth:"200px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.content as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.imageUrl ? "有图片" : "无"}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.id as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px", maxWidth:"200px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{unescapeNewlines(row.meme as string)}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px", maxWidth:"280px", lineHeight:1.5 }}>{unescapeNewlines(row.explain as string)}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}` }}>
+                  <button onClick={() => openDetail(row)} style={{ color:s.success, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>详情</button>
                   <button onClick={() => openEdit(row)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button>
                   <button onClick={() => handleDelete(row.id)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button>
                 </td>
@@ -82,16 +85,41 @@ export function MemeManager() {
           <button onClick={() => fetchData(data.current+1)} disabled={data.current>=data.pages} style={{ padding:"6px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>下一页</button>
         </div>
       </div>
+
+      {/* Add/Edit Dialog */}
       {dialogVisible && (
         <div style={{ position:"fixed", inset:0, backgroundColor:"rgba(0,0,0,0.5)", display:"flex", justifyContent:"center", alignItems:"center", zIndex:1000 }} onClick={() => setDialogVisible(false)}>
           <div style={{ backgroundColor:s.white, borderRadius:"8px", padding:"24px", width:"480px" }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ margin:"0 0 20px", fontSize:"18px", color:s.text }}>{editingItem?"编辑热梗":"新增热梗"}</h3>
-            <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>标题</label><input value={form.title as string} onChange={(e) => setForm({...form, title:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-            <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>内容</label><textarea value={form.content as string} onChange={(e) => setForm({...form, content:e.target.value})} rows={4} style={{ width:"100%", padding:"8px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box", resize:"vertical" }} /></div>
-            <div style={{ marginBottom:"20px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>图片URL</label><input value={form.imageUrl as string} onChange={(e) => setForm({...form, imageUrl:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
+            <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>梗</label><input value={form.meme as string} onChange={(e) => setForm({...form, meme:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
+            <div style={{ marginBottom:"20px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>解释</label><textarea value={form.explain as string} onChange={(e) => setForm({...form, explain:e.target.value})} rows={4} style={{ width:"100%", padding:"8px 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box", resize:"vertical" }} /></div>
             <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
               <button onClick={() => setDialogVisible(false)} style={{ height:"36px", padding:"0 20px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
               <button onClick={handleSave} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>保存</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detail Dialog */}
+      {detailVisible && detailItem && (
+        <div style={{ position:"fixed", inset:0, backgroundColor:"rgba(0,0,0,0.5)", display:"flex", justifyContent:"center", alignItems:"center", zIndex:1000 }} onClick={() => setDetailVisible(false)}>
+          <div style={{ backgroundColor:s.white, borderRadius:"8px", padding:"24px", width:"520px", maxHeight:"80vh", overflow:"auto" }} onClick={(e) => e.stopPropagation()}>
+            <h3 style={{ margin:"0 0 20px", fontSize:"18px", color:s.text }}>热梗详情</h3>
+            <div style={{ marginBottom:"16px" }}>
+              <label style={{ fontSize:"13px", color:s.text3 }}>ID</label>
+              <p style={{ margin:"4px 0 0", fontSize:"14px", color:s.text }}>{detailItem.id as string}</p>
+            </div>
+            <div style={{ marginBottom:"16px" }}>
+              <label style={{ fontSize:"13px", color:s.text3 }}>梗</label>
+              <p style={{ margin:"4px 0 0", fontSize:"15px", color:s.text, fontWeight:500 }}>{unescapeNewlines(detailItem.meme as string)}</p>
+            </div>
+            <div style={{ marginBottom:"20px" }}>
+              <label style={{ fontSize:"13px", color:s.text3 }}>解释</label>
+              <p style={{ margin:"4px 0 0", fontSize:"14px", color:s.text2, lineHeight:1.6, whiteSpace:"pre-wrap" }}>{unescapeNewlines(detailItem.explain as string)}</p>
+            </div>
+            <div style={{ display:"flex", justifyContent:"flex-end" }}>
+              <button onClick={() => setDetailVisible(false)} style={{ height:"36px", padding:"0 20px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>关闭</button>
             </div>
           </div>
         </div>

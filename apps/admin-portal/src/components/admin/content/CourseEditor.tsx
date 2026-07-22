@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { tokens } from "@/lib/design-tokens";
 import { useRouter, useParams } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 
-const s = { primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399", border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", radius: "4px" };
+import { s } from "@/lib/design-tokens";
 
 export function CourseEditor() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export function CourseEditor() {
         )}
 
         <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>封面图片URL</label><input value={form.coverUrl} onChange={(e) => setForm({...form, coverUrl:e.target.value})} style={{ width:"100%", height:"36px", padding:"0 12px", border:"1px solid " + s.border, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
-        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>状态</label><div style={{ display:"flex", alignItems:"center", gap:"8px" }}><button onClick={() => setForm({...form, status: form.status===1?0:1})} style={{ width:"44px", height:"24px", borderRadius:"12px", border:"none", backgroundColor: form.status===1?"#67c23a":"#c0c4cc", position:"relative", cursor:"pointer" }}><span style={{ display:"block", width:"18px", height:"18px", borderRadius:"50%", background:"#fff", position:"absolute", top:"3px", left: form.status===1?"23px":"3px", transition:"left 0.2s" }} /></button><span style={{ fontSize:"13px", color:s.text2 }}>{form.status===1?"上架":"下架"}</span></div></div>
+        <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"6px", fontSize:"13px", color:s.text2 }}>状态</label><div style={{ display:"flex", alignItems:"center", gap:"8px" }}><button onClick={() => setForm({...form, status: form.status===1?0:1})} style={{ width:"44px", height:"24px", borderRadius:"12px", border:"none", backgroundColor: form.status===1?tokens.success:"#c0c4cc", position:"relative", cursor:"pointer" }}><span style={{ display:"block", width:"18px", height:"18px", borderRadius:"50%", background:"#fff", position:"absolute", top:"3px", left: form.status===1?"23px":"3px", transition:"left 0.2s" }} /></button><span style={{ fontSize:"13px", color:s.text2 }}>{form.status===1?"上架":"下架"}</span></div></div>
         <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
           <button onClick={() => router.back()} style={{ height:"36px", padding:"0 20px", border:"1px solid " + s.border, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
           <button onClick={handleSave} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>保存</button>

@@ -4,11 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", warning: "#e6a23c", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
@@ -107,29 +103,29 @@ export function BookManager() {
           </div>
           <button onClick={() => router.push("/admin/content/books/new")} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>新增书籍</button>
         </div>
-        <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
           <thead>
-            <tr style={{ backgroundColor:"#f5f7fa" }}>
-              {["ID","封面","书名","简介","浏览数","评论数","排序","状态","创建时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+            <tr style={{ backgroundColor:s.bg }}>
+              {["ID","封面","书名","简介","浏览数","评论数","排序","状态","创建时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {data.records.map((row, i) => (
-              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.id as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}` }}>
                   {row.coverUrl ? <img src={row.coverUrl as string} alt="" style={{ width:"60px", height:"80px", objectFit:"cover", borderRadius:s.radius }} /> : <span style={{ color:s.text3, fontSize:"13px" }}>-</span>}
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.title as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px", maxWidth:"200px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.description as string || "-"}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.viewCount as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.commentCount as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.sortOrder as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.title as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px", maxWidth:"200px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.description as string || "-"}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.viewCount as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.commentCount as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.sortOrder as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>
                   <span style={{ color: getStatusColor(row.status as number) }}>{getStatusLabel(row.status as number)}</span>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.createTime as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}` }}>
                   <button onClick={() => router.push(`/admin/content/books/${row.id}/edit`)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button>
                   <button onClick={() => handleViewComments(row)} style={{ color:s.text2, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>评论管理</button>
                   <button onClick={() => handleToggleStatus(row)} style={{ color:s.warning, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>{(row.status as number)===1?"下架":"上架"}</button>
@@ -156,20 +152,20 @@ export function BookManager() {
               <div style={{ textAlign:"center", padding:"40px", color:s.text3 }}>加载中...</div>
             ) : (
               <>
-                <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+                <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
                   <thead>
-                    <tr style={{ backgroundColor:"#f5f7fa" }}>
-                      {["ID","用户","评论内容","评论时间","操作"].map(h => <th key={h} style={{ padding:"10px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+                    <tr style={{ backgroundColor:s.bg }}>
+                      {["ID","用户","评论内容","评论时间","操作"].map(h => <th key={h} style={{ padding:"10px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
                     </tr>
                   </thead>
                   <tbody>
                     {comments.map((c, i) => (
-                      <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                        <td style={{ padding:"10px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{c.id as string}</td>
-                        <td style={{ padding:"10px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{c.userNickname as string}</td>
-                        <td style={{ padding:"10px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{c.content as string}</td>
-                        <td style={{ padding:"10px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{c.createTime as string}</td>
-                        <td style={{ padding:"10px 8px", borderBottom:"1px solid #ebeef5" }}>
+                      <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                        <td style={{ padding:"10px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{c.id as string}</td>
+                        <td style={{ padding:"10px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{c.userNickname as string}</td>
+                        <td style={{ padding:"10px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{c.content as string}</td>
+                        <td style={{ padding:"10px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{c.createTime as string}</td>
+                        <td style={{ padding:"10px 8px", borderBottom:`1px solid ${s.border}` }}>
                           <button onClick={() => handleDeleteComment(c.id)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button>
                         </td>
                       </tr>

@@ -17,7 +17,7 @@ import { PeekCharacters, W, H } from "./peek-characters";
 export function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const nextPath = safeRedirect(searchParams.get("redirect"), "/me");
+  const nextPath = safeRedirect(searchParams.get("redirect"), "/home");
 
   const [tab, setTab] = useState("account");
   const [showPwd, setShowPwd] = useState(false);
@@ -81,7 +81,7 @@ export function LoginPage() {
   const handleSendCode = async () => {
     if (!emailForCode) { toast.warning("请先输入邮箱"); return; }
     try {
-      await api.user.sendEmailCode(emailForCode);
+      await api.user.sendEmailCode(emailForCode, "login");
       toast.success("验证码已发送");
       startCountdown();
     } catch {

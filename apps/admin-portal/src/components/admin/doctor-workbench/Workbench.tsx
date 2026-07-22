@@ -3,13 +3,7 @@
 import { useState, useEffect } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", green: "#67c23a", orange: "#e6a23c", red: "#f56c6c",
-  text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff",
-  radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-  statCardBg: "#fff",
-};
+import { s } from "@/lib/design-tokens";
 
 interface WorkbenchData {
   doctorName: string; title: string; hospitalName: string;
@@ -33,7 +27,7 @@ export function Workbench() {
   if (error || !data) return <div style={{ padding: "40px", textAlign: "center", color: s.red }}>数据加载失败: {error ?? "未知错误"}</div>;
 
   const tdStyle: React.CSSProperties = {
-    padding: "12px 8px", borderBottom: "1px solid #ebeef5", fontSize: "13px",
+    padding: "12px 8px", borderBottom: `1px solid ${s.border}`, fontSize: "13px",
   };
 
   return (
@@ -66,12 +60,12 @@ export function Workbench() {
 
       <div style={{ backgroundColor: s.white, borderRadius: "8px", boxShadow: s.shadow, padding: "20px" }}>
         <h3 style={{ margin: "0 0 16px 0", fontSize: "16px", fontWeight: 600, color: s.text }}>今日患者</h3>
-        <table style={{ width: "100%", borderCollapse: "collapse", border: "1px solid #ebeef5" }}>
+        <table style={{ width: "100%", borderCollapse: "collapse", border: `1px solid ${s.border}` }}>
           <thead>
-            <tr style={{ backgroundColor: "#f5f7fa" }}>
-              <th style={{ padding: "12px 8px", textAlign: "left", fontSize: "13px", color: s.text3, fontWeight: 600, borderBottom: "1px solid #ebeef5" }}>患者姓名</th>
-              <th style={{ padding: "12px 8px", textAlign: "left", fontSize: "13px", color: s.text3, fontWeight: 600, borderBottom: "1px solid #ebeef5" }}>预约时间</th>
-              <th style={{ padding: "12px 8px", textAlign: "left", fontSize: "13px", color: s.text3, fontWeight: 600, borderBottom: "1px solid #ebeef5" }}>状态</th>
+            <tr style={{ backgroundColor: s.bg }}>
+              <th style={{ padding: "12px 8px", textAlign: "left", fontSize: "13px", color: s.text3, fontWeight: 600, borderBottom: `1px solid ${s.border}` }}>患者姓名</th>
+              <th style={{ padding: "12px 8px", textAlign: "left", fontSize: "13px", color: s.text3, fontWeight: 600, borderBottom: `1px solid ${s.border}` }}>预约时间</th>
+              <th style={{ padding: "12px 8px", textAlign: "left", fontSize: "13px", color: s.text3, fontWeight: 600, borderBottom: `1px solid ${s.border}` }}>状态</th>
             </tr>
           </thead>
           <tbody>
@@ -79,7 +73,7 @@ export function Workbench() {
               <tr><td colSpan={3} style={{ ...tdStyle, textAlign: "center", color: s.text3 }}>今日暂无预约</td></tr>
             ) : (
               (data.todayPatients ?? []).map((p, i) => (
-                <tr key={p.id} style={{ backgroundColor: i % 2 === 0 ? s.white : "#fafafa" }}>
+                <tr key={p.id} style={{ backgroundColor: i % 2 === 0 ? s.white : s.bg }}>
                   <td style={tdStyle}>{p.patientName}</td>
                   <td style={tdStyle}>{p.time}</td>
                   <td style={tdStyle}>{p.status}</td>

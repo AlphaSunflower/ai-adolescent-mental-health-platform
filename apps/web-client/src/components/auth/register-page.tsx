@@ -42,7 +42,7 @@ export function RegisterPage() {
   const handleSendCode = async () => {
     if (!email) { toast.warning("请先输入邮箱"); return; }
     try {
-      await api.user.sendEmailCode(email);
+      await api.user.sendEmailCode(email, "register");
       toast.success("验证码已发送");
       setCodeCountdown(60);
       const timer = setInterval(() => {

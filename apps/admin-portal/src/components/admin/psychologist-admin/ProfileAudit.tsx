@@ -3,11 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", warning: "#e6a23c", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
@@ -74,29 +70,29 @@ export function ProfileAudit() {
             <option value="2">已拒绝</option>
           </select>
         </div>
-        <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
           <thead>
-            <tr style={{ backgroundColor:"#f5f7fa" }}>
-              {["ID","咨询师","变更字段","变更内容","审核状态","申请时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+            <tr style={{ backgroundColor:s.bg }}>
+              {["ID","咨询师","变更字段","变更内容","审核状态","申请时间","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {data.records.map((row, i) => (
-              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.psychologistName as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.id as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.psychologistName as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>
                   <span style={{ display:"inline-block", padding:"2px 8px", background:s.bg, borderRadius:"10px", fontSize:"12px", color:s.text2 }}>{row.fieldNameText as string || row.fieldName as string}</span>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>
                   <div><span style={{ color:s.text3, fontSize:"12px" }}>原值：</span><span style={{ textDecoration:"line-through", color:s.text3 }}>{row.oldValue as string || "(空)"}</span></div>
                   <div><span style={{ color:s.text3, fontSize:"12px" }}>新值：</span><span style={{ color:s.primary, fontWeight:500 }}>{row.newValue as string || "(空)"}</span></div>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>
                   <span style={{ color: getStatusColor(row.auditStatus as number) }}>{row.auditStatusText as string || getStatusLabel(row.auditStatus as number)}</span>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.createTime as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}` }}>
                   {(row.auditStatus as number) === 0 && (
                     <>
                       <button onClick={() => openAudit(row, "approve")} style={{ color:s.success, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>通过</button>

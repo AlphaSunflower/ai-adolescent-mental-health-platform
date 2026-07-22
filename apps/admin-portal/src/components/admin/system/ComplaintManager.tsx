@@ -3,11 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", warning: "#e6a23c", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
@@ -35,26 +31,26 @@ export function ComplaintManager() {
     <div style={{ padding:"20px", backgroundColor:s.bg, minHeight:"100%" }}>
       <div style={{ backgroundColor:s.white, borderRadius:"8px", boxShadow:s.shadow, padding:"20px" }}>
         <h3 style={{ margin:"0 0 20px", fontSize:"18px", color:s.text }}>投诉审核</h3>
-        <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${s.border}` }}>
           <thead>
-            <tr style={{ backgroundColor:"#f5f7fa" }}>
-              {["ID","投诉人","投诉对象","内容","时间","状态","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+            <tr style={{ backgroundColor:s.bg }}>
+              {["ID","投诉人","投诉对象","内容","时间","状态","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${s.border}` }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {data.records.map((row, i) => (
-              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.complainant as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.target as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px", maxWidth:"200px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.content as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.createTime as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.id as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.complainant as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.target as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px", maxWidth:"200px", overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{row.content as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>{row.createTime as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}`, fontSize:"13px" }}>
                   <span style={{ color: (row.status as string)==="pending"?s.warning:(row.status as string)==="resolved"?s.success:s.danger }}>
                     {(row.status as string)==="pending"?"待审核":(row.status as string)==="resolved"?"已处理":"已驳回"}
                   </span>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${s.border}` }}>
                   <button onClick={() => handleResolve(row.id)} style={{ color:s.success, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>通过</button>
                   <button onClick={() => handleReject(row.id)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>驳回</button>
                 </td>

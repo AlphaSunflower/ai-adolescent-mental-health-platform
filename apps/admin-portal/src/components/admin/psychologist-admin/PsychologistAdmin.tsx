@@ -1,13 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { tokens } from "@/lib/design-tokens";
 import { httpClient } from "@/lib/api-admin";
 
-const s = {
-  primary: "#409eff", text: "#303133", text2: "#606266", text3: "#909399",
-  border: "#dcdfe6", bg: "#f0f2f5", white: "#fff", danger: "#f56c6c",
-  success: "#67c23a", warning: "#e6a23c", radius: "4px", shadow: "0 2px 12px rgba(0,0,0,0.06)",
-};
+import { s } from "@/lib/design-tokens";
 
 type PageResult<T> = { total: number; records: T[]; current: number; size: number; pages: number };
 
@@ -266,34 +263,34 @@ export function PsychologistAdmin() {
             </select>
             <input placeholder="搜索咨询师..." value={search} onChange={(e) => setSearch(e.target.value)} onKeyDown={(e) => e.key==="Enter"&&fetchData()}
               style={{ height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, width:"240px", outline:"none" }} />
-            <button onClick={() => fetchData()} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>搜索</button>
+            <button onClick={() => fetchData()} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>搜索</button>
           </div>
-          <button onClick={openAddDialog} style={{ height:"36px", padding:"0 20px", backgroundColor:"#67c23a", color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>新增咨询师</button>
+          <button onClick={openAddDialog} style={{ height:"36px", padding:"0 20px", backgroundColor:tokens.success, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>新增咨询师</button>
         </div>
 
-        <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5" }}>
+        <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${tokens.borderLight}` }}>
           <thead>
-            <tr style={{ backgroundColor:"#f5f7fa" }}>
-              {["ID","姓名","昵称","手机号","咨询价格","评分","咨询次数","在线状态","状态","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}
+            <tr style={{ backgroundColor:tokens.bgPage }}>
+              {["ID","姓名","昵称","手机号","咨询价格","评分","咨询次数","在线状态","状态","操作"].map(h => <th key={h} style={{ padding:"12px 8px", textAlign:"left", fontSize:"13px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${tokens.borderLight}` }}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {data.records.map((row, i) => (
-              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":"#fafafa" }}>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.id as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.realName as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.userNickname as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.phone as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>¥{Number(row.consultationPrice || 0).toFixed(2)}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{Number(row.ratingScore || 0).toFixed(2)}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>{row.consultationCount as string}</td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+              <tr key={i} style={{ backgroundColor: i%2===0?"#fff":s.bg }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>{row.id as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>{row.realName as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>{row.userNickname as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>{row.phone as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>¥{Number(row.consultationPrice || 0).toFixed(2)}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>{Number(row.ratingScore || 0).toFixed(2)}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>{row.consultationCount as string}</td>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>
                   <span style={{ color: getOnlineColor(row.onlineStatus as number) }}>{getOnlineLabel(row.onlineStatus as number)}</span>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5", fontSize:"13px" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}`, fontSize:"13px" }}>
                   <span style={{ color: getStatusColor(row.status as number) }}>{row.statusText as string || getStatusLabel(row.status as number)}</span>
                 </td>
-                <td style={{ padding:"12px 8px", borderBottom:"1px solid #ebeef5" }}>
+                <td style={{ padding:"12px 8px", borderBottom:`1px solid ${tokens.borderLight}` }}>
                   <button onClick={() => viewDetail(row)} style={{ color:s.text2, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>详情</button>
                   <button onClick={() => openEditDialog(row)} style={{ color:s.warning, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button>
                   <button onClick={() => handleStatusToggle(row)} style={{ color: (row.status as number)===1?s.warning:s.success, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>{(row.status as number)===1?"禁用":"启用"}</button>
@@ -332,32 +329,32 @@ export function PsychologistAdmin() {
             </div>
 
             {/* Fields Section */}
-            <div style={{ marginBottom:"20px", padding:"16px", background:"#f5f7fa", borderRadius:"8px" }}>
+            <div style={{ marginBottom:"20px", padding:"16px", background:tokens.bgPage, borderRadius:"8px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
                 <h4 style={{ margin:0, fontSize:"14px", color:s.text }}>擅长领域</h4>
-                <button onClick={() => openFieldDialog()} style={{ height:"28px", padding:"0 12px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer", fontSize:"12px" }}>+ 添加</button>
+                <button onClick={() => openFieldDialog()} style={{ height:"28px", padding:"0 12px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer", fontSize:"12px" }}>+ 添加</button>
               </div>
-              <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5", background:s.white }}>
-                <thead><tr style={{ backgroundColor:"#f5f7fa" }}>{["领域名称","领域代码","细分标签","操作"].map(h => <th key={h} style={{ padding:"8px", textAlign:"left", fontSize:"12px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}</tr></thead>
+              <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${tokens.borderLight}`, background:s.white }}>
+                <thead><tr style={{ backgroundColor:tokens.bgPage }}>{["领域名称","领域代码","细分标签","操作"].map(h => <th key={h} style={{ padding:"8px", textAlign:"left", fontSize:"12px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${tokens.borderLight}` }}>{h}</th>)}</tr></thead>
                 <tbody>
                   {psychFields.map((f, i) => (
-                    <tr key={i}><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}>{f.fieldName as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}>{f.fieldCode as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}>{f.subTags as string || "-"}</td><td style={{ padding:"8px", borderBottom:"1px solid #ebeef5" }}><button onClick={() => openFieldDialog(f)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button><button onClick={() => deleteField(f.id as number)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button></td></tr>
+                    <tr key={i}><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}>{f.fieldName as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}>{f.fieldCode as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}>{f.subTags as string || "-"}</td><td style={{ padding:"8px", borderBottom:`1px solid ${tokens.borderLight}` }}><button onClick={() => openFieldDialog(f)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button><button onClick={() => deleteField(f.id as number)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button></td></tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
             {/* Qualifications Section */}
-            <div style={{ marginBottom:"20px", padding:"16px", background:"#f5f7fa", borderRadius:"8px" }}>
+            <div style={{ marginBottom:"20px", padding:"16px", background:tokens.bgPage, borderRadius:"8px" }}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:"12px" }}>
                 <h4 style={{ margin:0, fontSize:"14px", color:s.text }}>资质证书</h4>
-                <button onClick={() => openQualDialog()} style={{ height:"28px", padding:"0 12px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer", fontSize:"12px" }}>+ 添加</button>
+                <button onClick={() => openQualDialog()} style={{ height:"28px", padding:"0 12px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer", fontSize:"12px" }}>+ 添加</button>
               </div>
-              <table style={{ width:"100%", borderCollapse:"collapse", border:"1px solid #ebeef5", background:s.white }}>
-                <thead><tr style={{ backgroundColor:"#f5f7fa" }}>{["资质名称","资质代码","证书图片","认证状态","操作"].map(h => <th key={h} style={{ padding:"8px", textAlign:"left", fontSize:"12px", color:s.text3, fontWeight:600, borderBottom:"1px solid #ebeef5" }}>{h}</th>)}</tr></thead>
+              <table style={{ width:"100%", borderCollapse:"collapse", border:`1px solid ${tokens.borderLight}`, background:s.white }}>
+                <thead><tr style={{ backgroundColor:tokens.bgPage }}>{["资质名称","资质代码","证书图片","认证状态","操作"].map(h => <th key={h} style={{ padding:"8px", textAlign:"left", fontSize:"12px", color:s.text3, fontWeight:600, borderBottom:`1px solid ${tokens.borderLight}` }}>{h}</th>)}</tr></thead>
                 <tbody>
                   {psychQuals.map((q, i) => (
-                    <tr key={i}><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}>{q.qualificationName as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}>{q.qualificationCode as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}>{(q.certificateUrl as string) || "-"}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:"1px solid #ebeef5" }}><span style={{ color: (q.isVerified as number)===1?s.success:s.text3 }}>{(q.isVerified as number)===1?"已认证":"未认证"}</span></td><td style={{ padding:"8px", borderBottom:"1px solid #ebeef5" }}><button onClick={() => openQualDialog(q)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button><button onClick={() => deleteQualification(q.id as number)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button></td></tr>
+                    <tr key={i}><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}>{q.qualificationName as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}>{q.qualificationCode as string}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}>{(q.certificateUrl as string) || "-"}</td><td style={{ padding:"8px", fontSize:"12px", borderBottom:`1px solid ${tokens.borderLight}` }}><span style={{ color: (q.isVerified as number)===1?s.success:s.text3 }}>{(q.isVerified as number)===1?"已认证":"未认证"}</span></td><td style={{ padding:"8px", borderBottom:`1px solid ${tokens.borderLight}` }}><button onClick={() => openQualDialog(q)} style={{ color:s.primary, border:"none", background:"none", cursor:"pointer", marginRight:"8px" }}>编辑</button><button onClick={() => deleteQualification(q.id as number)} style={{ color:s.danger, border:"none", background:"none", cursor:"pointer" }}>删除</button></td></tr>
                   ))}
                 </tbody>
               </table>
@@ -379,7 +376,7 @@ export function PsychologistAdmin() {
             <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"4px", fontSize:"13px", color:s.text2 }}>细分标签</label><input value={fieldForm.subTags} onChange={(e) => setFieldForm({...fieldForm, subTags:e.target.value})} placeholder="多个标签用逗号分隔" style={{ width:"100%", height:"36px", padding:"0 12px", border:`1px solid ${s.border}`, borderRadius:s.radius, boxSizing:"border-box" }} /></div>
             <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
               <button onClick={() => setFieldDialogVisible(false)} style={{ height:"36px", padding:"0 20px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
-              <button onClick={saveField} disabled={fieldSaving} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>确定</button>
+              <button onClick={saveField} disabled={fieldSaving} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>确定</button>
             </div>
           </div>
         </div>
@@ -395,7 +392,7 @@ export function PsychologistAdmin() {
             <div style={{ marginBottom:"16px" }}><label style={{ display:"block", marginBottom:"4px", fontSize:"13px", color:s.text2 }}>认证状态</label><div style={{ display:"flex", gap:"16px" }}><label style={{ fontSize:"13px", cursor:"pointer" }}><input type="radio" checked={qualForm.isVerified===1} onChange={() => setQualForm({...qualForm, isVerified:1})} /> 已认证</label><label style={{ fontSize:"13px", cursor:"pointer" }}><input type="radio" checked={qualForm.isVerified===0} onChange={() => setQualForm({...qualForm, isVerified:0})} /> 未认证</label></div></div>
             <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
               <button onClick={() => setQualDialogVisible(false)} style={{ height:"36px", padding:"0 20px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
-              <button onClick={saveQualification} disabled={qualSaving} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>确定</button>
+              <button onClick={saveQualification} disabled={qualSaving} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>确定</button>
             </div>
           </div>
         </div>
@@ -430,11 +427,11 @@ export function PsychologistAdmin() {
                   <option value="">选择资质类型</option>
                   {editQualOptions.map(o => <option key={o.id as number} value={o.id as number}>{o.name as string}</option>)}
                 </select>
-                <button onClick={() => { if (selectedQualId && !form.qualificationIds.includes(selectedQualId)) setForm({...form, qualificationIds: [...form.qualificationIds, selectedQualId]}); setSelectedQualId(null); }} style={{ height:"36px", padding:"0 16px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>添加</button>
+                <button onClick={() => { if (selectedQualId && !form.qualificationIds.includes(selectedQualId)) setForm({...form, qualificationIds: [...form.qualificationIds, selectedQualId]}); setSelectedQualId(null); }} style={{ height:"36px", padding:"0 16px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>添加</button>
               </div>
               <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
                 {form.qualificationIds.map(qid => (
-                  <span key={qid} style={{ display:"inline-flex", alignItems:"center", gap:"4px", padding:"2px 8px", background:"#ecf5ff", color:s.primary, borderRadius:"3px", fontSize:"12px", border:`1px solid ${s.primary}33` }}>
+                  <span key={qid} style={{ display:"inline-flex", alignItems:"center", gap:"4px", padding:"2px 8px", background:tokens.primaryLight, color:s.primary, borderRadius:"3px", fontSize:"12px", border:`1px solid ${s.primary}33` }}>
                     {getQualName(qid) || String(qid)}
                     <button onClick={() => setForm({...form, qualificationIds: form.qualificationIds.filter(id => id !== qid)})} style={{ border:"none", background:"none", cursor:"pointer", color:s.primary, fontSize:"14px", padding:0, lineHeight:1 }}>×</button>
                   </span>
@@ -450,11 +447,11 @@ export function PsychologistAdmin() {
                   <option value="">选择擅长领域</option>
                   {editFieldOptions.map(o => <option key={o.id as number} value={o.id as number}>{o.name as string}</option>)}
                 </select>
-                <button onClick={() => { if (selectedFieldId && !form.fieldIds.includes(selectedFieldId)) setForm({...form, fieldIds: [...form.fieldIds, selectedFieldId]}); setSelectedFieldId(null); }} style={{ height:"36px", padding:"0 16px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>添加</button>
+                <button onClick={() => { if (selectedFieldId && !form.fieldIds.includes(selectedFieldId)) setForm({...form, fieldIds: [...form.fieldIds, selectedFieldId]}); setSelectedFieldId(null); }} style={{ height:"36px", padding:"0 16px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>添加</button>
               </div>
               <div style={{ display:"flex", flexWrap:"wrap", gap:"6px" }}>
                 {form.fieldIds.map(fid => (
-                  <span key={fid} style={{ display:"inline-flex", alignItems:"center", gap:"4px", padding:"2px 8px", background:"#ecf5ff", color:s.primary, borderRadius:"3px", fontSize:"12px", border:`1px solid ${s.primary}33` }}>
+                  <span key={fid} style={{ display:"inline-flex", alignItems:"center", gap:"4px", padding:"2px 8px", background:tokens.primaryLight, color:s.primary, borderRadius:"3px", fontSize:"12px", border:`1px solid ${s.primary}33` }}>
                     {getFieldName(fid) || String(fid)}
                     <button onClick={() => setForm({...form, fieldIds: form.fieldIds.filter(id => id !== fid)})} style={{ border:"none", background:"none", cursor:"pointer", color:s.primary, fontSize:"14px", padding:0, lineHeight:1 }}>×</button>
                   </span>
@@ -466,7 +463,7 @@ export function PsychologistAdmin() {
 
             <div style={{ display:"flex", justifyContent:"flex-end", gap:"10px" }}>
               <button onClick={() => setFormVisible(false)} style={{ height:"36px", padding:"0 20px", border:`1px solid ${s.border}`, borderRadius:s.radius, background:s.white, cursor:"pointer" }}>取消</button>
-              <button onClick={submitForm} disabled={formSaving} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:"#fff", border:"none", borderRadius:s.radius, cursor:"pointer" }}>确定</button>
+              <button onClick={submitForm} disabled={formSaving} style={{ height:"36px", padding:"0 20px", backgroundColor:s.primary, color:tokens.textInverse, border:"none", borderRadius:s.radius, cursor:"pointer" }}>确定</button>
             </div>
           </div>
         </div>
