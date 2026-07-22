@@ -265,17 +265,12 @@ jobs:
           echo "Generated deploy/.env.production ($(wc -l < "$env_file") lines)"
 
       - name: Configure SSH
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
         run: |
           set -euo pipefail
 
-          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
-          : "${DEPLOY_SSH_KEY:?Missing DEPLOY_SSH_KEY secret}"
-          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST}"
+          : "${DEPLOY_SSH_KEY:?Missing DEPLOY_SSH_KEY}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER}"
 
           mkdir -p ~/.ssh
           printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
@@ -284,18 +279,14 @@ jobs:
 
       - name: Deploy to server
         env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
           GHCR_TOKEN: ${{ github.token }}
           GHCR_USERNAME: ${{ github.actor }}
         run: |
           set -euo pipefail
 
-          : "${DEPLOY_HOST:?Missing DEPLOY_HOST secret}"
-          : "${DEPLOY_PATH:?Missing DEPLOY_PATH secret}"
-          : "${DEPLOY_USER:?Missing DEPLOY_USER secret}"
+          : "${DEPLOY_HOST:?Missing DEPLOY_HOST}"
+          : "${DEPLOY_PATH:?Missing DEPLOY_PATH}"
+          : "${DEPLOY_USER:?Missing DEPLOY_USER}"
 
           echo "::group::Upload files to server"
           # 确保目标目录存在
@@ -351,11 +342,6 @@ jobs:
           echo "::endgroup::"
 
       - name: Health check
-        env:
-          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_PORT: ${{ secrets.DEPLOY_PORT }}
-          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          BACKEND_URL: ${{ vars.BACKEND_URL }}
         run: |
           set -euo pipefail
 
