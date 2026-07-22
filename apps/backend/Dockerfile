@@ -7,18 +7,15 @@ WORKDIR /workspace
 
 # 先复制 Maven 配置，利用缓存
 COPY apps/backend/pom.xml ./apps/backend/pom.xml
-COPY apps/backend/.mvn ./apps/backend/.mvn
-COPY apps/backend/mvnw ./apps/backend/mvnw
-COPY apps/backend/mvnw.cmd ./apps/backend/mvnw.cmd
 
 # 下载依赖（利用 Docker 层缓存）
-RUN cd apps/backend && ./mvnw dependency:go-offline -B -q || true
+RUN mvn dependency:go-offline -B -q -f apps/backend/pom.xml || true
 
 # 复制源码
 COPY apps/backend/src ./apps/backend/src
 
 # 构建（跳过测试，生产构建在 CI 中已运行过）
-RUN cd apps/backend && ./mvnw clean package -DskipTests -B -q
+RUN mvn clean package -DskipTests -B -q -f apps/backend/pom.xml
 
 # ===== Stage 2: Runtime =====
 FROM eclipse-temurin:17-jre-alpine AS runtime
