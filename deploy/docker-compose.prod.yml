@@ -1,89 +1,26 @@
 # 生产环境 Docker Compose 配置
+# MySQL / Redis / RabbitMQ 由宿主机提供，不在此处部署
 # 环境变量通过 .env.production 注入（由 GitHub Actions deploy workflow 生成）
 
 name: aiamh
 
 services:
-  # ===== MySQL 8.0 =====
-  mysql:
-    image: mysql:8.0
-    container_name: aiamh-mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${DB_MYSQL_DATABASE:-xinyuzhilian}
-      MYSQL_USER: ${DB_MYSQL_USERNAME}
-      MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
-    ports:
-      - "${DB_MYSQL_PORT:-3306}:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-      - ./infra/sql:/docker-entrypoint-initdb.d:ro
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_MYSQL_PASSWORD}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 60s
-    networks:
-      - aiamh-net
-
-  # ===== Redis 7 =====
-  redis:
-    image: redis:7-alpine
-    container_name: aiamh-redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${DB_REDIS_PASSWORD:-}
-    ports:
-      - "${DB_REDIS_PORT:-6379}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aiamh-net
-
-  # ===== RabbitMQ（可选：消息队列）=====
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: aiamh-rabbitmq
-    restart: unless-stopped
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
-    ports:
-      - "${RABBITMQ_PORT:-5672}:5672"
-      - "${RABBITMQ_MGMT_PORT:-15672}:15672"
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - aiamh-net
-    profiles:
-      - full
-
   # ===== 后端 API 服务 =====
   backend:
     image: ${BACKEND_IMAGE}
     container_name: aiamh-backend
     restart: unless-stopped
+    network_mode: host
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
       JAVA_OPTS: ${JAVA_OPTS:--Xmx512m}
-      DB_MYSQL_HOST: mysql
-      DB_MYSQL_PORT: 3306
+      DB_MYSQL_HOST: ${DB_MYSQL_HOST:-127.0.0.1}
+      DB_MYSQL_PORT: ${DB_MYSQL_PORT:-3306}
       DB_MYSQL_DATABASE: ${DB_MYSQL_DATABASE:-xinyuzhilian}
       DB_MYSQL_USERNAME: ${DB_MYSQL_USERNAME}
       DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
-      DB_REDIS_HOST: redis
-      DB_REDIS_PORT: 6379
+      DB_REDIS_HOST: ${DB_REDIS_HOST:-127.0.0.1}
+      DB_REDIS_PORT: ${DB_REDIS_PORT:-6379}
       DB_REDIS_PASSWORD: ${DB_REDIS_PASSWORD:-}
       JWT_SECRET: ${JWT_SECRET}
       DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY}
@@ -100,50 +37,22 @@ services:
       MAIL_PORT: ${MAIL_PORT}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-    ports:
-      - "${BACKEND_PORT:-8080}:8080"
-    depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - aiamh-net
 
   # ===== Web 用户端 (Next.js) =====
   web-client:
     image: ${WEB_CLIENT_IMAGE}
     container_name: aiamh-web-client
     restart: unless-stopped
+    network_mode: host
     environment:
-      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
+      BACKEND_URL: ${BACKEND_URL:-http://127.0.0.1:8080}
       NEXT_PUBLIC_WS_BASE_URL: ${NEXT_PUBLIC_WS_BASE_URL}
-    ports:
-      - "${WEB_CLIENT_PORT:-3100}:3100"
-    depends_on:
-      - backend
-    networks:
-      - aiamh-net
 
   # ===== Admin 管理端 (Next.js) =====
   admin-portal:
     image: ${ADMIN_PORTAL_IMAGE}
     container_name: aiamh-admin-portal
     restart: unless-stopped
+    network_mode: host
     environment:
-      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
-    ports:
-      - "${ADMIN_PORTAL_PORT:-3101}:3101"
-    depends_on:
-      - backend
-    networks:
-      - aiamh-net
-
-volumes:
-  mysql_data:
-  redis_data:
-  rabbitmq_data:
-
-networks:
-  aiamh-net:
-    driver: bridge
+      BACKEND_URL: ${BACKEND_URL:-http://127.0.0.1:8080}
