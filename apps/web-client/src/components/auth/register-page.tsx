@@ -51,8 +51,8 @@ export function RegisterPage() {
           return prev - 1;
         });
       }, 1000);
-    } catch {
-      toast.error("发送失败");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "发送失败");
     }
   };
 
@@ -65,8 +65,8 @@ export function RegisterPage() {
       await api.user.registerWithEmail({ username, password, email, code, ...(phone ? { phone } : {}) });
       toast.success("注册成功，请登录");
       router.push("/login");
-    } catch {
-      toast.error("注册失败，请重试");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "注册失败，请重试");
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,8 @@ export function RegisterPage() {
         <form onSubmit={handleRegister} className="space-y-4">
           <div>
             <Input placeholder="用户名 *" value={username} onChange={(e) => setUsername(e.target.value)} maxLength={20} />
-            <span className="mt-1 text-right text-xs text-cosmic-dim block">{username.length}/20</span>
+            <p className="mt-1 text-xs text-cosmic-dim">4-16 位字母、数字、下划线、减号</p>
+            <span className="text-right text-xs text-cosmic-dim block">{username.length}/20</span>
           </div>
 
           <div>
@@ -95,7 +96,10 @@ export function RegisterPage() {
             {password && (
               <div className="mt-2 space-y-1">
                 <Progress value={pwdStrength.score} className="h-1.5" />
-                <span className="text-xs text-cosmic-muted">密码强度：{pwdStrength.label}</span>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-cosmic-dim">8-16 位，必须包含大小写字母和数字</span>
+                  <span className="text-xs text-cosmic-muted">密码强度：{pwdStrength.label}</span>
+                </div>
               </div>
             )}
           </div>
@@ -106,6 +110,7 @@ export function RegisterPage() {
               {codeCountdown > 0 ? `${codeCountdown}s` : "发送验证码"}
             </Button>
           </div>
+          <p className="text-xs text-cosmic-dim">请输入有效的邮箱地址，用于接收验证码</p>
 
           <Input placeholder="验证码 *" value={code} onChange={(e) => setCode(e.target.value)} />
           <Input placeholder="手机号（选填）" value={phone} onChange={(e) => setPhone(e.target.value)} />
