@@ -316,7 +316,7 @@ jobs:
           echo "::group::Upload files to server"
           # 确保目标目录存在
           ssh -i ~/.ssh/deploy_key -p "${DEPLOY_PORT:-22}" "$DEPLOY_USER@$DEPLOY_HOST" \
-            "mkdir -p $DEPLOY_PATH/deploy $DEPLOY_PATH/infra/sql"
+            "mkdir -p $DEPLOY_PATH/deploy/nginx $DEPLOY_PATH/infra/sql"
 
           # 上传文件
           scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" \
@@ -326,6 +326,10 @@ jobs:
           scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" \
             deploy/docker-compose.prod.yml \
             "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy/docker-compose.prod.yml"
+
+          scp -i ~/.ssh/deploy_key -P "${DEPLOY_PORT:-22}" \
+            deploy/nginx/default.conf \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/deploy/nginx/default.conf"
 
           # 上传 SQL 初始化脚本（如果存在）
           if ls infra/sql/*.sql 1>/dev/null 2>&1; then

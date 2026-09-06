@@ -78,6 +78,23 @@ services:
     networks:
       - app
 
+  # ===== 边缘代理 =====
+  # 宝塔 nginx(443/TLS)反代到本容器发布端口:web-client 3200 / admin-portal 3201
+  # HTML no-store、/_next/static 一年 immutable,缓存策略由这里收口
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - web-client
+      - admin-portal
+    ports:
+      - "${NGINX_WEB_PORT:-3200}:80"
+      - "${NGINX_ADMIN_PORT:-3201}:81"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - app
+
 networks:
   app:
     driver: bridge
