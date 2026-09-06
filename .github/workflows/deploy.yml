@@ -60,6 +60,9 @@ jobs:
           context: .
           file: apps/backend/Dockerfile
           push: true
+          # ACR 个人版不接受 buildx 默认附带的 in-toto attestation 清单
+          # (denied: unknown manifest class for application/vnd.oci.empty.v1+json)
+          provenance: false
           tags: |
             ${{ env.BACKEND_IMAGE }}:${{ env.IMAGE_TAG }}
             ${{ env.BACKEND_IMAGE }}:latest
@@ -72,6 +75,7 @@ jobs:
           context: .
           file: apps/web-client/Dockerfile
           push: true
+          provenance: false
           tags: |
             ${{ env.WEB_CLIENT_IMAGE }}:${{ env.IMAGE_TAG }}
             ${{ env.WEB_CLIENT_IMAGE }}:latest
@@ -87,6 +91,7 @@ jobs:
           context: .
           file: apps/admin-portal/Dockerfile
           push: true
+          provenance: false
           tags: |
             ${{ env.ADMIN_PORTAL_IMAGE }}:${{ env.IMAGE_TAG }}
             ${{ env.ADMIN_PORTAL_IMAGE }}:latest
