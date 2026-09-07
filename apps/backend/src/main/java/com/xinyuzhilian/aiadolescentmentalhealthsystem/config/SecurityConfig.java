@@ -39,10 +39,6 @@ public class SecurityConfig {
     final AuthenticationConfiguration authenticationConfiguration;
     final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
-    /** CORS 白名单，逗号分隔；未配置时回退到本地开发端口 */
-    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:}")
-    private String corsAllowedOrigins;
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -56,15 +52,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // 安全：不允许通配符 origin + credentials。从配置读取白名单（逗号分隔），默认仅本地开发端口。
-        String origins = corsAllowedOrigins == null || corsAllowedOrigins.isBlank()
-                ? "http://localhost:3000,http://localhost:3001,http://localhost:5173,http://127.0.0.1:5173"
-                : corsAllowedOrigins;
-        configuration.setAllowedOriginPatterns(Arrays.stream(origins.split(","))
-                .map(String::trim).filter(s -> !s.isEmpty()).toList());
+        // 开放：允许任意来源访问（浏览器侧）。认证依赖 JWT Authorization 头而非 cookie，
+        // 前端不使用 credentials，因此关闭 allowCredentials 更安全；数据仍由 Spring Security 的 JWT 校验拦截保护。
+        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
