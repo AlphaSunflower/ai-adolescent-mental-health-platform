@@ -39,6 +39,10 @@ public class SecurityConfig {
     final AuthenticationConfiguration authenticationConfiguration;
     final JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
+    /** CORS 白名单，逗号分隔；未配置时回退到本地开发端口 */
+    @org.springframework.beans.factory.annotation.Value("${app.cors.allowed-origins:}")
+    private String corsAllowedOrigins;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -52,7 +56,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // 安全：不允许通配符 origin + credentials。从配置读取白名单（逗号分隔），默认仅本地开发端口。
+        String origins = corsAllowedOrigins == null || corsAllowedOrigins.isBlank()
+                ? "http://localhost:3000,http://localhost:3001,http://localhost:5173,http://127.0.0.1:5173"
+                : corsAllowedOrigins;
+        configuration.setAllowedOriginPatterns(Arrays.stream(origins.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).toList());
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);
@@ -90,12 +99,12 @@ public class SecurityConfig {
                                 "/user/forgot/send",
                                 "/user/forgot/verify",
                                 "/user/forgot/reset").permitAll()
-                        // SSE 流式输出放行（支持 /api 前缀）
-                        .requestMatchers("/consultation/message/stream/**").permitAll()
-                        .requestMatchers("/api/consultation/message/stream/**").permitAll()
-                        // 心理咨询消息 SSE 放行
-                        .requestMatchers("/psychologist/message/stream/**").permitAll()
-                        .requestMatchers("/api/psychologist/message/stream/**").permitAll()
+                        // SSE 流式输出需要认证（经 Authorization header 的 Bearer token，前端不应把 JWT 放进 URL）
+                        .requestMatchers("/consultation/message/stream/**").authenticated()
+                        .requestMatchers("/api/consultation/message/stream/**").authenticated()
+                        // 心理咨询消息 SSE 需要认证
+                        .requestMatchers("/psychologist/message/stream/**").authenticated()
+                        .requestMatchers("/api/psychologist/message/stream/**").authenticated()
                         // 搜索和书籍放行
                         .requestMatchers("/search/**").permitAll()
                         .requestMatchers("/book/**").permitAll()
@@ -111,18 +120,17 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(ex -> ex
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
-                            log.error("=== AccessDenied === uri: {}, exception: {}, msg: {}",
-                                    request.getRequestURI(), accessDeniedException.getClass().getName(), accessDeniedException.getMessage());
+                            log.error("=== AccessDenied === uri: {}, exception: {}",
+                                    request.getRequestURI(), accessDeniedException.getClass().getName());
                             response.setContentType("application/json;charset=UTF-8");
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                            response.getWriter().write("{\"code\":403,\"message\":\"拒绝访问: " + accessDeniedException.getMessage() + "\"}");
+                            response.getWriter().write("{\"code\":403,\"message\":\"拒绝访问\"}");
                         })
                         .authenticationEntryPoint((request, response, authException) -> {
-                            log.error("=== AuthenticationEntryPoint === uri: {}, msg: {}",
-                                    request.getRequestURI(), authException.getMessage());
+                            log.error("=== AuthenticationEntryPoint === uri: {}", request.getRequestURI());
                             response.setContentType("application/json;charset=UTF-8");
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.getWriter().write("{\"code\":401,\"message\":\"未认证: " + authException.getMessage() + "\"}");
+                            response.getWriter().write("{\"code\":401,\"message\":\"未认证或登录已过期\"}");
                         })
                 );
 

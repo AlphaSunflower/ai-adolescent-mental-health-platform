@@ -45,7 +45,8 @@ aliyun:
     bucketName: ${ALIYUN_OSS_BUCKET_NAME:}
 
 jwt:
-  secret: ${JWT_SECRET:ai-adolescent-mental-health-dev-secret-key-2024}
+  # 安全：JWT 签名密钥必须由外部 JWT_SECRET 提供，无公开默认值；缺失或过短时启动即失败（见 JwtProperties.init）
+  secret: ${JWT_SECRET}
   expiration: 86400000
   issuer: "AIAdolescentMentalHealthSystem"
   rememberExpiration: 2592000000

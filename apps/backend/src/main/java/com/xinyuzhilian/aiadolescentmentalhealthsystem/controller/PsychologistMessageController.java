@@ -35,7 +35,6 @@ public class PsychologistMessageController {
     private final PsychologistMessageSseServiceImpl sseService;
     private final com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.PsychologistAppointmentMapper appointmentMapper;
     private final PsychologistMapper psychologistMapper;
-    private final JwtUtil jwtUtil;
 
     /**
      * 发送消息
@@ -141,8 +140,7 @@ public class PsychologistMessageController {
     @GetMapping("/stream/{appointmentId}")
     public SseEmitter subscribeUser(
             @PathVariable Long appointmentId,
-            @RequestParam(required = false) String token) {
-        Long userId = parseUserId(token);
+            @CurrentUserId Long userId) {
         if (userId == null) {
             log.warn("SSE订阅失败：无法解析用户ID, appointmentId={}", appointmentId);
             SseEmitter emitter = new SseEmitter(0L);
@@ -169,8 +167,7 @@ public class PsychologistMessageController {
     @GetMapping("/stream/psychologist/{psychologistId}")
     public SseEmitter subscribePsychologist(
             @PathVariable Long psychologistId,
-            @RequestParam(required = false) String token) {
-        Long userId = parseUserId(token);
+            @CurrentUserId Long userId) {
         if (userId == null) {
             log.warn("咨询师SSE订阅失败：无法解析用户ID, psychologistId={}", psychologistId);
             SseEmitter emitter = new SseEmitter(0L);
@@ -324,22 +321,4 @@ public class PsychologistMessageController {
         }
     }
 
-    /**
-     * 从Token解析用户ID
-     */
-    private Long parseUserId(String token) {
-        if (token == null || token.isEmpty()) {
-            return null;
-        }
-        try {
-            var claims = jwtUtil.parse(token);
-            Object uid = claims.get("userId");
-            if (uid != null) {
-                return Long.valueOf(uid.toString());
-            }
-        } catch (Exception e) {
-            log.debug("解析Token失败: {}", e.getMessage());
-        }
-        return null;
-    }
 }

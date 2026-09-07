@@ -230,6 +230,7 @@ import request from '@/api/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus } from '@element-plus/icons-vue'
 import { recognizeMemesBatch, getMemeDetail } from '@/api/meme'
+import { sseSubscribe } from '@/utils/sse'
 
 const user = JSON.parse(localStorage.getItem('user') || '{}')
 const doctorId = computed(() => user.id)
@@ -249,7 +250,7 @@ const currentChat = ref<any>(null)
 const messages = ref<any[]>([])
 const chatInput = ref('')
 const messageBox = ref<any>(null)
-let sse: EventSource | null = null
+let sse: import('@/utils/sse').SseHandle | null = null
 
 const fetchActiveChats = () => {
     // Active chats are appointments with status 0 and type 1
@@ -285,23 +286,26 @@ const setupSse = (appointmentId: number) => {
         sse.close()
     }
     const token = localStorage.getItem('token') || ''
-    sse = new EventSource(`/api/consultation/message/stream/${appointmentId}?token=${encodeURIComponent(token)}`)
-    sse.onmessage = async (e) => {
-        try {
-            const m = JSON.parse(e.data)
-            if (m.senderId === doctorId.value) return
-            messages.value.push({ id: m.id, content: m.content, type: m.type, isSelf: false })
-            if (m.type === 0) {
-                try {
-                    const res:any = await recognizeMemesBatch([m.content])
-                    if (res.code === 200 && res.data && res.data[0] && res.data[0].length) {
-                        memeMatches.value[m.id] = res.data[0]
-                    }
-                } catch {}
-            }
-            scrollToBottom()
-        } catch {}
-    }
+    sse = sseSubscribe({
+        url: `/api/consultation/message/stream/${appointmentId}`,
+        token,
+        onMessage: async (data) => {
+            try {
+                const m = JSON.parse(data)
+                if (m.senderId === doctorId.value) return
+                messages.value.push({ id: m.id, content: m.content, type: m.type, isSelf: false })
+                if (m.type === 0) {
+                    try {
+                        const res:any = await recognizeMemesBatch([m.content])
+                        if (res.code === 200 && res.data && res.data[0] && res.data[0].length) {
+                            memeMatches.value[m.id] = res.data[0]
+                        }
+                    } catch {}
+                }
+                scrollToBottom()
+            } catch {}
+        },
+    })
 }
 
 const fetchChatHistory = async (appointmentId: number) => {

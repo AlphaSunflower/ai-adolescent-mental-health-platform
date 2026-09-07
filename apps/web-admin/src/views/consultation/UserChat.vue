@@ -148,6 +148,7 @@ import { ElMessage } from 'element-plus'
 import { User, ArrowLeft, Picture, Promotion, Loading, Close } from '@element-plus/icons-vue'
 import { getMessageHistory, sendMessage, sendImageMessage } from '@/api/psychologist'
 import request from '@/utils/request'
+import { sseSubscribe } from '@/utils/sse'
 
 const router = useRouter()
 const route = useRoute()
@@ -175,7 +176,7 @@ const receiverId = ref<number>(0)
 const messagesArea = ref<HTMLElement | null>(null)
 
 // SSE连接
-let eventSource: EventSource | null = null
+let eventSource: import('@/utils/sse').SseHandle | null = null
 
 // 配置
 const token = localStorage.getItem('token') || ''
@@ -285,83 +286,58 @@ const loadMore = () => {
   ElMessage.info('暂无更多消息')
 }
 
-// 连接SSE
+// 连接SSE：用 fetch + ReadableStream 携带 Authorization 头，避免 JWT 进 URL
 const connectSSE = () => {
   if (eventSource) {
     eventSource.close()
     eventSource = null
   }
 
-  // 构建SSE URL - 使用 /api 前缀以便vite代理转发
   const apptId = appointmentId.value
-  const encodedToken = encodeURIComponent(token)
-  const sseUrl = '/api/psychologist/message/stream/' + apptId + '?token=' + encodedToken
+  const sseUrl = '/api/psychologist/message/stream/' + apptId
 
-  console.log('连接SSE:', sseUrl)
+  eventSource = sseSubscribe({
+    url: sseUrl,
+    token,
+    onOpen: () => {
+      isConnected.value = true
+    },
+    onClose: () => {
+      isConnected.value = false
+    },
+    onMessage: (data) => {
+      try {
+        const eventData = data
+        if (!eventData || eventData === '') return
 
-  eventSource = new EventSource(sseUrl)
+        const messageData = JSON.parse(String(eventData))
 
-  // 连接打开时设置状态
-  eventSource.onopen = () => {
-    console.log('SSE连接已建立')
-    isConnected.value = true
-  }
-
-  // 使用 addEventListener 监听特定事件（更可靠）
-  eventSource.addEventListener('connected', (event: MessageEvent) => {
-    console.log('SSE连接确认:', event.data)
-    isConnected.value = true
-  })
-
-  // 处理所有消息
-  eventSource.onmessage = (event: MessageEvent) => {
-    try {
-      const eventData = event.data
-      if (!eventData || eventData === '') {
-        return
-      }
-      const messageData = JSON.parse(String(eventData))
-      console.log('收到SSE消息:', messageData)
-
-      // 跳过连接确认消息（type=connected）
-      if (messageData.type === 'connected') {
-        isConnected.value = true
-        return
-      }
-
-      // 添加新消息（去重）
-      if (messageData.id) {
-        const exists = messages.value.some(m => m.id === messageData.id)
-        if (!exists) {
-          const newMsg = {
-            ...messageData,
-            isSelf: messageData.senderId === currentUserId.value
-          }
-          messages.value.push(newMsg)
-          nextTick(() => scrollToBottom())
+        // 跳过连接确认消息（type=connected）
+        if (messageData.type === 'connected') {
+          isConnected.value = true
+          return
         }
+
+        // 添加新消息（去重）
+        if (messageData.id) {
+          const exists = messages.value.some(m => m.id === messageData.id)
+          if (!exists) {
+            const newMsg = {
+              ...messageData,
+              isSelf: messageData.senderId === currentUserId.value
+            }
+            messages.value.push(newMsg)
+            nextTick(() => scrollToBottom())
+          }
+        }
+      } catch (e) {
+        console.error('解析SSE消息失败', e)
       }
-    } catch (e) {
-      console.error('解析SSE消息失败', e)
-    }
-  }
-
-  eventSource.onerror = (error: Event) => {
-    console.error('SSE连接错误', error)
-    isConnected.value = false
-
-    // 清理连接
-    if (eventSource) {
-      eventSource.close()
-      eventSource = null
-    }
-
-    // 尝试重连
-    setTimeout(() => {
-      console.log('尝试重连SSE...')
-      connectSSE()
-    }, 3000)
-  }
+    },
+    onError: () => {
+      isConnected.value = false
+    },
+  })
 }
 
 // 断开SSE

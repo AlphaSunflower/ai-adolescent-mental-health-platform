@@ -41,7 +41,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public Result<Void> handleAllException(Exception e) {
-        log.error("兜底异常捕获, message: {}, type: {}", e.getMessage(), e.getClass().getName(), e);
-        return Result.error(500, "服务器内部错误: " + e.getMessage());
+        log.error("兜底异常捕获, type: {}", e.getClass().getName(), e);
+        // 安全：不向客户端回泄原始异常消息（可能含 SQL 片段、表名、内部路径）
+        return Result.error(500, "服务器内部错误,请稍后重试");
     }
 } 

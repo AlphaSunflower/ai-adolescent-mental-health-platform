@@ -734,10 +734,10 @@ public class LoginServiceImpl implements ILoginService {
         if (user.getNickname() == null) {
             user.setNickname("用户" + UUID.randomUUID().toString().substring(0, 7));
         }
-        if (user.getRole() == null) {
-            user.setRole(1);
-        }
+        // 安全：注册通道永远创建普通用户(role=1)，忽略任何客户端传入的 role/状态，防止提权
+        user.setRole(1);
         user.setStatus(1);
+        user.setMemberType(null);
         user.setDeleted(false);
 
         // 5. 保存

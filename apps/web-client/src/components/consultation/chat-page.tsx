@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/lib/api";
 import { getToken } from "@/lib/session";
+import { sseSubscribe } from "@/lib/sse";
 
 interface ChatMessage {
   id: number;
@@ -68,22 +69,20 @@ export function ConsultationChatPage() {
     })();
   }, [appointmentId, scrollToBottom]);
 
-  // SSE connection
+  // SSE connection：用 fetch + ReadableStream 携带 Authorization header，避免 JWT 进 URL
   useEffect(() => {
     const id = Number(appointmentId);
     if (!id) return;
     const token = getToken();
     const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
-    const url = `${baseUrl.replace(/\/$/, "")}/psychologist/message/stream/${id}?token=${token || ""}`;
+    const url = `${baseUrl.replace(/\/$/, "")}/psychologist/message/stream/${id}`;
 
-    let eventSource: EventSource | null = null;
-    let shouldReconnect = true;
-
-    const connect = () => {
-      eventSource = new EventSource(url);
-      eventSource.addEventListener("message", (event: MessageEvent) => {
+    const sse = sseSubscribe({
+      url,
+      token,
+      onMessage: (data) => {
         try {
-          const msg = JSON.parse(event.data) as ChatMessage;
+          const msg = JSON.parse(data) as ChatMessage;
           if (msg.contentType === 2) {
             setMessages((prev) => [...prev, { ...msg, content: `[系统消息] ${msg.content}` }]);
           } else {
@@ -94,21 +93,13 @@ export function ConsultationChatPage() {
           }
           scrollToBottom();
         } catch { /* ignore */ }
-      });
-      eventSource.onerror = () => {
-        eventSource?.close();
-        if (shouldReconnect && reconnectRef.current < maxReconnect) {
-          reconnectRef.current++;
-          setTimeout(connect, 3000);
-        }
-      };
-    };
+      },
+      onError: () => {
+        if (reconnectRef.current < maxReconnect) reconnectRef.current += 1;
+      },
+    });
 
-    connect();
-    return () => {
-      shouldReconnect = false;
-      eventSource?.close();
-    };
+    return () => sse.close();
   }, [appointmentId, scrollToBottom]);
 
   const handleSend = async () => {

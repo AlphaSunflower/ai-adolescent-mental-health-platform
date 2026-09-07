@@ -156,6 +156,7 @@ import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import { User, Promotion, Picture, Loading, Close } from '@element-plus/icons-vue'
 import { getConversations, getMessageHistory, sendMessage, sendImageMessage } from '@/api/psychologist'
+import { sseSubscribe } from '@/utils/sse'
 import { getMyPsychologistProfile } from '@/api/psychologistAdminPage'
 
 // 状态
@@ -174,7 +175,7 @@ const currentUserId = ref<number>(0)
 const psychologistId = ref<number>(0)  // 心理咨询师ID
 
 // SSE连接
-let eventSource: EventSource | null = null
+let eventSource: import('@/utils/sse').SseHandle | null = null
 
 // 配置
 const token = localStorage.getItem('token') || ''
@@ -310,7 +311,7 @@ const loadMessages = async () => {
   }
 }
 
-// 连接SSE
+// 连接SSE：用 fetch + ReadableStream 携带 Authorization 头，避免 JWT 进 URL
 const connectSSE = () => {
   // 检查必要参数
   if (!psychologistId.value) {
@@ -326,88 +327,61 @@ const connectSSE = () => {
     eventSource = null
   }
 
-  // 构建SSE URL - 使用 /api 前缀以便vite代理转发
   const psyId = psychologistId.value
-  const encodedToken = encodeURIComponent(token)
-  const sseUrl = '/api/psychologist/message/stream/psychologist/' + psyId + '?token=' + encodedToken
+  const sseUrl = '/api/psychologist/message/stream/psychologist/' + psyId
 
-  console.log('连接SSE:', sseUrl)
+  eventSource = sseSubscribe({
+    url: sseUrl,
+    token,
+    onOpen: () => {
+      isConnected.value = true
+    },
+    onClose: () => {
+      isConnected.value = false
+    },
+    onMessage: (data) => {
+      try {
+        const eventData = data
+        if (!eventData || eventData === '') return
 
-  eventSource = new EventSource(sseUrl)
+        const messageData = JSON.parse(String(eventData))
 
-  // 连接打开时设置状态
-  eventSource.onopen = () => {
-    console.log('SSE连接已建立')
-    isConnected.value = true
-  }
+        // 跳过连接确认消息
+        if (messageData.type === 'connected') {
+          isConnected.value = true
+          return
+        }
 
-  // 使用 addEventListener 监听特定事件
-  eventSource.addEventListener('connected', (event: MessageEvent) => {
-    console.log('SSE连接确认:', event.data)
-    isConnected.value = true
-  })
-
-  // 处理所有消息
-  eventSource.onmessage = (event: MessageEvent) => {
-    try {
-      const eventData = event.data
-      if (!eventData || eventData === '') {
-        return
-      }
-      const messageData = JSON.parse(String(eventData))
-      console.log('收到SSE消息:', messageData)
-
-      // 跳过连接确认消息
-      if (messageData.type === 'connected') {
-        isConnected.value = true
-        return
-      }
-
-      // 只处理当前对话的消息
-      if (messageData.appointmentId === activeUser.value?.appointmentId) {
-        // 去重
-        if (messageData.id) {
-          const exists = messages.value.some(m => m.id === messageData.id)
-          if (!exists) {
-            const newMsg = {
-              ...messageData,
-              isSelf: messageData.senderId === currentUserId.value
+        // 只处理当前对话的消息
+        if (messageData.appointmentId === activeUser.value?.appointmentId) {
+          // 去重
+          if (messageData.id) {
+            const exists = messages.value.some(m => m.id === messageData.id)
+            if (!exists) {
+              const newMsg = {
+                ...messageData,
+                isSelf: messageData.senderId === currentUserId.value
+              }
+              messages.value.push(newMsg)
+              nextTick(() => scrollToBottom())
             }
-            messages.value.push(newMsg)
-            nextTick(() => scrollToBottom())
           }
         }
+
+        // 更新用户列表的最后消息
+        const chatUser = chatUsers.value.find(u => u.appointmentId === messageData.appointmentId)
+        if (chatUser && !messageData.isSelf) {
+          chatUser.lastMessage = messageData.contentType === 1 ? '[图片]' : messageData.content
+          chatUser.unreadCount++
+        }
+      } catch (e) {
+        console.error('解析SSE消息失败', e)
       }
-
-      // 更新用户列表的最后消息
-      const chatUser = chatUsers.value.find(u => u.appointmentId === messageData.appointmentId)
-      if (chatUser && !messageData.isSelf) {
-        chatUser.lastMessage = messageData.contentType === 1 ? '[图片]' : messageData.content
-        chatUser.unreadCount++
-      }
-    } catch (e) {
-      console.error('解析SSE消息失败', e)
-    }
-  }
-
-  eventSource.onerror = (error: Event) => {
-    console.error('SSE连接错误', error)
-    isConnected.value = false
-
-    // 清理连接
-    if (eventSource) {
-      eventSource.close()
-      eventSource = null
-    }
-
-    // 尝试重连
-    setTimeout(() => {
-      if (activeUser.value) {
-        console.log('尝试重连SSE...')
-        connectSSE()
-      }
-    }, 3000)
-  }
+    },
+    onError: () => {
+      isConnected.value = false
+    },
+  })
 }
 
 // 断开SSE

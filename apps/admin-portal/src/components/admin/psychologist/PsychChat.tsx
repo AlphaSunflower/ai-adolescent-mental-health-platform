@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { httpClient } from "@/lib/api-admin";
 import { getToken } from "@/lib/session";
+import { sseSubscribe } from "@/lib/sse";
 
 import { s } from "@/lib/design-tokens";
 
@@ -30,7 +31,6 @@ export function PsychChat() {
   const [sending, setSending] = useState(false);
   const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const eventSourceRef = useRef<EventSource | null>(null);
 
   const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
@@ -84,40 +84,36 @@ export function PsychChat() {
       .catch(() => {});
   };
 
-  // SSE subscription for real-time messages
+  // SSE subscription：fetch + ReadableStream 携带 Authorization，避免 JWT 进 URL
   useEffect(() => {
     if (!activeConv?.psychologistId) return;
     const token = getToken();
-    const url = `${BASE_URL.replace(/\/$/, "")}/psychologist/message/stream/psychologist/${activeConv.psychologistId}?token=${token || ""}`;
+    const url = `${BASE_URL.replace(/\/$/, "")}/psychologist/message/stream/psychologist/${activeConv.psychologistId}`;
 
-    const es = new EventSource(url);
-    eventSourceRef.current = es;
-
-    es.addEventListener("message", (event: MessageEvent) => {
-      try {
-        const raw = JSON.parse(event.data);
-        const msg: Message = {
-          id: raw.id as number,
-          senderType: (raw.senderId === activeConv.psychologistId) ? "psychologist" : "user",
-          content: raw.content as string,
-          createTime: raw.createTime as string,
-          contentType: raw.contentType as number,
-        };
-        setMessages((prev) => {
-          if (prev.some((m) => m.id === msg.id)) return prev;
-          return [...prev, msg];
-        });
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      } catch { /* ignore */ }
+    const sse = sseSubscribe({
+      url,
+      token,
+      onMessage: (data) => {
+        try {
+          const raw = JSON.parse(data);
+          const msg: Message = {
+            id: raw.id as number,
+            senderType: (raw.senderId === activeConv.psychologistId) ? "psychologist" : "user",
+            content: raw.content as string,
+            createTime: raw.createTime as string,
+            contentType: raw.contentType as number,
+          };
+          setMessages((prev) => {
+            if (prev.some((m) => m.id === msg.id)) return prev;
+            return [...prev, msg];
+          });
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        } catch { /* ignore */ }
+      },
+      onError: () => {},
     });
 
-    es.onerror = () => {
-      es.close();
-    };
-
-    return () => {
-      es.close();
-    };
+    return () => sse.close();
   }, [activeConv?.appointmentId, activeConv?.psychologistId]);
 
   useEffect(() => { fetchConversations(); }, []);

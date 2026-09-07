@@ -21,7 +21,6 @@ public class ConsultationMessageController {
     private final IConsultationMessageService messageService;
     private final ConsultationMessageSseServiceImpl sseService;
     private final com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.AppointmentMapper appointmentMapper;
-    private final com.xinyuzhilian.aiadolescentmentalhealthsystem.utils.JwtUtil jwtUtil;
 
     @PostMapping("/send")
     public Result<String> sendMessage(@RequestBody ConsultationMessage message, @CurrentUserId Long userId) {
@@ -39,17 +38,7 @@ public class ConsultationMessageController {
      */
     @GetMapping("/stream/{appointmentId}")
     public org.springframework.web.servlet.mvc.method.annotation.SseEmitter stream(@PathVariable Long appointmentId,
-                                                                                   @RequestParam(required = false) String token) {
-        Long userId = null;
-        try {
-            if (token != null && !token.isEmpty()) {
-                io.jsonwebtoken.Claims claims = jwtUtil.parse(token);
-                Object uid = claims.get("userId");
-                if (uid != null) {
-                    userId = Long.valueOf(uid.toString());
-                }
-            }
-        } catch (Exception ignored) {}
+                                                                                   @CurrentUserId Long userId) {
         if (userId == null) {
             org.springframework.web.servlet.mvc.method.annotation.SseEmitter emitter = new org.springframework.web.servlet.mvc.method.annotation.SseEmitter(0L);
             emitter.complete();

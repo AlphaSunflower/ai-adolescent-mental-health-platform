@@ -386,6 +386,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, reactive, onUnmounted, watch } from 'vue'
 import request from '@/api/user'
+import { sseSubscribe } from '@/utils/sse'
 import { searchDoctors, sendMessage as apiSendMessage, getMessageHistory, submitComplaint } from '@/api/consultation'
 import { submitConsultationFeedback } from '@/api/feedback'
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -515,7 +516,7 @@ const chatList = ref<any[]>([])
 const currentChat = ref<any>(null)
 const chatInput = ref('')
 const messageBox = ref<any>(null)
-let sse: EventSource | null = null
+let sse: import('@/utils/sse').SseHandle | null = null
 
 // Removed mock myAppointments
 
@@ -658,20 +659,23 @@ const openChat = async (chat: any) => {
 const setupSse = (appointmentId: number) => {
     if (sse) { sse.close() }
     const token = localStorage.getItem('token') || ''
-    sse = new EventSource(`/api/consultation/message/stream/${appointmentId}?token=${encodeURIComponent(token)}`)
-    sse.onmessage = (e) => {
-        try {
-            const m = JSON.parse(e.data)
-            if (m.senderId === userId.value) return
-            currentChat.value?.messages.push({
-                id: m.id,
-                content: m.content,
-                type: m.type === 0 ? 'text' : 'image',
-                isSelf: false
-            })
-            scrollToBottom()
-        } catch {}
-    }
+    sse = sseSubscribe({
+        url: `/api/consultation/message/stream/${appointmentId}`,
+        token,
+        onMessage: (data) => {
+            try {
+                const m = JSON.parse(data)
+                if (m.senderId === userId.value) return
+                currentChat.value?.messages.push({
+                    id: m.id,
+                    content: m.content,
+                    type: m.type === 0 ? 'text' : 'image',
+                    isSelf: false
+                })
+                scrollToBottom()
+            } catch {}
+        },
+    })
 }
 
 const sendMessage = async () => {

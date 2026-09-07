@@ -99,13 +99,6 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         
         log.debug("用户认证成功, userId: {}, uri: {}", userId, request.getRequestURI());
 
-        // 8. 打印当前 SecurityContext 状态（用于调试）
-        log.info(">>> SecurityContext 状态 - authenticated: {}, principal: {}, uri: {}, authorities: {}",
-                SecurityContextHolder.getContext().getAuthentication().isAuthenticated(),
-                SecurityContextHolder.getContext().getAuthentication().getPrincipal(),
-                request.getRequestURI(),
-                SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
         // 9. 放行
         filterChain.doFilter(request, response);
     }
