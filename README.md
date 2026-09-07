@@ -113,6 +113,7 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 | `WX_GZH_APP_ID` / `WX_GZH_SECRET` | 微信公众号 AppID 与 AppSecret |
 | `WX_GZH_CALLBACK_BASE_URL` | 微信公众号授权回调基础地址 |
 | `MAIL_HOST` / `MAIL_PORT` / `MAIL_USERNAME` / `MAIL_PASSWORD` | SMTP 服务配置 |
+| `APP_CORS_ALLOWED_ORIGINS` | 后端 CORS 跨源白名单（逗号分隔的生产前端 origin，如 `https://app.example.com`）。缺失时回落本地开发端口，生产必须注入，否则跨源 WebSocket（小艾语音）/SSE 会被 `CorsFilter` 拒绝 |
 
 本地起服前请确保：
 

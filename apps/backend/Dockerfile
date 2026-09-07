@@ -38,7 +38,7 @@ USER app
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=60s \
-  CMD curl -fsS http://localhost:8080/actuator/health || exit 1
+  CMD curl -fsS http://localhost:8080/health || exit 1
 
 ENTRYPOINT ["java", \
   "-XX:+UseContainerSupport", \
