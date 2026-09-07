@@ -1,5 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@fontsource-variable/nunito";
+@import "../components/pouf/pouf.css";
 @plugin "@tailwindcss/typography";
 
 @custom-variant dark (&:is(.dark *));
@@ -387,5 +389,33 @@
     height: 3px;
     animation: portalCardParticleFloat 2s ease-in-out infinite;
     pointer-events: none;
+  }
+}
+
+/* ── reactbits-style Aurora: soft pastel gradient blobs (pouf login pilot) ── */
+@keyframes aurora-blob {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(3vw, -4vh) scale(1.14);
+  }
+  66% {
+    transform: translate(-2.5vw, 2.5vh) scale(0.94);
+  }
+}
+.aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(72px);
+  opacity: 0.62;
+  will-change: transform;
+  animation: aurora-blob 22s ease-in-out infinite;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .aurora-blob {
+    animation: none;
   }
 }

@@ -1,85 +1,61 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
+import type { FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Leaf, Mail, Send, User } from "lucide-react";
 import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+import { Button } from "@/components/pouf/Button";
+import { AuthShell, Field, Input, Segmented } from "./pouf-auth";
 import { api } from "@/lib/api";
 import { saveSession } from "@/lib/session";
 import { safeRedirect } from "@/lib/safe-redirect";
-import { PeekCharacters, W, H } from "./peek-characters";
+
+type LoginTab = "account" | "emailCode" | "emailPwd";
 
 export function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = safeRedirect(searchParams.get("redirect"), "/home");
 
-  const [tab, setTab] = useState("account");
+  const [tab, setTab] = useState<LoginTab>("account");
   const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
   const [codeCountdown, setCodeCountdown] = useState(0);
 
-  // Account login
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
 
-  // Peek character state
-  const [isTyping, setIsTyping] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const typingTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
-
-  const onPasswordChange = (value: string) => {
-    setPassword(value);
-    setIsTyping(true);
-    if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
-    typingTimerRef.current = setTimeout(() => setIsTyping(false), 1000);
-  };
-
-  const onPasswordFocus = () => setIsFocused(true);
-  const onPasswordBlur = () => setIsFocused(false);
-
-  // Email code login
-  const [emailCode, setEmailCode] = useState("");
   const [emailForCode, setEmailForCode] = useState("");
+  const [emailCode, setEmailCode] = useState("");
 
-  // Email password login
-  const [emailPwd, setEmailPwd] = useState("");
   const [passwordEmail, setPasswordEmail] = useState("");
+  const [emailPwd, setEmailPwd] = useState("");
 
-  const activePasswordLength =
-    tab === "account" ? password.length : tab === "emailPwd" ? passwordEmail.length : 0;
-
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [cardHeight, setCardHeight] = useState(0);
-
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => {
-      setCardHeight(entry.contentRect.height);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+  const timerRef = useRef<ReturnType<typeof setInterval>>(undefined);
 
   const startCountdown = useCallback(() => {
     setCodeCountdown(60);
-    const timer = setInterval(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
       setCodeCountdown((prev) => {
-        if (prev <= 1) { clearInterval(timer); return 0; }
+        if (prev <= 1) {
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
         return prev - 1;
       });
     }, 1000);
   }, []);
 
   const handleSendCode = async () => {
-    if (!emailForCode) { toast.warning("请先输入邮箱"); return; }
+    if (!emailForCode) {
+      toast.warning("请先输入邮箱");
+      return;
+    }
     try {
       await api.user.sendEmailCode(emailForCode, "login");
       toast.success("验证码已发送");
@@ -89,19 +65,28 @@ export function LoginPage() {
     }
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
       let result;
       if (tab === "account") {
-        if (!username || !password) { toast.warning("请填写账号和密码"); return; }
+        if (!username || !password) {
+          toast.warning("请填写账号和密码");
+          return;
+        }
         result = await api.user.loginByUsernamePassword(username, password, rememberMe);
       } else if (tab === "emailCode") {
-        if (!emailForCode || !emailCode) { toast.warning("请填写邮箱和验证码"); return; }
+        if (!emailForCode || !emailCode) {
+          toast.warning("请填写邮箱和验证码");
+          return;
+        }
         result = await api.user.loginByEmailCode(emailForCode, emailCode);
       } else {
-        if (!emailPwd || !passwordEmail) { toast.warning("请填写邮箱和密码"); return; }
+        if (!emailPwd || !passwordEmail) {
+          toast.warning("请填写邮箱和密码");
+          return;
+        }
         result = await api.user.loginByEmailPassword(emailPwd, passwordEmail, rememberMe);
       }
       saveSession(result.token, result.user);
@@ -114,111 +99,109 @@ export function LoginPage() {
     }
   };
 
-  const MAX_SCALE = 1.35;
-  const scale = cardHeight > 0 ? Math.min(cardHeight / H, MAX_SCALE) : 1;
-
   return (
-    <div className="flex items-end justify-center px-4">
-      {/* Peek characters — left side, bottom-aligned, all tabs */}
-      {cardHeight > 0 && (
-        <div
-          className="hidden xl:flex flex-col justify-end shrink-0"
-          style={{ width: Math.round(W * scale), height: cardHeight }}
-        >
-          <div style={{ transform: `scale(${scale})`, transformOrigin: "bottom left" }}>
-            <PeekCharacters
-              isTyping={isTyping}
-              showPassword={showPwd}
-              passwordLength={activePasswordLength}
-              isFocused={isFocused}
-            />
+    <AuthShell>
+      <div className="w-full max-w-md rounded-card bg-surface/75 p-7 sm:p-8 backdrop-blur-md cushion-card [animation:pouf-fade_360ms_ease]">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 inline-grid size-14 place-items-center rounded-full bg-mint tone-mint cushion-control">
+            <Leaf className="size-6 text-ink" />
           </div>
+          <h1 className="text-2xl font-black text-ink">登录心愈智联</h1>
+          <p className="mt-2 text-sm font-bold text-muted">青少年心理健康 AI 平台</p>
         </div>
-      )}
 
-      {/* Vertical divider */}
-      <div
-        className="hidden xl:block w-px shrink-0 bg-white/15"
-        style={{ height: cardHeight > 0 ? cardHeight : "auto", margin: "0 24px" }}
-      />
+        <form onSubmit={handleLogin} className="flex flex-col gap-5">
+          <Segmented
+            value={tab}
+            onChange={setTab}
+            options={[
+              { value: "account", label: "账号登录" },
+              { value: "emailCode", label: "邮箱验证码" },
+              { value: "emailPwd", label: "邮箱密码" },
+            ]}
+          />
 
-      <div ref={cardRef} className="shrink-0">
-        <Card className="w-full max-w-md animate-fadeIn">
-        <CardHeader className="text-center">
-          <CardTitle className="cosmic-gradient-text text-3xl font-bold">登录</CardTitle>
-          <CardDescription>青少年心理健康 AI 平台</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs value={tab} onValueChange={setTab}>
-            <TabsList className="mb-6 grid w-full grid-cols-3">
-              <TabsTrigger value="account">账号登录</TabsTrigger>
-              <TabsTrigger value="emailCode">邮箱验证码</TabsTrigger>
-              <TabsTrigger value="emailPwd">邮箱密码</TabsTrigger>
-            </TabsList>
-
-            <form onSubmit={handleLogin}>
-              {/* Account Login */}
-              <TabsContent value="account" className="space-y-4">
-                <Input placeholder="用户名" value={username} onChange={(e) => setUsername(e.target.value)} />
+          {tab === "account" ? (
+            <div className="flex flex-col gap-4">
+              <Field label="用户名">
                 <div className="relative">
-                  <Input
-                    type={showPwd ? "text" : "password"}
-                    placeholder="密码"
-                    value={password}
-                    onChange={(e) => onPasswordChange(e.target.value)}
-                    onFocus={onPasswordFocus}
-                    onBlur={onPasswordBlur}
-                  />
-                  <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-cosmic-dim hover:text-cosmic-gold" onClick={() => setShowPwd(!showPwd)}>
+                  <User className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                  <Input value={username} onChange={(e) => setUsername(e.target.value)} className="pl-11" placeholder="请输入用户名" autoComplete="username" />
+                </div>
+              </Field>
+              <Field label="密码">
+                <div className="relative">
+                  <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                  <Input type={showPwd ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="pl-11 pr-11" placeholder="请输入密码" autoComplete="current-password" />
+                  <button type="button" aria-label={showPwd ? "隐藏密码" : "显示密码"} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted transition-colors hover:text-ink" onClick={() => setShowPwd((v) => !v)}>
                     {showPwd ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
                 </div>
-                <div className="flex items-center justify-between text-sm">
-                  <label className="flex items-center gap-2 text-cosmic-muted cursor-pointer">
-                    <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="accent-cosmic-blue" />
-                    记住我
-                  </label>
-                  <Link href="/forgot-password" className="text-cosmic-sky hover:underline">忘记密码？</Link>
+              </Field>
+            </div>
+          ) : tab === "emailCode" ? (
+            <div className="flex flex-col gap-4">
+              <Field label="邮箱">
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                  <Input type="email" value={emailForCode} onChange={(e) => setEmailForCode(e.target.value)} className="pl-11" placeholder="请输入邮箱地址" autoComplete="email" />
                 </div>
-              </TabsContent>
-
-              {/* Email Code Login */}
-              <TabsContent value="emailCode" className="space-y-4">
-                <Input type="email" placeholder="邮箱" value={emailForCode} onChange={(e) => setEmailForCode(e.target.value)} />
-                <div className="flex gap-3">
-                  <Input placeholder="验证码" value={emailCode} onChange={(e) => setEmailCode(e.target.value)} className="flex-1" />
-                  <Button type="button" variant="outline" size="sm" disabled={codeCountdown > 0} onClick={handleSendCode}>
-                    {codeCountdown > 0 ? `${codeCountdown}s` : "发送验证码"}
+              </Field>
+              <Field label="验证码" hint={codeCountdown > 0 ? `${codeCountdown}秒后重发` : undefined}>
+                <div className="flex gap-2">
+                  <Input value={emailCode} onChange={(e) => setEmailCode(e.target.value)} className="min-w-0 flex-1" placeholder="6位验证码" maxLength={6} inputMode="numeric" />
+                  <Button type="button" variant="quiet" tone="info" onClick={handleSendCode} disabled={codeCountdown > 0}>
+                    {codeCountdown > 0 ? `${codeCountdown}秒` : <Send className="size-4" />}
                   </Button>
                 </div>
-              </TabsContent>
+              </Field>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <Field label="邮箱">
+                <div className="relative">
+                  <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                  <Input type="email" value={emailPwd} onChange={(e) => setEmailPwd(e.target.value)} className="pl-11" placeholder="请输入邮箱地址" autoComplete="email" />
+                </div>
+              </Field>
+              <Field label="密码">
+                <div className="relative">
+                  <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                  <Input type={showPwd ? "text" : "password"} value={passwordEmail} onChange={(e) => setPasswordEmail(e.target.value)} className="pl-11 pr-11" placeholder="请输入密码" autoComplete="current-password" />
+                  <button type="button" aria-label={showPwd ? "隐藏密码" : "显示密码"} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted transition-colors hover:text-ink" onClick={() => setShowPwd((v) => !v)}>
+                    {showPwd ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </button>
+                </div>
+              </Field>
+            </div>
+          )}
 
-              {/* Email Password Login */}
-              <TabsContent value="emailPwd" className="space-y-4">
-                <Input type="email" placeholder="邮箱" value={emailPwd} onChange={(e) => setEmailPwd(e.target.value)} />
-                <Input
-                  type="password"
-                  placeholder="密码"
-                  value={passwordEmail}
-                  onChange={(e) => { setPasswordEmail(e.target.value); setIsTyping(true); if (typingTimerRef.current) clearTimeout(typingTimerRef.current); typingTimerRef.current = setTimeout(() => setIsTyping(false), 1000); }}
-                  onFocus={onPasswordFocus}
-                  onBlur={onPasswordBlur}
-                />
-              </TabsContent>
+          {tab === "account" || tab === "emailPwd" ? (
+            <label className="flex items-center justify-between gap-3 rounded-control bg-bg px-4 py-3 text-sm">
+              <span className="font-bold text-ink">记住我</span>
+              <input type="checkbox" checked={rememberMe} onChange={(e) => setRememberMe(e.target.checked)} className="size-5 accent-mint" />
+            </label>
+          ) : null}
 
-              <Button type="submit" variant="primary" className="mt-6 w-full" disabled={loading}>
-                {loading ? "登录中..." : "登 录"}
-              </Button>
-            </form>
-          </Tabs>
+          <Button tone="mint" variant="solid" size="lg" block type="submit" loading={loading}>
+            登录
+          </Button>
+        </form>
 
-          <p className="mt-6 text-center text-sm text-cosmic-muted">
+        <div className="mt-6 space-y-3 text-center text-sm font-bold text-muted">
+          <p>
             还没有账号？
-            <Link href="/register" className="ml-1 text-cosmic-sky hover:underline">立即注册</Link>
+            <Link href="/register" className="ml-1 transition-colors hover:text-ink">
+              立即注册
+            </Link>
           </p>
-        </CardContent>
-      </Card>
+          <p>
+            <Link href="/forgot-password" className="transition-colors hover:text-ink">
+              忘记密码？
+            </Link>
+          </p>
+        </div>
       </div>
-    </div>
+    </AuthShell>
   );
 }

@@ -1,5 +1,5 @@
-import { AppShell } from "@/components/cosmic/app-shell";
+import { ShellRouter } from "@/components/shell/shell-router";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  return <AppShell>{children}</AppShell>;
+  return <ShellRouter>{children}</ShellRouter>;
 }

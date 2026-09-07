@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Leaf, Mail, Send, Smartphone, User } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+
+import { Button } from "@/components/pouf/Button";
+import { AuthShell, Field, Input } from "./pouf-auth";
 import { api } from "@/lib/api";
 
 function getPasswordStrength(pwd: string): { score: number; label: string; color: string } {
@@ -19,9 +19,9 @@ function getPasswordStrength(pwd: string): { score: number; label: string; color
   if (/[^a-zA-Z\d]/.test(pwd)) score++;
   if (pwd.length >= 12) score++;
 
-  if (score <= 1) return { score: 25, label: "弱", color: "bg-red-500" };
-  if (score <= 3) return { score: 60, label: "中", color: "bg-orange-500" };
-  return { score: 100, label: "强", color: "bg-green-500" };
+  if (score <= 1) return { score: 25, label: "弱", color: "bg-pink" };
+  if (score <= 3) return { score: 60, label: "中", color: "bg-yellow" };
+  return { score: 100, label: "强", color: "bg-mint" };
 }
 
 export function RegisterPage() {
@@ -40,14 +40,20 @@ export function RegisterPage() {
   const pwdStrength = getPasswordStrength(password);
 
   const handleSendCode = async () => {
-    if (!email) { toast.warning("请先输入邮箱"); return; }
+    if (!email) {
+      toast.warning("请先输入邮箱");
+      return;
+    }
     try {
       await api.user.sendEmailCode(email, "register");
       toast.success("验证码已发送");
       setCodeCountdown(60);
       const timer = setInterval(() => {
         setCodeCountdown((prev) => {
-          if (prev <= 1) { clearInterval(timer); return 0; }
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
           return prev - 1;
         });
       }, 1000);
@@ -56,10 +62,16 @@ export function RegisterPage() {
     }
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: FormEvent) => {
     e.preventDefault();
-    if (!username || !password || !email || !code) { toast.warning("请填写必填项"); return; }
-    if (!agreed) { toast.warning("请阅读并同意隐私政策"); return; }
+    if (!username || !password || !email || !code) {
+      toast.warning("请填写必填项");
+      return;
+    }
+    if (!agreed) {
+      toast.warning("请阅读并同意隐私政策");
+      return;
+    }
     setLoading(true);
     try {
       await api.user.registerWithEmail({ username, password, email, code, ...(phone ? { phone } : {}) });
@@ -73,64 +85,87 @@ export function RegisterPage() {
   };
 
   return (
-    <Card className="w-full max-w-md animate-fadeIn">
-      <CardHeader className="text-center">
-        <CardTitle className="cosmic-gradient-text text-3xl font-bold">注册</CardTitle>
-        <CardDescription>加入心愈智联，开启心理健康之旅</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleRegister} className="space-y-4">
-          <div>
-            <Input placeholder="用户名 *" value={username} onChange={(e) => setUsername(e.target.value)} maxLength={20} />
-            <p className="mt-1 text-xs text-cosmic-dim">4-16 位字母、数字、下划线、减号</p>
-            <span className="text-right text-xs text-cosmic-dim block">{username.length}/20</span>
+    <AuthShell>
+      <div className="w-full max-w-md rounded-card bg-surface/75 p-7 sm:p-8 backdrop-blur-md cushion-card [animation:pouf-fade_360ms_ease]">
+        <div className="mb-6 text-center">
+          <div className="mx-auto mb-3 inline-grid size-14 place-items-center rounded-full bg-mint tone-mint cushion-control">
+            <Leaf className="size-6 text-ink" />
           </div>
+          <h1 className="text-2xl font-black text-ink">注册心愈智联</h1>
+          <p className="mt-2 text-sm font-bold text-muted">加入我们，开启心理健康之旅</p>
+        </div>
 
-          <div>
+        <form onSubmit={handleRegister} className="flex flex-col gap-4">
+          <Field label="用户名" hint={`${username.length}/20`}>
             <div className="relative">
-              <Input type={showPwd ? "text" : "password"} placeholder="密码 *" value={password} onChange={(e) => setPassword(e.target.value)} />
-              <button type="button" className="absolute right-3 top-1/2 -translate-y-1/2 text-cosmic-dim hover:text-cosmic-gold" onClick={() => setShowPwd(!showPwd)}>
+              <User className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+              <Input value={username} onChange={(e) => setUsername(e.target.value)} className="pl-11" placeholder="用户名 *" maxLength={20} autoComplete="username" />
+            </div>
+            <p className="mt-2 text-xs font-bold text-muted">4-16 位字母、数字、下划线、减号</p>
+          </Field>
+
+          <Field label="密码">
+            <div className="relative">
+              <KeyRound className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+              <Input type={showPwd ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} className="pl-11 pr-11" placeholder="密码 *" autoComplete="new-password" />
+              <button type="button" aria-label={showPwd ? "隐藏密码" : "显示密码"} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted transition-colors hover:text-ink" onClick={() => setShowPwd((v) => !v)}>
                 {showPwd ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
               </button>
             </div>
             {password && (
-              <div className="mt-2 space-y-1">
-                <Progress value={pwdStrength.score} className="h-1.5" />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-cosmic-dim">8-16 位，必须包含大小写字母和数字</span>
-                  <span className="text-xs text-cosmic-muted">密码强度：{pwdStrength.label}</span>
+              <div className="mt-2 flex items-center gap-2">
+                <div className="h-2 flex-1 overflow-hidden rounded-full bg-bg">
+                  <div className={`h-full rounded-full transition-all ${pwdStrength.color}`} style={{ width: `${pwdStrength.score}%` }} />
                 </div>
+                <span className="text-xs font-bold text-muted">强度：{pwdStrength.label}</span>
               </div>
             )}
-          </div>
+            <p className="mt-2 text-xs font-bold text-muted">8-16 位，必须包含大小写字母和数字</p>
+          </Field>
 
-          <div className="flex gap-3">
-            <Input type="email" placeholder="邮箱 *" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1" />
-            <Button type="button" variant="outline" size="sm" disabled={codeCountdown > 0} onClick={handleSendCode} className="shrink-0">
-              {codeCountdown > 0 ? `${codeCountdown}s` : "发送验证码"}
-            </Button>
-          </div>
-          <p className="text-xs text-cosmic-dim">请输入有效的邮箱地址，用于接收验证码</p>
+          <Field label="邮箱">
+            <div className="flex gap-2">
+              <div className="relative min-w-0 flex-1">
+                <Mail className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="pl-11" placeholder="邮箱 *" autoComplete="email" />
+              </div>
+              <Button type="button" variant="quiet" tone="info" onClick={handleSendCode} disabled={codeCountdown > 0}>
+                {codeCountdown > 0 ? `${codeCountdown}秒` : <Send className="size-4" />}
+              </Button>
+            </div>
+          </Field>
 
-          <Input placeholder="验证码 *" value={code} onChange={(e) => setCode(e.target.value)} />
-          <Input placeholder="手机号（选填）" value={phone} onChange={(e) => setPhone(e.target.value)} />
+          <Field label="验证码">
+            <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="请输入验证码 *" maxLength={6} inputMode="numeric" />
+          </Field>
 
-          <label className="flex items-center gap-2 text-sm text-cosmic-muted cursor-pointer">
-            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="accent-cosmic-blue" />
+          <Field label="手机号（选填）">
+            <div className="relative">
+              <Smartphone className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted" />
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} className="pl-11" placeholder="请输入手机号" autoComplete="tel" />
+            </div>
+          </Field>
+
+          <label className="flex items-center gap-2 rounded-control bg-bg px-4 py-3 text-sm font-bold text-ink">
+            <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="size-5 accent-mint" />
             我已阅读并同意
-            <span className="text-cosmic-sky cursor-pointer hover:underline">《隐私政策》</span>
+            <Link href="/privacy" className="transition-colors hover:text-ink">
+              《隐私政策》
+            </Link>
           </label>
 
-          <Button type="submit" variant="primary" className="w-full" disabled={loading}>
-            {loading ? "注册中..." : "注 册"}
+          <Button tone="mint" variant="solid" size="lg" block type="submit" loading={loading}>
+            注册
           </Button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-cosmic-muted">
+        <p className="mt-6 text-center text-sm font-bold text-muted">
           已有账号？
-          <Link href="/login" className="ml-1 text-cosmic-sky hover:underline">立即登录</Link>
+          <Link href="/login" className="ml-1 transition-colors hover:text-ink">
+            立即登录
+          </Link>
         </p>
-      </CardContent>
-    </Card>
+      </div>
+    </AuthShell>
   );
 }

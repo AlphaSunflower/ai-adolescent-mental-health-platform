@@ -16,10 +16,8 @@
 | `apps/backend` | `@ai-adolescent-mental-health/backend` | Spring Boot 3.5.9 / Java 17 / Maven Wrapper | 有（`mvnw`） |
 | `apps/web-client` | `@ai-adolescent-mental-health/web-client` | Next.js 16 / React 19 / Tailwind CSS 4 | 有（`next`） |
 | `apps/admin-portal` | `@ai-adolescent-mental-health/admin-portal` | Next.js 16 / React 19 / TypeScript | 有（`next`） |
-| `apps/web-admin` | `@ai-adolescent-mental-health/web-admin` | Vue 3 / Vite 8 beta / TS 5.9 | 有（`vite`）；旧版用户端 + 管理端 |
-| `apps/android` | `@ai-adolescent-mental-health/android` | Kotlin / Gradle Wrapper / AGP 8.12 | 有（`gradlew`） |
-| `apps/wechat-miniapp` | `@ai-adolescent-mental-health/wechat-miniapp` | 原生微信小程序 | 无（使用微信开发者工具） |
-| `apps/wechat-functions` | `@ai-adolescent-mental-health/wechat-functions` | Node.js + `wx-server-sdk@~2.4.0` | 无（Serverless） |
+| `apps/mobile` | `@ai-adolescent-mental-health/mobile` | 规划中 / 待填充（已定 uniapp） | 待填充 |
+| `apps/parent-portal` | `@ai-adolescent-mental-health/parent-portal` | 规划中 / 待填充 | 待填充 |
 
 工作区通配：见 [pnpm-workspace.yaml](pnpm-workspace.yaml)（`apps/*`）。
 共享 SQL：`infra/sql/`。
@@ -38,11 +36,8 @@ pnpm clean          # turbo run clean + 清理 .turbo
 pnpm dev:backend           # 只起后端
 pnpm dev:web-client        # 只起当前 Web 用户端（web-client）
 pnpm --filter @ai-adolescent-mental-health/admin-portal dev
-pnpm dev:web-admin         # 只起旧版 Vue 用户端 + 管理端
 pnpm test:backend          # 只跑后端测试
-pnpm test:android          # 只跑 Android 测试
 pnpm --filter @ai-adolescent-mental-health/admin-portal typecheck
-pnpm typecheck:web-admin   # 只跑旧版 Vue 用户端 + 管理端类型检查
 ```
 
 精确过滤（替代记忆 shortcut）：
@@ -101,9 +96,7 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 | --- | --- |
 | `apps/web-client` | `pnpm --filter @ai-adolescent-mental-health/web-client typecheck` |
 | `apps/admin-portal` | `pnpm --filter @ai-adolescent-mental-health/admin-portal typecheck` |
-| `apps/web-admin`（旧版用户端 + 管理端） | `pnpm typecheck:web-admin` |
 | 后端代码或 SQL | `pnpm test:backend` |
-| Android 代码 | `pnpm test:android` |
 | 跨多个工作区 | `pnpm typecheck && pnpm test` |
 | 数据库 schema | 同步更新 `infra/sql/` 脚本并在 PR 说明 |
 
@@ -114,7 +107,3 @@ Turbo 任务管线（来源：[turbo.json](turbo.json)）：
 - [apps/backend/AGENTS.md](apps/backend/AGENTS.md)
 - [apps/web-client/AGENTS.md](apps/web-client/AGENTS.md)
 - [apps/admin-portal/AGENTS.md](apps/admin-portal/AGENTS.md)
-- [apps/web-admin/AGENTS.md](apps/web-admin/AGENTS.md)
-- [apps/android/AGENTS.md](apps/android/AGENTS.md)
-- [apps/wechat-miniapp/AGENTS.md](apps/wechat-miniapp/AGENTS.md)
-- [apps/wechat-functions/AGENTS.md](apps/wechat-functions/AGENTS.md)
