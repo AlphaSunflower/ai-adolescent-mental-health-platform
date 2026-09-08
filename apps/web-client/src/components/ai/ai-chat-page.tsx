@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Bot, Send, Plus, Menu, X, Trash2, ChevronDown, ChevronUp, Brain } from "lucide-react";
+import { Bot, Send, Plus, Menu, Trash2, ChevronDown, ChevronUp, Brain } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -177,29 +177,32 @@ export function AiChatPage() {
   };
 
   return (
-    <div className="relative flex h-[calc(100dvh-9rem)]">
-      {/* Mobile sidebar toggle */}
-      <button
-        type="button"
-        className="fixed left-4 top-20 z-30 rounded-control border border-[rgba(201,168,255,0.3)] bg-surface/90 p-3 backdrop-blur-md text-ink lg:hidden"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        {sidebarOpen ? <X className="size-5 text-muted" /> : <Menu className="size-5 text-muted" />}
-      </button>
+    <div className="relative flex h-full min-h-0">
+      {/* Mobile sidebar toggle (hidden once the drawer is open) */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          className="absolute left-4 top-4 z-30 rounded-control border border-[rgba(201,168,255,0.3)] bg-surface/90 p-2.5 text-ink backdrop-blur-md lg:hidden"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu className="size-5 text-muted" />
+        </button>
+      )}
 
-      {/* Overlay */}
+      {/* Overlay (mobile drawer) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-[rgba(58,46,92,0.35)] backdrop-blur-[2px] lg:hidden"
+          className="fixed inset-0 z-30 bg-[rgba(58,46,92,0.35)] backdrop-blur-[2px] lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Session Sidebar */}
+      {/* Session Sidebar: in-flow on desktop, drawer above the nav on mobile */}
       <aside
-        className={`fixed inset-y-0 left-0 z-20 w-64 transform border-r border-[rgba(201,168,255,0.3)] bg-surface/90 backdrop-blur-md transition-transform lg:relative lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`flex h-full w-72 flex-col overflow-hidden border-r border-[rgba(201,168,255,0.3)] bg-surface/95 backdrop-blur-md
+          fixed inset-y-0 left-0 z-40 transform transition-transform lg:static lg:h-full lg:z-auto lg:w-64 lg:translate-x-0 lg:bg-surface ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="flex h-full flex-col">
           <div className="flex items-center justify-between border-b border-[rgba(201,168,255,0.3)] p-4">
@@ -240,7 +243,7 @@ export function AiChatPage() {
       </aside>
 
       {/* Chat Area */}
-      <main className="flex flex-1 flex-col">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         {activeSessionId === null ? (
           <div className="flex flex-1 items-center justify-center">
             <div className="text-center">
@@ -256,7 +259,7 @@ export function AiChatPage() {
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto px-4 py-6">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
               {loadingMessages ? (
                 <div className="mx-auto max-w-3xl space-y-4">
                   {Array.from({ length: 4 }).map((_, i) => (
@@ -348,7 +351,7 @@ export function AiChatPage() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-[rgba(201,168,255,0.3)] bg-bg/60 p-4">
+            <div className="shrink-0 border-t border-[rgba(201,168,255,0.3)] bg-bg/60 p-4">
               <div className="mx-auto flex max-w-3xl gap-3">
                 <input
                   ref={inputRef}
