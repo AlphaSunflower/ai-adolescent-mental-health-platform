@@ -1,5 +1,5 @@
-import { ShellRouter } from "@/components/shell/shell-router";
+import { PoufAppShell } from "@/components/pouf-shell/pouf-app-shell";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
-  return <ShellRouter>{children}</ShellRouter>;
+  return <PoufAppShell>{children}</PoufAppShell>;
 }

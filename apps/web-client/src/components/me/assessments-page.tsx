@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
+import { Dialog, DialogContent, DialogTitle } from "@/components/pouf/Dialog";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 
@@ -57,16 +58,16 @@ export function AssessmentsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">我的测评记录</h1>
+      <h1 className="mb-6 text-xl font-black text-ink">我的测评记录</h1>
 
       {records.length === 0 ? (
-        <div className="py-20 text-center text-cosmic-muted">暂无测评记录</div>
+        <div className="py-20 text-center text-muted">暂无测评记录</div>
       ) : (
         <>
-          <div className="cosmic-card overflow-hidden">
+          <Card className="overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/5 text-left text-cosmic-dim">
+                <tr className="border-b border-purple/10 text-left text-muted/70">
                   <th className="px-4 py-3 font-medium">测评量表</th>
                   <th className="px-4 py-3 font-medium">测评时间</th>
                   <th className="px-4 py-3 font-medium">得分</th>
@@ -75,26 +76,26 @@ export function AssessmentsPage() {
               </thead>
               <tbody>
                 {records.map((r) => (
-                  <tr key={r.id} className="border-b border-white/5 last:border-0">
-                    <td className="px-4 py-3 text-white">{r.title}</td>
-                    <td className="px-4 py-3 text-cosmic-dim">{r.createTime}</td>
+                  <tr key={r.id} className="border-b border-purple/10 last:border-0">
+                    <td className="px-4 py-3 text-ink">{r.title}</td>
+                    <td className="px-4 py-3 text-muted/70">{r.createTime}</td>
                     <td className="px-4 py-3">
                       <Badge variant="success" className="text-xs">{r.score}</Badge>
                     </td>
                     <td className="px-4 py-3">
-                      <Button variant="ghost" size="xs" onClick={() => viewDetail(r.id)}>查看详情</Button>
+                      <Button variant="quiet" size="sm" onClick={() => viewDetail(r.id)}>查看详情</Button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
 
           {total > 20 && (
             <div className="mt-4 flex justify-center gap-2">
-              <Button variant="ghost" size="icon-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
-              <span className="self-center text-sm text-cosmic-dim">{page} / {Math.ceil(total / 20)}</span>
-              <Button variant="ghost" size="icon-sm" disabled={page * 20 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
+              <Button variant="quiet" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
+              <span className="self-center text-sm text-muted/70">{page} / {Math.ceil(total / 20)}</span>
+              <Button variant="quiet" size="sm" disabled={page * 20 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
             </div>
           )}
         </>
@@ -111,18 +112,18 @@ export function AssessmentsPage() {
             </div>
           ) : detail ? (
             <div className="space-y-4">
-              <h3 className="text-center text-lg font-bold text-white">
+              <h3 className="text-center text-lg font-black text-ink">
                 {(detail.templateTitle ?? detail.title) as string}
               </h3>
-              <div className="flex justify-between rounded-lg bg-white/5 px-4 py-3 text-sm">
-                <span className="text-cosmic-dim">测评时间：{(detail.record as Record<string, unknown>)?.createTime as string ?? detail.createTime as string}</span>
-                <span className="text-cosmic-dim">
-                  总得分：<strong className="text-cosmic-gold text-lg">{(detail.record as Record<string, unknown>)?.resultScore as number ?? detail.score as number}</strong>
+              <div className="flex justify-between rounded-control bg-purple/10 px-4 py-3 text-sm">
+                <span className="text-muted/70">测评时间：{(detail.record as Record<string, unknown>)?.createTime as string ?? detail.createTime as string}</span>
+                <span className="text-muted/70">
+                  总得分：<strong className="text-yellow text-lg">{(detail.record as Record<string, unknown>)?.resultScore as number ?? detail.score as number}</strong>
                 </span>
               </div>
-              <div className="rounded-lg border-l-4 border-cosmic-blue/50 bg-cosmic-blue/5 p-4">
-                <h4 className="mb-2 font-medium text-cosmic-sky">结果分析</h4>
-                <p className="text-sm leading-relaxed text-cosmic-muted">
+              <div className="rounded-control border-l-4 border-purple/50 bg-purple/5 p-4">
+                <h4 className="mb-2 font-bold text-purple">结果分析</h4>
+                <p className="text-sm leading-relaxed text-muted">
                   {(detail.record as Record<string, unknown>)?.resultAnalysis as string ?? detail.result as string ?? "暂无分析"}
                 </p>
               </div>

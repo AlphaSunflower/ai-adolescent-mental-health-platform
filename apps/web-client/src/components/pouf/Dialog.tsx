@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { Button } from "./button";
+import { Button } from "./Button";
+import { IconButton } from "./Button";
 import { X } from "lucide-react";
 
 type DialogContextValue = {
@@ -15,6 +16,10 @@ const DialogContext = React.createContext<DialogContextValue>({
   setOpen: () => {},
 });
 
+/** Pouf modal — a centred clay card over a frosted backdrop, driven by the same
+ *  controlled/uncontrolled context API the cosmic ui/dialog uses, but styled
+ *  with the pouf overlay/dialog chrome (the .pouf-dialog cushion + blur, with a
+ *  full-screen sheet fallback under 900px from pouf.css). */
 function Dialog({
   children,
   defaultOpen = false,
@@ -53,7 +58,8 @@ function DialogOverlay({ className }: { className?: string }) {
   if (!open) return null;
   return (
     <div
-      className={cn("fixed inset-0 z-40 bg-black/60 backdrop-blur-sm animate-fadeIn", className)}
+      className={cn("pouf-overlay", className)}
+      data-state="open"
       onClick={() => setOpen(false)}
     />
   );
@@ -73,66 +79,52 @@ function DialogContent({
   return (
     <>
       <DialogOverlay />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div
-          className={cn(
-            "cosmic-dialog relative w-full max-w-lg animate-fadeInUp",
-            className
-          )}
-        >
-          {showClose && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="absolute right-3 top-3 text-cosmic-muted hover:text-white"
+      <div
+        className={cn("pouf-dialog", className)}
+        data-state="open"
+        role="dialog"
+        aria-modal="true"
+      >
+        {showClose && (
+          <div className="pouf-dialog__head">
+            <span />
+            <IconButton
+              icon={<X />}
+              label="关闭"
+              size="sm"
+              variant="quiet"
               onClick={() => setOpen(false)}
-            >
-              <X />
-            </Button>
-          )}
-          {children}
-        </div>
+            />
+          </div>
+        )}
+        <div className="pouf-dialog__body">{children}</div>
       </div>
     </>
   );
 }
 
 function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-6 pt-6", className)} {...props} />;
+  return <div className={cn("pouf-stack", className)} {...props} />;
 }
 
 function DialogTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={cn("text-lg font-semibold text-cosmic-gold", className)} {...props} />;
+  return <h2 className={cn("text-lg font-black text-ink", className)} {...props} />;
 }
 
 function DialogDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("mt-2 text-sm text-cosmic-muted", className)} {...props} />;
+  return <p className={cn("mt-1 text-[15px] font-bold text-muted", className)} {...props} />;
 }
 
 function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("flex justify-end gap-3 border-t border-white/10 px-6 py-4", className)} {...props} />;
+  return (
+    <div className={cn("flex justify-end gap-2 pt-4", className)} {...props} />
+  );
 }
 
-function DialogClose({
-  className,
-  children,
-  asChild,
-}: {
-  className?: string;
-  children?: React.ReactNode;
-  asChild?: boolean;
-}) {
+function DialogClose({ children }: { children?: React.ReactNode }) {
   const { setOpen } = useDialog();
-  if (asChild && React.isValidElement(children)) {
-    return React.cloneElement(children as React.ReactElement<{ onClick?: React.MouseEventHandler }>, {
-      onClick: (e: React.MouseEvent) => {
-        (children as React.ReactElement<{ onClick?: React.MouseEventHandler }>).props.onClick?.(e);
-        setOpen(false);
-      },
-    });
-  }
   return (
-    <Button variant="outline" size="sm" className={className} onClick={() => setOpen(false)}>
+    <Button size="sm" variant="quiet" onClick={() => setOpen(false)}>
       {children ?? "取消"}
     </Button>
   );

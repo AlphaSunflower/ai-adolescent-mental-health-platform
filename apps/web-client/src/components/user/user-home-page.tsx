@@ -5,8 +5,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User, FileText, Users, Heart } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { LibraryItem } from "@/lib/types";
 
@@ -68,11 +69,11 @@ export function UserHomePage() {
     return (
       <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
         <Skeleton className="mb-4 h-5 w-24" />
-        <div className="cosmic-card mb-8 p-6">
+        <Card className="mb-8 p-6">
           <Skeleton className="mb-3 size-20 rounded-full" />
           <Skeleton className="mb-2 h-6 w-32" />
           <Skeleton className="h-4 w-48" />
-        </div>
+        </Card>
       </div>
     );
   }
@@ -80,8 +81,8 @@ export function UserHomePage() {
   if (!profile) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
-        <p className="text-lg text-cosmic-muted">用户不存在</p>
-        <Link href="/" className="mt-4 inline-block text-cosmic-sky hover:underline">
+        <p className="text-lg text-muted">用户不存在</p>
+        <Link href="/" className="mt-4 inline-block text-blue hover:underline">
           返回首页
         </Link>
       </div>
@@ -95,93 +96,93 @@ export function UserHomePage() {
     <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-blue transition-colors"
       >
         <ArrowLeft className="size-4" />
         返回首页
       </Link>
 
       {/* Profile Header */}
-      <div className="cosmic-card mb-8 p-6">
+      <Card className="mb-8 p-6">
         <div className="flex items-start gap-5">
-          <div className="size-20 rounded-full bg-cosmic-blue/20 flex items-center justify-center">
+          <div className="size-20 rounded-full bg-purple/20 flex items-center justify-center">
             {profile.headPath ? (
               <img src={profile.headPath} alt="" className="size-20 rounded-full object-cover" />
             ) : (
-              <User className="size-10 text-cosmic-sky" />
+              <User className="size-10 text-blue" />
             )}
           </div>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-white">{profile.nickname}</h1>
+            <h1 className="text-xl font-black text-ink">{profile.nickname}</h1>
             {profile.signature && (
-              <p className="mt-1 text-sm text-cosmic-muted">{profile.signature}</p>
+              <p className="mt-1 text-sm text-muted">{profile.signature}</p>
             )}
             <div className="mt-3 flex gap-6 text-sm">
-              <span className="text-cosmic-muted">
-                <span className="font-semibold text-white">{stats.articleCount}</span> 文章
+              <span className="text-muted">
+                <span className="font-black text-ink">{stats.articleCount}</span> 文章
               </span>
               {canViewFollow ? (
                 <Link
                   href={`/user/${userId}/follow`}
-                  className="text-cosmic-muted hover:text-cosmic-sky transition-colors"
+                  className="text-muted hover:text-blue transition-colors"
                 >
-                  <span className="font-semibold text-white">{stats.followCount}</span> 关注
+                  <span className="font-black text-ink">{stats.followCount}</span> 关注
                 </Link>
               ) : (
-                <span className="text-cosmic-muted">
-                  <span className="font-semibold text-white">{stats.followCount}</span> 关注
+                <span className="text-muted">
+                  <span className="font-black text-ink">{stats.followCount}</span> 关注
                 </span>
               )}
               {canViewFollow ? (
                 <Link
                   href={`/user/${userId}/follow`}
-                  className="text-cosmic-muted hover:text-cosmic-sky transition-colors"
+                  className="text-muted hover:text-blue transition-colors"
                 >
-                  <span className="font-semibold text-white">{stats.fanCount}</span> 粉丝
+                  <span className="font-black text-ink">{stats.fanCount}</span> 粉丝
                 </Link>
               ) : (
-                <span className="text-cosmic-muted">
-                  <span className="font-semibold text-white">{stats.fanCount}</span> 粉丝
+                <span className="text-muted">
+                  <span className="font-black text-ink">{stats.fanCount}</span> 粉丝
                 </span>
               )}
-              <span className="text-cosmic-muted">
-                <span className="font-semibold text-white">{stats.likeCount}</span> 获赞
+              <span className="text-muted">
+                <span className="font-black text-ink">{stats.likeCount}</span> 获赞
               </span>
             </div>
           </div>
           <Button
-            variant={profile.isFollowing ? "outline" : "primary"}
+            tone="purple"
+            variant={profile.isFollowing ? "quiet" : "solid"}
             size="sm"
             onClick={handleFollow}
-            className="gap-1"
           >
             <Heart className={`size-4 ${profile.isFollowing ? "fill-current" : ""}`} />
             {profile.isFollowing ? "已关注" : "关注"}
           </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Articles */}
-      <h2 className="cosmic-page-title mb-4 text-lg">发布的文章</h2>
+      <h2 className="mb-4 text-2xl font-black text-ink">发布的文章</h2>
       {articles.length === 0 ? (
-        <div className="cosmic-card p-12 text-center">
-          <FileText className="mx-auto mb-3 size-10 text-cosmic-dim opacity-40" />
-          <p className="text-cosmic-muted">暂无文章</p>
-        </div>
+        <Card className="p-12 text-center">
+          <FileText className="mx-auto mb-3 size-10 text-muted opacity-40" />
+          <p className="text-muted">暂无文章</p>
+        </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {articles.map((item) => (
             <Link key={item.id} href={`/user/${userId}/article/${item.id}`}>
-              <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-1">
+              <Card className="group cursor-pointer p-4 transition-all hover:-translate-y-1">
                 {item.coverUrl && (
                   <img src={item.coverUrl} alt="" className="mb-3 w-full h-32 object-cover rounded-lg" />
                 )}
-                <span className="cosmic-tag mb-2 inline-block text-xs">{item.tag}</span>
-                <h3 className="mb-1 font-semibold text-white group-hover:text-cosmic-nav-hover transition-colors">
+                <span className="mb-2 inline-block rounded-control bg-purple/10 px-2 py-0.5 text-xs font-bold text-ink">{item.tag}</span>
+                <h3 className="mb-1 font-bold text-ink group-hover:text-purple transition-colors">
                   {item.title}
                 </h3>
-                <p className="line-clamp-2 text-sm text-cosmic-muted">{item.summary}</p>
-              </div>
+                <p className="line-clamp-2 text-sm text-muted">{item.summary}</p>
+              </Card>
             </Link>
           ))}
         </div>

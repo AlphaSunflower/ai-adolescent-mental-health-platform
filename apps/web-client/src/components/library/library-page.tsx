@@ -7,9 +7,11 @@ import {
   BookOpen, Eye, Clock, Search, ChevronLeft, ChevronRight,
   LayoutGrid, Smile, GraduationCap, MessageCircle,
 } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Button, IconButton } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Card } from "@/components/pouf/Card";
+import { Input } from "@/components/pouf/Input";
 import { api } from "@/lib/api";
 import type { LibraryItem, LibraryItemType } from "@/lib/types";
 
@@ -118,10 +120,10 @@ export function LibraryPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
-      <h1 className="cosmic-page-title mb-8 text-2xl">内容馆</h1>
+      <h1 className="mb-8 text-2xl font-black text-ink">内容馆</h1>
 
       <div className="flex flex-col gap-6 md:flex-row">
-        {/* Mobile filter tabs — horizontal scroll */}
+        {/* Mobile filter tabs - horizontal scroll */}
         <div className="md:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide">
           <nav className="flex gap-2 pb-2">
             {SIDEBAR_ITEMS.map((item) => {
@@ -133,8 +135,8 @@ export function LibraryPage() {
                   onClick={() => handleNavClick(item.value)}
                   className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm transition-colors whitespace-nowrap ${
                     isActive
-                      ? "bg-cosmic-blue/30 text-cosmic-sky border border-cosmic-sky/30"
-                      : "bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10"
+                      ? "bg-purple/20 text-blue border border-blue/30"
+                      : "bg-purple/10 text-muted border border-[rgba(201,168,255,0.3)] hover:bg-purple/15"
                   }`}
                 >
                   <item.icon className="size-3.5 shrink-0" />
@@ -147,7 +149,7 @@ export function LibraryPage() {
 
         {/* Desktop Sidebar */}
         <aside className="hidden md:block w-[180px] shrink-0">
-          <nav className="cosmic-card sticky top-24 py-2">
+          <nav className="cushion-card rounded-card bg-surface/85 sticky top-24 py-2">
             {SIDEBAR_ITEMS.map((item) => {
               const isActive = tab === item.value;
               return (
@@ -157,8 +159,8 @@ export function LibraryPage() {
                   onClick={() => handleNavClick(item.value)}
                   className={`flex items-center gap-3 w-full px-4 py-3 text-sm transition-colors text-left ${
                     isActive
-                      ? "bg-cosmic-blue/15 text-cosmic-sky border-r-2 border-cosmic-sky"
-                      : "text-cosmic-muted hover:bg-white/5 hover:text-white"
+                      ? "bg-purple/10 text-blue border-r-2 border-blue"
+                      : "text-muted hover:bg-purple/10 hover:text-ink"
                   }`}
                 >
                   <item.icon className="size-4 shrink-0" />
@@ -175,22 +177,22 @@ export function LibraryPage() {
           {isBookTab && (
             <form onSubmit={handleSearch} className="mb-6 flex gap-2">
               <div className="flex flex-1 max-w-md">
-                <input
+                <Input
                   type="text"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="搜索书籍..."
-                  className="cosmic-input flex-1 rounded-lg rounded-r-none bg-white/10 px-4 py-2 text-sm"
+                  className="flex-1 rounded-r-none"
                 />
                 <button
                   type="submit"
-                  className="flex items-center justify-center rounded-lg rounded-l-none bg-cosmic-blue/60 px-4 text-white hover:bg-cosmic-blue/80 transition-colors"
+                  className="flex h-11 items-center justify-center rounded-control rounded-l-none bg-purple/60 px-4 text-ink transition-colors hover:bg-purple/80"
                 >
                   <Search className="size-4" />
                 </button>
               </div>
               {keyword && (
-                <Button variant="ghost" size="sm" onClick={handleClearSearch}>
+                <Button tone="purple" variant="quiet" size="sm" onClick={handleClearSearch}>
                   清除
                 </Button>
               )}
@@ -200,17 +202,17 @@ export function LibraryPage() {
           {loading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="cosmic-card p-5">
+                <Card key={i} className="p-5">
                   <Skeleton className="mb-3 h-5 w-20" />
                   <Skeleton className="mb-2 h-6 w-3/4" />
                   <Skeleton className="mb-1 h-4 w-full" />
                   <Skeleton className="mb-1 h-4 w-5/6" />
                   <Skeleton className="h-4 w-1/2" />
-                </div>
+                </Card>
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className="py-20 text-center text-cosmic-muted">
+            <div className="py-20 text-center text-muted">
               <BookOpen className="mx-auto mb-4 size-12 opacity-30" />
               <p>暂无{currentItem.label}内容</p>
             </div>
@@ -229,7 +231,7 @@ export function LibraryPage() {
                   const isExternal = isCourse && !!item.linkUrl;
 
                   const cardContent = (
-                    <div className="cosmic-card group cursor-pointer overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 w-full">
+                    <Card className="group cursor-pointer overflow-hidden p-5 transition-all duration-300 hover:-translate-y-1 w-full">
                       {item.coverUrl && (
                         <div className="mb-4 overflow-hidden rounded-lg">
                           <img
@@ -240,16 +242,16 @@ export function LibraryPage() {
                         </div>
                       )}
                       <div className="mb-3 flex items-center gap-2">
-                        <span className="cosmic-tag text-xs">{item.tag}</span>
+                        <span className="rounded-control bg-purple/10 px-2 py-0.5 text-xs font-bold text-ink">{item.tag}</span>
                         <Badge variant="secondary" className="text-xs">{item.type}</Badge>
                       </div>
-                      <h3 className="mb-2 font-semibold text-white group-hover:text-cosmic-nav-hover transition-colors line-clamp-2">
+                      <h3 className="mb-2 font-bold text-ink group-hover:text-purple transition-colors line-clamp-2">
                         {item.title}
                       </h3>
-                      <p className="mb-3 line-clamp-2 text-sm text-cosmic-muted">
+                      <p className="mb-3 line-clamp-2 text-sm text-muted">
                         {item.summary}
                       </p>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-cosmic-dim">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted/70">
                         <span>{item.author}</span>
                         <span className="inline-flex items-center gap-1">
                           <Clock className="size-3" />
@@ -260,7 +262,7 @@ export function LibraryPage() {
                           {item.views}
                         </span>
                       </div>
-                    </div>
+                    </Card>
                   );
 
                   if (isExternal) {
@@ -292,14 +294,14 @@ export function LibraryPage() {
               {/* Pagination */}
               {totalPages > 1 && (
                 <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
+                  <IconButton
+                    icon={<ChevronLeft className="size-4" />}
+                    label="上一页"
+                    variant="quiet"
+                    size="sm"
                     onClick={() => goToPage(page - 1)}
                     disabled={page <= 1}
-                  >
-                    <ChevronLeft className="size-4" />
-                  </Button>
+                  />
 
                   {Array.from({ length: totalPages }).map((_, i) => {
                     const pageNum = i + 1;
@@ -315,7 +317,7 @@ export function LibraryPage() {
 
                     if (!showPage) {
                       if (showEllipsisBefore || showEllipsisAfter) {
-                        return <span key={pageNum} className="px-1 text-cosmic-dim text-sm">…</span>;
+                        return <span key={pageNum} className="px-1 text-muted/70 text-sm">…</span>;
                       }
                       return null;
                     }
@@ -323,26 +325,26 @@ export function LibraryPage() {
                     return (
                       <Button
                         key={pageNum}
-                        variant={isCurrent ? "primary" : "ghost"}
-                        size="icon-sm"
+                        tone="purple"
+                        variant={isCurrent ? "solid" : "quiet"}
+                        size="sm"
                         onClick={() => goToPage(pageNum)}
-                        className={isCurrent ? "" : "text-cosmic-dim hover:text-white"}
                       >
                         {pageNum}
                       </Button>
                     );
                   })}
 
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
+                  <IconButton
+                    icon={<ChevronRight className="size-4" />}
+                    label="下一页"
+                    variant="quiet"
+                    size="sm"
                     onClick={() => goToPage(page + 1)}
                     disabled={page >= totalPages}
-                  >
-                    <ChevronRight className="size-4" />
-                  </Button>
+                  />
 
-                  <span className="ml-4 text-xs text-cosmic-dim">
+                  <span className="ml-4 text-xs text-muted/70">
                     共 {total} 条
                   </span>
                 </div>

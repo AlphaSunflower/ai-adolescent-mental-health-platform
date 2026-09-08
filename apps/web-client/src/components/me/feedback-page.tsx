@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Badge } from "@/components/pouf/Badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 
 type PlatformFeedback = {
@@ -59,7 +60,7 @@ export function FeedbackPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">我的反馈</h1>
+      <h1 className="mb-6 text-xl font-black text-ink">我的反馈</h1>
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList className="mb-6">
           <TabsTrigger value="platform">平台反馈</TabsTrigger>
@@ -73,12 +74,12 @@ export function FeedbackPage() {
             </div>
           ) : tab === "platform" ? (
             platformItems.length === 0 ? (
-              <div className="py-20 text-center text-cosmic-muted">暂无平台反馈</div>
+              <div className="py-20 text-center text-muted">暂无平台反馈</div>
             ) : (
-              <div className="cosmic-card overflow-hidden">
+              <Card className="overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/5 text-left text-cosmic-dim">
+                    <tr className="border-b border-purple/10 text-left text-muted/70">
                       <th className="px-4 py-3 font-medium">反馈内容</th>
                       <th className="px-4 py-3 font-medium w-[100px]">状态</th>
                       <th className="px-4 py-3 font-medium w-[180px]">取消理由</th>
@@ -89,26 +90,26 @@ export function FeedbackPage() {
                     {platformItems.map((item) => {
                       const s = platformStatusLabel(item.status);
                       return (
-                        <tr key={item.id} className="border-b border-white/5 last:border-0">
-                          <td className="px-4 py-3 text-white">{item.content}</td>
+                        <tr key={item.id} className="border-b border-purple/10 last:border-0">
+                          <td className="px-4 py-3 text-ink">{item.content}</td>
                           <td className="px-4 py-3"><Badge variant={s.variant} className="text-xs">{s.text}</Badge></td>
-                          <td className="px-4 py-3 text-cosmic-dim">{item.status === 3 ? item.cancelReason ?? "-" : "-"}</td>
-                          <td className="px-4 py-3 text-cosmic-dim">{item.createTime}</td>
+                          <td className="px-4 py-3 text-muted/70">{item.status === 3 ? item.cancelReason ?? "-" : "-"}</td>
+                          <td className="px-4 py-3 text-muted/70">{item.createTime}</td>
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
-              </div>
+              </Card>
             )
           ) : (
             consultationItems.length === 0 ? (
-              <div className="py-20 text-center text-cosmic-muted">暂无咨询反馈</div>
+              <div className="py-20 text-center text-muted">暂无咨询反馈</div>
             ) : (
-              <div className="cosmic-card overflow-hidden">
+              <Card className="overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-white/5 text-left text-cosmic-dim">
+                    <tr className="border-b border-purple/10 text-left text-muted/70">
                       <th className="px-4 py-3 font-medium">反馈内容</th>
                       <th className="px-4 py-3 font-medium w-[80px]">评分</th>
                       <th className="px-4 py-3 font-medium w-[100px]">状态</th>
@@ -120,20 +121,20 @@ export function FeedbackPage() {
                     {consultationItems.map((item) => {
                       const s = consultationStatusLabel(item.status);
                       return (
-                        <tr key={item.id} className="border-b border-white/5 last:border-0">
-                          <td className="px-4 py-3 text-white">{item.content}</td>
+                        <tr key={item.id} className="border-b border-purple/10 last:border-0">
+                          <td className="px-4 py-3 text-ink">{item.content}</td>
                           <td className="px-4 py-3"><Badge variant="success" className="text-xs">{item.rating}</Badge></td>
                           <td className="px-4 py-3"><Badge variant={s.variant} className="text-xs">{s.text}</Badge></td>
-                          <td className="px-4 py-3 text-cosmic-dim">
+                          <td className="px-4 py-3 text-muted/70">
                             {item.status === 1 ? `回复: ${item.replyContent ?? "-"}` : item.status === 2 ? `拒收理由: ${item.rejectReason ?? "-"}` : "-"}
                           </td>
-                          <td className="px-4 py-3 text-cosmic-dim">{item.createTime}</td>
+                          <td className="px-4 py-3 text-muted/70">{item.createTime}</td>
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
-              </div>
+              </Card>
             )
           )}
         </TabsContent>

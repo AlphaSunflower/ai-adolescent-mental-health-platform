@@ -5,9 +5,9 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Send, Image, User, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
+import { IconButton } from "@/components/pouf/Button";
+import { Avatar, AvatarFallback } from "@/components/pouf/Avatar";
+import { Skeleton } from "@/components/pouf/Skeleton";
 import { api } from "@/lib/api";
 import { getToken } from "@/lib/session";
 import { sseSubscribe } from "@/lib/sse";
@@ -158,10 +158,10 @@ export function ConsultationChatPage() {
     return (
       <div className="mx-auto flex h-full max-w-3xl flex-col px-4">
         <Skeleton className="mb-4 h-5 w-24" />
-        <Skeleton className="mb-4 h-16 w-full rounded-xl" />
+        <Skeleton className="mb-4 h-16 w-full rounded-control" />
         <div className="flex-1 space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className={`h-12 w-3/4 rounded-xl ${i % 2 === 0 ? "ml-auto" : ""}`} />
+            <Skeleton key={i} className={`h-12 w-3/4 rounded-control ${i % 2 === 0 ? "ml-auto" : ""}`} />
           ))}
         </div>
       </div>
@@ -169,30 +169,30 @@ export function ConsultationChatPage() {
   }
 
   return (
-    <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-3xl flex-col px-4">
+    <div className="mx-auto flex h-[calc(100dvh-9rem)] max-w-3xl flex-col px-4">
       {/* Header */}
-      <div className="flex items-center gap-4 py-3 border-b border-white/10 shrink-0">
-        <Link href="/me/orders" className="text-cosmic-muted hover:text-cosmic-sky transition-colors">
+      <div className="flex items-center gap-4 border-b border-[rgba(201,168,255,0.3)] py-3 shrink-0">
+        <Link href="/me/orders" className="text-muted transition-colors hover:text-purple">
           <ArrowLeft className="size-5" />
         </Link>
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           <Avatar className="size-9 shrink-0">
             {detail?.psychologistAvatar ? (
               <img src={detail.psychologistAvatar} alt="" className="size-9 rounded-full object-cover" />
             ) : (
-              <AvatarFallback className="bg-cosmic-blue/20 text-cosmic-sky"><User className="size-4" /></AvatarFallback>
+              <AvatarFallback className="bg-purple/20 text-purple"><User className="size-4" /></AvatarFallback>
             )}
           </Avatar>
-          <span className="font-medium text-cosmic-header text-sm truncate">
+          <span className="text-sm font-bold text-ink">
             {detail?.psychologistName || "心理咨询师"}
           </span>
         </div>
       </div>
 
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto py-4 space-y-3">
+      <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto py-4">
         {messages.length === 0 && (
-          <div className="py-12 text-center text-cosmic-dim text-sm">
+          <div className="py-12 text-center text-sm font-bold text-muted">
             暂无消息，发送第一条消息开始沟通
           </div>
         )}
@@ -201,25 +201,25 @@ export function ConsultationChatPage() {
           if (isSystem) {
             return (
               <div key={msg.id} className="flex justify-center">
-                <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-cosmic-dim">{msg.content}</span>
+                <span className="rounded-full bg-purple/10 px-3 py-1 text-xs font-bold text-muted">{msg.content}</span>
               </div>
             );
           }
           const isMine = msg.senderId !== detail?.psychologistId;
           return (
             <div key={msg.id} className={`flex gap-2 ${isMine ? "flex-row-reverse" : ""}`}>
-              <Avatar className="size-7 shrink-0 mt-0.5">
+              <Avatar className="mt-0.5 size-7 shrink-0">
                 {msg.senderAvatar ? (
                   <img src={msg.senderAvatar} alt="" className="size-7 rounded-full object-cover" />
                 ) : (
-                  <AvatarFallback className="bg-cosmic-blue/20 text-cosmic-sky text-xs"><User className="size-3" /></AvatarFallback>
+                  <AvatarFallback className="bg-purple/20 text-xs text-purple"><User className="size-3" /></AvatarFallback>
                 )}
               </Avatar>
-              <div className={`max-w-[70%] rounded-xl px-3 py-2 text-sm ${
-                isMine ? "bg-cosmic-blue/30 text-white" : "bg-white/10 text-cosmic-header"
+              <div className={`max-w-[70%] rounded-control px-3 py-2 text-sm ${
+                isMine ? "bg-purple text-[var(--on-accent)]" : "cushion-card border border-[rgba(201,168,255,0.3)] bg-surface text-ink"
               }`}>
                 {msg.contentType === 1 ? (
-                  <img src={msg.content} alt="" className="max-w-full rounded-lg" />
+                  <img src={msg.content} alt="" className="max-w-full rounded-control" />
                 ) : (
                   <p className="whitespace-pre-wrap break-words">{msg.content}</p>
                 )}
@@ -230,8 +230,8 @@ export function ConsultationChatPage() {
       </div>
 
       {/* Input */}
-      <div className="flex items-end gap-2 py-3 border-t border-white/10 shrink-0">
-        <label className="flex cursor-pointer items-center justify-center size-9 rounded-lg text-cosmic-muted hover:text-cosmic-sky hover:bg-white/5 transition-colors">
+      <div className="flex items-end gap-2 border-t border-[rgba(201,168,255,0.3)] py-3 shrink-0">
+        <label className="flex size-9 cursor-pointer items-center justify-center rounded-control text-muted transition-colors hover:bg-purple/10 hover:text-purple">
           {uploading ? <Loader2 className="size-5 animate-spin" /> : <Image className="size-5" />}
           <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} className="hidden" />
         </label>
@@ -241,16 +241,16 @@ export function ConsultationChatPage() {
           onKeyDown={handleKeyDown}
           placeholder="输入消息..."
           rows={1}
-          className="cosmic-input flex-1 resize-none rounded-lg px-3 py-2 text-sm min-h-0"
+          className="cushion-field min-h-0 flex-1 resize-none rounded-control bg-surface px-3 py-2 text-sm font-bold text-ink placeholder:text-muted"
         />
-        <Button
-          variant="primary"
-          size="icon-sm"
+        <IconButton
+          icon={<Send className="size-4" />}
+          label="发送"
+          tone="purple"
+          size="sm"
           onClick={handleSend}
           disabled={!input.trim() || sending}
-        >
-          <Send className="size-4" />
-        </Button>
+        />
       </div>
     </div>
   );

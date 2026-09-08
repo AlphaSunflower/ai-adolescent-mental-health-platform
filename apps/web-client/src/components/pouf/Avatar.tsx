@@ -1,5 +1,3 @@
-"use client";
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
@@ -7,8 +5,8 @@ function Avatar({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "relative flex size-10 shrink-0 overflow-hidden rounded-full bg-white/10",
-        className
+        "cushion-row relative flex size-10 shrink-0 overflow-hidden rounded-full bg-surface",
+        className,
       )}
       {...props}
     />
@@ -23,8 +21,8 @@ function AvatarFallback({ className, ...props }: React.HTMLAttributes<HTMLDivEle
   return (
     <div
       className={cn(
-        "flex size-full items-center justify-center rounded-full text-sm text-cosmic-muted",
-        className
+        "flex size-full items-center justify-center rounded-full text-sm font-bold text-muted",
+        className,
       )}
       {...props}
     />

@@ -9,10 +9,11 @@ import {
   BookOpen, GraduationCap, Award, ChevronDown, Building2, Loader2
 } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { Psychologist } from "@/lib/types";
 
@@ -158,7 +159,7 @@ export function PsychologistDetailPage() {
     return (
       <div className="mx-auto max-w-5xl px-4 py-8 md:py-12">
         <Skeleton className="mb-4 h-5 w-24" />
-        <div className="cosmic-card mb-8 p-6 md:p-8">
+        <Card className="mb-8 p-6 md:p-8">
           <div className="flex flex-col gap-6 md:flex-row">
             <Skeleton className="size-[130px] rounded-full" />
             <div className="flex-1 space-y-2">
@@ -168,13 +169,13 @@ export function PsychologistDetailPage() {
               <Skeleton className="h-5 w-full" />
             </div>
           </div>
-        </div>
-        <div className="cosmic-card p-8">
+        </Card>
+        <Card className="p-8">
           <Skeleton className="mb-4 h-6 w-32" />
           <Skeleton className="mb-2 h-4 w-full" />
           <Skeleton className="mb-2 h-4 w-5/6" />
           <Skeleton className="h-4 w-3/4" />
-        </div>
+        </Card>
       </div>
     );
   }
@@ -182,8 +183,8 @@ export function PsychologistDetailPage() {
   if (!p) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
-        <p className="text-lg text-cosmic-muted">咨询师不存在</p>
-        <Link href="/consultation/psychologist" className="mt-4 inline-block text-cosmic-sky hover:underline">
+        <p className="text-lg text-muted">咨询师不存在</p>
+        <Link href="/consultation/psychologist" className="mt-4 inline-block text-purple hover:underline">
           返回列表
         </Link>
       </div>
@@ -197,32 +198,32 @@ export function PsychologistDetailPage() {
       {/* Back nav */}
       <Link
         href="/consultation/psychologist"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm font-bold text-muted transition-colors hover:text-purple"
       >
         <ArrowLeft className="size-4" />
         返回列表
       </Link>
 
       {/* Info Card */}
-      <div className="cosmic-card mb-8 overflow-hidden">
+      <Card className="mb-8 overflow-hidden">
         <div className="flex flex-col gap-6 p-6 md:flex-row md:p-8">
           {/* Left: Avatar */}
           <div className="flex flex-col items-center gap-2">
             <div
-              className="size-[130px] rounded-full flex items-center justify-center shrink-0"
+              className="flex size-[130px] shrink-0 items-center justify-center rounded-full"
               style={{
-                background: "rgba(100, 149, 237, 0.2)",
-                boxShadow: "0 0 0 4px rgba(255, 215, 0, 0.5), 0 0 30px rgba(255, 215, 0, 0.15)",
+                background: "rgba(201, 168, 255, 0.25)",
+                boxShadow: "0 0 0 4px rgba(201, 168, 255, 0.4), 0 0 30px rgba(201, 168, 255, 0.25)",
               }}
             >
               {p.avatar ? (
                 <img src={p.avatar} alt={p.name} className="size-[130px] rounded-full object-cover" />
               ) : (
-                <span className="text-5xl font-bold text-cosmic-sky">{p.name[0]}</span>
+                <span className="text-5xl font-black text-purple">{p.name[0]}</span>
               )}
             </div>
-            <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-              p.availableToday ? "bg-green-500/80 text-white" : "bg-gray-500/60 text-gray-300"
+            <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+              p.availableToday ? "bg-mint text-[var(--on-accent)]" : "bg-purple/15 text-muted"
             }`}>
               {p.availableToday ? "在线" : "离线"}
             </span>
@@ -231,7 +232,7 @@ export function PsychologistDetailPage() {
           {/* Middle: Info */}
           <div className="flex-1">
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-3xl font-bold text-white">{p.name}</h1>
+              <h1 className="text-3xl font-black text-ink">{p.name}</h1>
               <Badge variant="gold">
                 <CheckCircle2 className="mr-1 size-3" />已认证
               </Badge>
@@ -243,17 +244,17 @@ export function PsychologistDetailPage() {
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm">
               {p.title && (
                 <div className="text-center">
-                  <div className="text-lg font-bold text-cosmic-gold">{p.title}</div>
-                  <div className="text-xs text-cosmic-muted">职称</div>
+                  <div className="text-lg font-black text-purple">{p.title}</div>
+                  <div className="text-xs font-bold text-muted">职称</div>
                 </div>
               )}
               <div className="text-center">
-                <div className="text-lg font-bold text-cosmic-gold">{p.rating}</div>
-                <div className="text-xs text-cosmic-muted">评分</div>
+                <div className="text-lg font-black text-purple">{p.rating}</div>
+                <div className="text-xs font-bold text-muted">评分</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-cosmic-gold">{p.city}</div>
-                <div className="text-xs text-cosmic-muted">
+                <div className="text-lg font-black text-purple">{p.city}</div>
+                <div className="text-xs font-bold text-muted">
                   <MapPin className="inline size-3" /> 所在城市
                 </div>
               </div>
@@ -262,7 +263,7 @@ export function PsychologistDetailPage() {
             {/* Tags */}
             <div className="mt-4 flex flex-wrap gap-2">
               {p.fields.map((f) => (
-                <span key={f} className="cosmic-tag">{f}</span>
+                <span key={f} className="rounded-control bg-purple/10 px-2 py-0.5 text-xs font-bold text-ink">{f}</span>
               ))}
               {p.serviceTypes.map((s) => (
                 <Badge key={s} variant="secondary" className="text-xs">{s}</Badge>
@@ -273,7 +274,8 @@ export function PsychologistDetailPage() {
           {/* Right: Actions */}
           <div className="flex flex-col items-center gap-3 md:items-end">
             <Button
-              variant={isFavorite ? "gold" : "outline"}
+              tone={isFavorite ? "yellow" : "purple"}
+              variant={isFavorite ? "solid" : "quiet"}
               size="sm"
               onClick={async () => {
                 const wasFavorite = isFavorite;
@@ -291,8 +293,8 @@ export function PsychologistDetailPage() {
               {isFavorite ? "已收藏" : "收藏"}
             </Button>
             <Button
-              variant="primary"
-              size="default"
+              tone="purple"
+              size="md"
               onClick={() => setTab("services")}
             >
               <Calendar className="mr-1 size-4" />
@@ -300,11 +302,11 @@ export function PsychologistDetailPage() {
             </Button>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Tabs */}
       <Tabs value={tab} onValueChange={setTab}>
-        <TabsList className="mb-6 grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+        <TabsList className="mb-6">
           <TabsTrigger value="intro">个人简介</TabsTrigger>
           <TabsTrigger value="fields">擅长领域</TabsTrigger>
           <TabsTrigger value="services">服务与价格</TabsTrigger>
@@ -314,60 +316,60 @@ export function PsychologistDetailPage() {
 
         {/* Tab 1: 个人简介 */}
         <TabsContent value="intro" className="space-y-6">
-          <div className="cosmic-card p-6">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-              <BookOpen className="size-5 text-cosmic-sky" />个人介绍
+          <Card className="p-6">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-black text-ink">
+              <BookOpen className="size-5 text-blue" />个人介绍
             </h3>
-            <p className="leading-relaxed text-cosmic-muted whitespace-pre-wrap">{p.intro}</p>
-          </div>
+            <p className="whitespace-pre-wrap leading-relaxed text-muted">{p.intro}</p>
+          </Card>
 
-          <div className="cosmic-card p-6">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-              <GraduationCap className="size-5 text-cosmic-sky" />教育背景
+          <Card className="p-6">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-black text-ink">
+              <GraduationCap className="size-5 text-blue" />教育背景
             </h3>
-            <p className="leading-relaxed text-cosmic-muted whitespace-pre-wrap">
+            <p className="whitespace-pre-wrap leading-relaxed text-muted">
               {p.educationBackground || "暂无教育背景信息"}
             </p>
-          </div>
+          </Card>
 
-          <div className="cosmic-card p-6">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-              <Medal className="size-5 text-cosmic-gold" />受训经历
+          <Card className="p-6">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-black text-ink">
+              <Medal className="size-5 text-yellow" />受训经历
             </h3>
-            <p className="leading-relaxed text-cosmic-muted whitespace-pre-wrap">
+            <p className="whitespace-pre-wrap leading-relaxed text-muted">
               {p.trainingExperience || "暂无受训经历信息"}
             </p>
-          </div>
+          </Card>
 
-          <div className="cosmic-card p-6">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
-              <Award className="size-5 text-cosmic-gold" />资质认证
+          <Card className="p-6">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-black text-ink">
+              <Award className="size-5 text-yellow" />资质认证
             </h3>
             <div className="grid gap-3 sm:grid-cols-2">
               {p.fields.map((f) => (
-                <div key={f} className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-3">
-                  <CheckCircle2 className="size-4 text-green-400 shrink-0" />
-                  <span className="text-sm text-cosmic-muted">{f}</span>
+                <div key={f} className="flex items-center gap-2 rounded-control bg-purple/10 px-4 py-3">
+                  <CheckCircle2 className="size-4 shrink-0 text-mint" />
+                  <span className="text-sm font-bold text-muted">{f}</span>
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
         </TabsContent>
 
         {/* Tab 2: 擅长领域 */}
         <TabsContent value="fields">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {p.fields.map((f) => (
-              <div key={f} className="cosmic-card p-5 text-center hover:-translate-y-1 transition-all">
-                <div className="mx-auto mb-3 size-12 rounded-xl bg-cosmic-blue/20 flex items-center justify-center">
-                  <Sparkles className="size-6 text-cosmic-sky" />
+              <Card key={f} className="p-5 text-center transition-all hover:-translate-y-1">
+                <div className="mx-auto mb-3 flex size-12 items-center justify-center rounded-control bg-purple/20">
+                  <Sparkles className="size-6 text-purple" />
                 </div>
-                <h3 className="font-semibold text-white">{f}</h3>
-              </div>
+                <h3 className="font-black text-ink">{f}</h3>
+              </Card>
             ))}
           </div>
           {p.fields.length === 0 && (
-            <div className="cosmic-card p-12 text-center text-cosmic-muted">暂无擅长领域信息</div>
+            <Card className="p-12 text-center text-muted">暂无擅长领域信息</Card>
           )}
         </TabsContent>
 
@@ -382,38 +384,38 @@ export function PsychologistDetailPage() {
                   key={s.type}
                   type="button"
                   onClick={() => { setSelectedService(s.type); setTab("schedule"); }}
-                  className={`cosmic-card relative p-5 text-left transition-all hover:-translate-y-1 ${
-                    isSelected ? "!border-cosmic-gold/60 bg-cosmic-gold/10" : ""
+                  className={`cushion-card relative rounded-card bg-surface p-5 text-left transition-all hover:-translate-y-1 ${
+                    isSelected ? "border-2 border-purple/50" : "border-2 border-transparent"
                   }`}
                 >
                   {isSelected && (
-                    <div className="absolute right-3 top-3 size-6 rounded-full bg-cosmic-gold flex items-center justify-center">
-                      <CheckCircle2 className="size-4 text-cosmic-navy-start" />
+                    <div className="absolute right-3 top-3 flex size-6 items-center justify-center rounded-full bg-yellow">
+                      <CheckCircle2 className="size-4 text-[var(--on-accent)]" />
                     </div>
                   )}
-                  <div className="mb-3 inline-flex rounded-lg bg-cosmic-blue/20 p-2.5">
-                    <Icon className="size-5 text-cosmic-sky" />
+                  <div className="mb-3 inline-flex rounded-control bg-purple/20 p-2.5">
+                    <Icon className="size-5 text-purple" />
                   </div>
-                  <h3 className="mb-1 font-semibold text-white">{s.label}</h3>
-                  <p className="mb-3 text-sm text-cosmic-muted">专业一对一{s.label}服务</p>
-                  <div className="text-xl font-bold text-cosmic-gold">
+                  <h3 className="mb-1 font-black text-ink">{s.label}</h3>
+                  <p className="mb-3 text-sm font-bold text-muted">专业一对一{s.label}服务</p>
+                  <div className="text-xl font-black text-purple">
                     ¥{s.price?.toFixed(0) ?? "0"}
-                    <span className="text-sm font-normal text-cosmic-dim">/次</span>
+                    <span className="text-sm font-bold text-muted">/次</span>
                   </div>
                 </button>
               );
             })}
           </div>
           {services.length === 0 && (
-            <div className="cosmic-card p-12 text-center text-cosmic-muted">暂无可预约服务</div>
+            <Card className="p-12 text-center text-muted">暂无可预约服务</Card>
           )}
         </TabsContent>
 
         {/* Tab 4: 预约咨询 */}
         <TabsContent value="schedule">
-          <div className="cosmic-card p-4 sm:p-6">
-            <h3 className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
-              <Calendar className="size-5 text-cosmic-sky" />选择预约时间
+          <Card className="p-4 sm:p-6">
+            <h3 className="mb-4 flex items-center gap-2 text-lg font-black text-ink">
+              <Calendar className="size-5 text-blue" />选择预约时间
             </h3>
 
             {/* 7-day view */}
@@ -433,20 +435,20 @@ export function PsychologistDetailPage() {
                       d.setDate(d.getDate() + i);
                       fetchSchedules(d);
                     }}
-                    className={`shrink-0 rounded-xl border px-3 py-2.5 text-center transition-all hover:-translate-y-0.5 sm:p-3 sm:w-auto w-[52px] ${
-                      isSelected ? "border-cosmic-gold/60 bg-cosmic-gold/10" : "border-white/10 bg-white/5"
+                    className={`shrink-0 w-[52px] rounded-control border px-3 py-2.5 text-center transition-all hover:-translate-y-0.5 sm:w-auto sm:p-3 ${
+                      isSelected ? "border-purple/50 bg-purple/10" : "border-[rgba(201,168,255,0.3)] bg-surface"
                     }`}
                   >
-                    <div className="text-[11px] text-cosmic-dim sm:text-xs">
+                    <div className="text-[11px] font-bold text-muted sm:text-xs">
                       周{dayNames[date.getDay()]}
                     </div>
-                    <div className={`text-base font-bold sm:text-lg ${isSelected ? "text-cosmic-gold" : "text-white"}`}>
+                    <div className={`text-base font-black sm:text-lg ${isSelected ? "text-purple" : "text-ink"}`}>
                       {date.getDate()}
                     </div>
                     <div className="mt-1 flex justify-center gap-0.5">
-                      <span className="size-1 rounded-full bg-green-400 sm:size-1.5" />
-                      <span className="size-1 rounded-full bg-green-400 sm:size-1.5" />
-                      <span className="size-1 rounded-full bg-yellow-400 sm:size-1.5" />
+                      <span className="size-1 rounded-full bg-mint sm:size-1.5" />
+                      <span className="size-1 rounded-full bg-mint sm:size-1.5" />
+                      <span className="size-1 rounded-full bg-yellow sm:size-1.5" />
                     </div>
                   </button>
                 );
@@ -454,12 +456,12 @@ export function PsychologistDetailPage() {
             </div>
 
             {loadingSchedules ? (
-              <div className="mb-4 text-sm text-cosmic-dim flex items-center gap-2">
+              <div className="mb-4 flex items-center gap-2 text-sm font-bold text-muted">
                 <Loader2 className="size-4 animate-spin" /> 加载排班中...
               </div>
             ) : schedules.length > 0 ? (
               <div className="mb-4">
-                <p className="mb-2 text-sm text-cosmic-muted">选择时段：</p>
+                <p className="mb-2 text-sm font-bold text-muted">选择时段：</p>
                 <div className="flex flex-wrap gap-2">
                   {schedules.map((s) => {
                     const isFull = s.bookedCount >= s.maxAppointments;
@@ -470,16 +472,16 @@ export function PsychologistDetailPage() {
                         type="button"
                         disabled={isFull || s.status === 0}
                         onClick={() => setSelectedScheduleId(s.id)}
-                        className={`rounded-lg border px-4 py-2 text-sm transition-all ${
+                        className={`rounded-control border px-4 py-2 text-sm font-bold transition-all ${
                           isPicked
-                            ? "border-cosmic-gold bg-cosmic-gold/20 text-cosmic-gold"
+                            ? "border-purple bg-purple/20 text-purple"
                             : isFull || s.status === 0
-                              ? "border-white/5 bg-white/5 text-cosmic-dim cursor-not-allowed"
-                              : "border-white/10 bg-white/5 text-cosmic-muted hover:border-white/20 hover:text-white"
+                              ? "cursor-not-allowed border-[rgba(201,168,255,0.2)] bg-purple/5 text-muted/60"
+                              : "border-[rgba(201,168,255,0.3)] bg-surface text-muted hover:border-purple/40 hover:text-ink"
                         }`}
                       >
                         <div>{timeSlotLabel(s.timeSlot)} {s.startTime?.slice(0, 5)}-{s.endTime?.slice(0, 5)}</div>
-                        <div className="text-xs mt-0.5 opacity-60">
+                        <div className="mt-0.5 text-xs opacity-60">
                           {isFull ? "已约满" : s.status === 0 ? "休息" : `余${s.maxAppointments - s.bookedCount}位`}
                         </div>
                       </button>
@@ -488,31 +490,31 @@ export function PsychologistDetailPage() {
                 </div>
               </div>
             ) : selectedDayIndex >= 0 ? (
-              <p className="mb-4 text-sm text-cosmic-dim">该日期暂无可用排班</p>
+              <p className="mb-4 text-sm font-bold text-muted">该日期暂无可用排班</p>
             ) : null}
 
             {/* Selected service summary + direct book */}
             {(selectedService || selectedScheduleId) && (
-              <div className="rounded-xl bg-cosmic-gold/10 border border-cosmic-gold/20 p-4 mb-4">
+              <div className="mb-4 rounded-control border border-purple/20 bg-purple/10 p-4">
                 <div className="flex items-center justify-between">
                   <div>
                     {selectedService && (
                       <>
-                        <span className="text-sm text-cosmic-muted">已选服务：</span>
-                        <span className="text-sm font-semibold text-white ml-1">
+                        <span className="text-sm font-bold text-muted">已选服务：</span>
+                        <span className="ml-1 text-sm font-black text-ink">
                           {services.find((s) => s.type === selectedService)?.label}
                         </span>
                       </>
                     )}
                     {selectedScheduleId && (
-                      <span className="text-sm text-cosmic-muted ml-3">
+                      <span className="ml-3 text-sm font-bold text-muted">
                         已选时段
                       </span>
                     )}
                   </div>
                   <Button
-                    variant="primary"
-                    size="xs"
+                    tone="purple"
+                    size="sm"
                     disabled={submitting || !selectedScheduleId}
                     onClick={handleBook}
                   >
@@ -521,57 +523,57 @@ export function PsychologistDetailPage() {
                 </div>
               </div>
             )}
-          </div>
+          </Card>
         </TabsContent>
 
         {/* Tab 5: 用户评价 */}
         <TabsContent value="reviews">
           <div className="mb-6 flex items-center gap-6">
             <div className="text-center">
-              <div className="text-5xl font-bold text-cosmic-gold">{p.rating}</div>
+              <div className="text-5xl font-black text-purple">{p.rating}</div>
               <div className="mt-1 flex justify-center gap-0.5">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={i < Math.round(p.rating) ? "text-cosmic-gold fill-current" : "text-cosmic-dim"}
+                    className={i < Math.round(p.rating) ? "text-yellow fill-current" : "text-muted/40"}
                     style={{ width: 16, height: 16 }}
                   />
                 ))}
               </div>
             </div>
-            <div className="text-sm text-cosmic-muted">
+            <div className="text-sm font-bold text-muted">
               基于用户真实评价
             </div>
           </div>
 
           <div className="space-y-3">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="cosmic-card p-4">
+              <Card key={i} className="p-4">
                 <div className="mb-2 flex items-center gap-2">
-                  <div className="size-8 rounded-full bg-cosmic-blue/20 flex items-center justify-center">
-                    <span className="text-sm font-bold text-cosmic-sky">U</span>
+                  <div className="flex size-8 items-center justify-center rounded-full bg-purple/20">
+                    <span className="text-sm font-black text-purple">U</span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">用户{i + 1}</p>
+                    <p className="text-sm font-bold text-ink">用户{i + 1}</p>
                     <div className="flex gap-0.5">
                       {Array.from({ length: 5 }).map((_, j) => (
                         <Star
                           key={j}
-                          className={j < 4 ? "text-cosmic-gold fill-current" : "text-cosmic-dim"}
+                          className={j < 4 ? "text-yellow fill-current" : "text-muted/40"}
                           style={{ width: 12, height: 12 }}
                         />
                       ))}
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-cosmic-muted">
+                <p className="text-sm font-bold text-muted">
                   咨询师很有耐心，给了我很多实用的建议。
                 </p>
-              </div>
+              </Card>
             ))}
           </div>
 
-          <div className="mt-4 py-8 text-center text-cosmic-dim text-sm">
+          <div className="mt-4 py-8 text-center text-sm font-bold text-muted">
             更多评价功能开发中
           </div>
         </TabsContent>

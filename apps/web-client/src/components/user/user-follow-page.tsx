@@ -5,8 +5,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, User, UserPlus, UserMinus, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button, IconButton } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { FollowUser } from "@/lib/types";
 
@@ -70,83 +71,79 @@ export function UserFollowPage() {
     <div className="mx-auto max-w-2xl px-4 py-8 md:py-12">
       <Link
         href={`/user/${userId}`}
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-blue transition-colors"
       >
         <ArrowLeft className="size-4" /> 返回用户主页
       </Link>
 
-      <h1 className="cosmic-gradient-text mb-6 text-2xl font-bold">关注列表</h1>
+      <h1 className="mb-6 text-2xl font-black text-ink">关注列表</h1>
 
       {/* Tabs */}
-      <div className="cosmic-card mb-6 flex p-1">
+      <Card className="mb-6 flex p-1">
         {(["followings", "followers"] as const).map((t) => (
           <button
             key={t}
             onClick={() => { setTab(t); setPage(1); }}
-            className={`flex-1 rounded-lg py-2 text-sm font-medium transition-colors ${
-              tab === t ? "bg-cosmic-blue/30 text-cosmic-sky" : "text-cosmic-dim hover:text-cosmic-header"
+            className={`flex-1 rounded-control py-2 text-sm font-bold transition-colors ${
+              tab === t ? "bg-purple/20 text-purple" : "text-muted/70 hover:text-ink"
             }`}
           >
             {t === "followings" ? "TA 的关注" : "TA 的粉丝"}
           </button>
         ))}
-      </div>
+      </Card>
 
       {/* List */}
       <div className="space-y-3">
         {loading ? (
           Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="cosmic-card p-4 flex items-center gap-4">
+            <Card key={i} className="p-4 flex items-center gap-4">
               <Skeleton className="size-11 rounded-full shrink-0" />
               <div className="flex-1">
                 <Skeleton className="h-4 w-20 mb-1" />
                 <Skeleton className="h-3 w-32" />
               </div>
               <Skeleton className="h-8 w-20 rounded-lg" />
-            </div>
+            </Card>
           ))
         ) : list.length === 0 ? (
           <div className="py-16 text-center">
-            <User className="mx-auto mb-3 size-10 text-cosmic-dim opacity-40" />
-            <p className="text-cosmic-muted">{tab === "followings" ? "暂无关注" : "暂无粉丝"}</p>
+            <User className="mx-auto mb-3 size-10 text-muted opacity-40" />
+            <p className="text-muted">{tab === "followings" ? "暂无关注" : "暂无粉丝"}</p>
           </div>
         ) : (
           list.map((user) => (
-            <div key={user.userId} className="cosmic-card p-4 flex items-center gap-4">
-              <Link href={`/user/${user.userId}`} className="size-11 rounded-full bg-cosmic-blue/20 flex items-center justify-center shrink-0">
+            <Card key={user.userId} className="p-4 flex items-center gap-4">
+              <Link href={`/user/${user.userId}`} className="size-11 rounded-full bg-purple/20 flex items-center justify-center shrink-0">
                 {user.headPath ? (
                   <img src={user.headPath} alt="" className="size-11 rounded-full object-cover" />
                 ) : (
-                  <User className="size-5 text-cosmic-sky" />
+                  <User className="size-5 text-blue" />
                 )}
               </Link>
               <div className="flex-1 min-w-0">
-                <Link href={`/user/${user.userId}`} className="text-sm font-medium text-cosmic-header hover:text-cosmic-sky transition-colors">
+                <Link href={`/user/${user.userId}`} className="text-sm font-bold text-ink hover:text-blue transition-colors">
                   {user.nickname}
                 </Link>
-                {user.signature && <p className="text-xs text-cosmic-dim truncate mt-0.5">{user.signature}</p>}
+                {user.signature && <p className="text-xs text-muted/70 truncate mt-0.5">{user.signature}</p>}
               </div>
               <div className="flex items-center gap-2">
                 <Link href={`/user/${user.userId}`}>
-                  <Button variant="ghost" size="icon-sm" title="访问主页">
-                    <ExternalLink className="size-4" />
-                  </Button>
+                  <IconButton icon={<ExternalLink className="size-4" />} label="访问主页" variant="quiet" size="sm" />
                 </Link>
                 {tab === "followings" ? (
                   <Button
-                    variant="outline"
+                    variant="quiet"
                     size="sm"
                     onClick={() => handleFollow(user.userId, true)}
-                    className="gap-1"
                   >
                     <UserMinus className="size-3.5" /> 取消关注
                   </Button>
                 ) : (
                   <Button
-                    variant={user.isFollowed ? "outline" : "primary"}
+                    variant={user.isFollowed ? "quiet" : "solid"}
                     size="sm"
                     onClick={() => handleFollow(user.userId, user.isFollowed)}
-                    className="gap-1"
                   >
                     {user.isFollowed ? (
                       <><UserMinus className="size-3.5" /> 已关注</>
@@ -156,7 +153,7 @@ export function UserFollowPage() {
                   </Button>
                 )}
               </div>
-            </div>
+            </Card>
           ))
         )}
       </div>
@@ -165,18 +162,18 @@ export function UserFollowPage() {
       {totalPages > 1 && (
         <div className="mt-6 flex items-center justify-center gap-2">
           <Button
-            variant="outline"
+            variant="quiet"
             size="sm"
             disabled={page <= 1}
             onClick={() => { const p = page - 1; setPage(p); fetchData(p); }}
           >
             上一页
           </Button>
-          <span className="text-sm text-cosmic-dim px-3">
+          <span className="text-sm text-muted/70 px-3">
             {page} / {totalPages}
           </span>
           <Button
-            variant="outline"
+            variant="quiet"
             size="sm"
             disabled={page >= totalPages}
             onClick={() => { const p = page + 1; setPage(p); fetchData(p); }}

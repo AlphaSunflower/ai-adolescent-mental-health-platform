@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Shield, FileText, AlertTriangle, Heart } from "lucide-react";
+import { Card } from "@/components/pouf/Card";
 
 export type LegalTab = "privacy" | "terms" | "disclaimer" | "minor";
 
@@ -168,8 +169,8 @@ export function LegalPage({ initialTab = "privacy" }: { initialTab?: LegalTab })
     <div className="mx-auto max-w-4xl px-6 py-12">
       {/* Header */}
       <div className="mb-10 text-center">
-        <h1 className="text-2xl font-bold text-white sm:text-3xl">法律声明</h1>
-        <p className="mt-3 text-cosmic-muted">
+        <h1 className="text-2xl font-black text-ink sm:text-3xl">法律声明</h1>
+        <p className="mt-3 text-muted">
           请仔细阅读以下法律文件，了解您的权利和义务
         </p>
       </div>
@@ -181,10 +182,10 @@ export function LegalPage({ initialTab = "privacy" }: { initialTab?: LegalTab })
             key={key}
             type="button"
             onClick={() => setTab(key)}
-            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
+            className={`flex items-center justify-center gap-2 rounded-control px-4 py-3 text-sm font-medium transition-all ${
               tab === key
-                ? "bg-cosmic-blue/30 text-cosmic-gold border border-cosmic-gold/30"
-                : "bg-white/5 text-cosmic-muted border border-white/10 hover:bg-white/10 hover:text-white"
+                ? "bg-purple/20 text-purple border border-purple/30"
+                : "bg-purple/10 text-muted border border-[rgba(201,168,255,0.3)] hover:bg-purple/10 hover:text-ink"
             }`}
           >
             <Icon className="size-4 shrink-0" />
@@ -194,17 +195,17 @@ export function LegalPage({ initialTab = "privacy" }: { initialTab?: LegalTab })
       </div>
 
       {/* Content */}
-      <div className="cosmic-card rounded-xl p-6 sm:p-10">
-        <h2 className="mb-8 text-center text-xl font-bold text-cosmic-gold">{current.title}</h2>
+      <Card className="p-6 sm:p-10">
+        <h2 className="mb-8 text-center text-xl font-black text-purple">{current.title}</h2>
         <div className="space-y-8">
           {current.sections.map((section) => (
             <section key={section.heading}>
-              <h3 className="mb-2 text-base font-semibold text-white">{section.heading}</h3>
-              <p className="text-sm leading-relaxed text-cosmic-muted">{section.body}</p>
+              <h3 className="mb-2 text-base font-semibold text-ink">{section.heading}</h3>
+              <p className="text-sm leading-relaxed text-muted">{section.body}</p>
             </section>
           ))}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

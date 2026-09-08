@@ -5,10 +5,11 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Search, Clock, Flame, X, Eye, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/pouf/Input";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { httpClient } from "@/lib/api";
 
 interface SearchResultItem {
@@ -121,7 +122,7 @@ export function SearchPage() {
       <div className="mx-auto mb-12 max-w-2xl">
         <form onSubmit={handleSearch} className="flex gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cosmic-dim" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted/70" />
             <Input
               type="text"
               placeholder="搜索文章、课程..."
@@ -130,7 +131,7 @@ export function SearchPage() {
               className="pl-10"
             />
           </div>
-          <Button type="submit" variant="primary" disabled={loading}>
+          <Button type="submit" tone="purple" variant="solid" disabled={loading}>
             {loading ? "搜索中..." : "搜索"}
           </Button>
         </form>
@@ -141,9 +142,9 @@ export function SearchPage() {
         <div className="mx-auto max-w-2xl">
           {/* Hot Keywords */}
           {hotKeywords.length > 0 && (
-            <div className="cosmic-card mb-6 p-5">
-              <h3 className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-white">
-                <Flame className="size-4 text-cosmic-orange" />
+            <Card className="mb-6 p-5">
+              <h3 className="mb-3 inline-flex items-center gap-2 text-sm font-bold text-ink">
+                <Flame className="size-4 text-orange" />
                 热门搜索
               </h3>
               <div className="flex flex-wrap gap-2">
@@ -152,27 +153,27 @@ export function SearchPage() {
                     key={kw}
                     type="button"
                     onClick={() => handleHistoryClick(kw)}
-                    className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-cosmic-muted hover:border-cosmic-gold/40 hover:text-cosmic-gold transition-colors"
+                    className="rounded-pill border border-[rgba(201,168,255,0.3)] bg-purple/10 px-3 py-1 text-sm font-bold text-muted hover:border-yellow/60 hover:text-yellow transition-colors"
                   >
                     {kw}
                   </button>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
 
           {/* Search History */}
           {searchHistory.length > 0 && (
-            <div className="cosmic-card p-5">
+            <Card className="p-5">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="inline-flex items-center gap-2 text-sm font-semibold text-white">
-                  <Clock className="size-4 text-cosmic-dim" />
+                <h3 className="inline-flex items-center gap-2 text-sm font-bold text-ink">
+                  <Clock className="size-4 text-muted/70" />
                   搜索历史
                 </h3>
                 <button
                   type="button"
                   onClick={clearHistory}
-                  className="text-xs text-cosmic-dim hover:text-cosmic-muted transition-colors"
+                  className="text-xs text-muted/70 hover:text-muted transition-colors"
                 >
                   清空
                 </button>
@@ -183,13 +184,13 @@ export function SearchPage() {
                     key={kw}
                     type="button"
                     onClick={() => handleHistoryClick(kw)}
-                    className="rounded-full border border-white/5 bg-white/5 px-3 py-1 text-sm text-cosmic-muted hover:border-white/20 hover:text-white transition-colors"
+                    className="rounded-pill border border-[rgba(201,168,255,0.3)] bg-purple/10 px-3 py-1 text-sm font-bold text-muted hover:text-ink transition-colors"
                   >
                     {kw}
                   </button>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
         </div>
       )}
@@ -197,22 +198,22 @@ export function SearchPage() {
       {/* Search Results */}
       {hasSearched && (
         <div>
-          <div className="mb-6 flex items-center gap-2 text-sm text-cosmic-muted">
-            <span>找到 <span className="text-cosmic-gold">{total}</span> 条结果</span>
+          <div className="mb-6 flex items-center gap-2 text-sm text-muted">
+            <span>找到 <span className="text-yellow">{total}</span> 条结果</span>
           </div>
 
           {loading ? (
             <div className="space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="cosmic-card p-4">
+                <Card key={i} className="p-4">
                   <Skeleton className="mb-2 h-5 w-3/4" />
                   <Skeleton className="mb-1 h-4 w-full" />
                   <Skeleton className="h-4 w-1/2" />
-                </div>
+                </Card>
               ))}
             </div>
           ) : results.length === 0 ? (
-            <div className="py-20 text-center text-cosmic-muted">
+            <div className="py-20 text-center text-muted">
               <Search className="mx-auto mb-4 size-12 opacity-30" />
               <p>未找到相关结果，试试其他关键词</p>
             </div>
@@ -229,23 +230,23 @@ export function SearchPage() {
                         : `/library/article/${item.id}`
                   }
                 >
-                  <div className="cosmic-card group cursor-pointer p-4 transition-all duration-300 hover:-translate-y-1">
+                  <Card className="group cursor-pointer p-4 transition-all duration-300 hover:-translate-y-1">
                     <div className="mb-2 flex items-center gap-2">
                       <Badge variant={item.type === "course" ? "gold" : "secondary"} className="text-xs">
                         {item.type === "course" ? "课程" : "文章"}
                       </Badge>
                       {item.category && (
-                        <span className="text-xs text-cosmic-dim">{item.category}</span>
+                        <span className="text-xs text-muted/70">{item.category}</span>
                       )}
                       {item.isFree && (
-                        <span className="text-xs text-green-400">免费</span>
+                        <span className="text-xs text-mint">免费</span>
                       )}
                     </div>
-                    <h3 className="mb-1 font-semibold text-white group-hover:text-cosmic-nav-hover transition-colors">
+                    <h3 className="mb-1 font-bold text-ink group-hover:text-purple transition-colors">
                       {item.title}
                     </h3>
-                    <p className="mb-2 line-clamp-2 text-sm text-cosmic-muted">{item.description}</p>
-                    <div className="flex items-center gap-4 text-xs text-cosmic-dim">
+                    <p className="mb-2 line-clamp-2 text-sm text-muted">{item.description}</p>
+                    <div className="flex items-center gap-4 text-xs text-muted/70">
                       {item.author && <span>{item.author}</span>}
                       <span>{item.createTime}</span>
                       <span className="inline-flex items-center gap-1">
@@ -253,7 +254,7 @@ export function SearchPage() {
                         {item.viewCount}
                       </span>
                     </div>
-                  </div>
+                  </Card>
                 </Link>
               ))}
             </div>

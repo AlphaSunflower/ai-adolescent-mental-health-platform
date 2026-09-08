@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ArrowLeft, Users, Star, Shield, Award, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
+import { Card } from "@/components/pouf/Card";
 
 const BENEFITS = [
   { icon: Users, title: "专业平台", desc: "加入专业的心理健康服务平台，接触更多需要帮助的青少年" },
@@ -23,47 +24,47 @@ export function ApplyIntroPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
       <Link
         href="/"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-purple transition-colors"
       >
         <ArrowLeft className="size-4" />
         返回首页
       </Link>
 
       <div className="text-center mb-12">
-        <h1 className="cosmic-gradient-text text-3xl font-bold md:text-4xl">成为心愈智联咨询师</h1>
-        <p className="mt-4 text-cosmic-muted">加入我们，用专业守护青少年的心理健康</p>
+        <h1 className="text-3xl font-black text-ink md:text-4xl">成为心愈智联咨询师</h1>
+        <p className="mt-4 text-muted">加入我们，用专业守护青少年的心理健康</p>
       </div>
 
       {/* Benefits */}
       <div className="mb-12 grid gap-4 sm:grid-cols-2">
         {BENEFITS.map((b) => (
-          <div key={b.title} className="cosmic-card p-5">
-            <div className="mb-3 inline-flex rounded-lg bg-cosmic-blue/20 p-2">
-              <b.icon className="size-5 text-cosmic-sky" />
+          <Card key={b.title} className="p-5">
+            <div className="mb-3 inline-flex rounded-control bg-purple/20 p-2">
+              <b.icon className="size-5 text-purple" />
             </div>
-            <h3 className="mb-1 font-semibold text-white">{b.title}</h3>
-            <p className="text-sm text-cosmic-muted">{b.desc}</p>
-          </div>
+            <h3 className="mb-1 font-black text-ink">{b.title}</h3>
+            <p className="text-sm font-bold text-muted">{b.desc}</p>
+          </Card>
         ))}
       </div>
 
       {/* Requirements */}
-      <div className="cosmic-card mb-8 p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">申请条件</h2>
+      <Card className="mb-8 p-6">
+        <h2 className="mb-4 text-lg font-black text-ink">申请条件</h2>
         <ul className="space-y-2">
           {REQUIREMENTS.map((r, i) => (
-            <li key={i} className="flex items-start gap-2 text-sm text-cosmic-muted">
-              <span className="mt-1 size-1.5 shrink-0 rounded-full bg-cosmic-gold" />
+            <li key={i} className="flex items-start gap-2 text-sm font-bold text-muted">
+              <span className="mt-1 size-1.5 shrink-0 rounded-full bg-yellow" />
               {r}
             </li>
           ))}
         </ul>
-      </div>
+      </Card>
 
       {/* CTA */}
       <div className="text-center">
         <Link href="/apply/basic">
-          <Button variant="primary" size="lg" className="gap-2">
+          <Button tone="purple" size="lg">
             开始申请
             <ChevronRight className="size-4" />
           </Button>

@@ -1,9 +1,9 @@
 import Particles from "@/components/effects/Particles";
 
 /** The pouf app background: a bright lavender gradient base with soft blurred
- *  glow washes and a slow particle drift. Shared by the home shell and the
- *  (auth) pages so /login, /register and /forgot-password read as the same
- *  surface as /home. */
+ *  glow washes and a slow particle drift. This is the app's single global
+ *  background — rendered once by the shell, shared by every route so the whole
+ *  product reads as one surface. */
 export function PoufBackground() {
   return (
     <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
+import { Textarea } from "@/components/pouf/Textarea";
 import {
   Dialog,
   DialogContent,
@@ -10,7 +11,7 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/components/pouf/Dialog";
 import { isLoggedIn } from "@/lib/session";
 import { api } from "@/lib/api";
 
@@ -69,25 +70,26 @@ export function FeedbackDialogProvider({ children }: { children: React.ReactNode
               请描述您遇到的问题或建议，我们会认真对待每一条反馈。
             </DialogDescription>
           </DialogHeader>
-          <div className="px-6 py-4">
-            <textarea
-              className="cosmic-input w-full min-h-[160px] resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-cosmic-dim focus:border-cosmic-gold/60 focus:outline-none"
+          <div className="py-4">
+            <Textarea
+              className="min-h-[160px]"
               placeholder="请输入您的反馈内容..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
               maxLength={2000}
             />
-            <p className="mt-2 text-right text-xs text-cosmic-dim">{content.length}/2000</p>
+            <p className="mt-2 text-right text-xs font-bold text-muted">{content.length}/2000</p>
           </div>
           <DialogFooter>
             <Button
-              variant="outline"
+              variant="quiet"
               size="sm"
               onClick={() => setDialogOpen(false)}
             >
               取消
             </Button>
             <Button
+              tone="purple"
               size="sm"
               onClick={handleSubmit}
               disabled={submitting}

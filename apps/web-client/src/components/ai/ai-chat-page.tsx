@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { Bot, Send, Plus, Menu, X, Trash2, ChevronDown, ChevronUp, Brain } from "lucide-react";
+import { Bot, Send, Plus, Menu, Trash2, ChevronDown, ChevronUp, Brain } from "lucide-react";
 import { toast } from "sonner";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button, IconButton } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
 import { api } from "@/lib/api";
 import { getToken, clearSession } from "@/lib/session";
 import { streamAiChat } from "@ai-adolescent-mental-health/api-client";
@@ -177,36 +177,37 @@ export function AiChatPage() {
   };
 
   return (
-    <div className="relative flex h-[calc(100vh-4rem)] -mt-2">
-      {/* Mobile sidebar toggle */}
-      <button
-        type="button"
-        className="fixed left-4 top-20 z-30 rounded-lg bg-cosmic-card-bg p-3 backdrop-blur-md lg:hidden border border-white/10"
-        onClick={() => setSidebarOpen(!sidebarOpen)}
-      >
-        {sidebarOpen ? <X className="size-5 text-cosmic-muted" /> : <Menu className="size-5 text-cosmic-muted" />}
-      </button>
+    <div className="relative flex h-full min-h-0">
+      {/* Mobile sidebar toggle (hidden once the drawer is open) */}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          className="absolute left-4 top-4 z-30 rounded-control border border-[rgba(201,168,255,0.3)] bg-surface/90 p-2.5 text-ink backdrop-blur-md lg:hidden"
+          onClick={() => setSidebarOpen(true)}
+        >
+          <Menu className="size-5 text-muted" />
+        </button>
+      )}
 
-      {/* Overlay */}
+      {/* Overlay (mobile drawer) */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-20 bg-black/50 lg:hidden"
+          className="fixed inset-0 z-30 bg-[rgba(58,46,92,0.35)] backdrop-blur-[2px] lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Session Sidebar */}
+      {/* Session Sidebar: in-flow on desktop, drawer above the nav on mobile */}
       <aside
-        className={`fixed inset-y-0 left-0 z-20 w-64 transform border-r border-white/10 bg-cosmic-card-bg backdrop-blur-xl transition-transform lg:relative lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`flex h-full w-72 flex-col overflow-hidden border-r border-[rgba(201,168,255,0.3)] bg-surface/95 backdrop-blur-md
+          fixed inset-y-0 left-0 z-40 transform transition-transform lg:static lg:h-full lg:z-auto lg:w-64 lg:translate-x-0 lg:bg-surface ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between border-b border-white/10 p-4">
-            <h2 className="font-semibold text-white">会话列表</h2>
-            <Button variant="outline" size="icon-sm" onClick={handleCreateSession} title="新建会话">
-              <Plus className="size-4" />
-            </Button>
+          <div className="flex items-center justify-between border-b border-[rgba(201,168,255,0.3)] p-4">
+            <h2 className="font-black text-ink">会话列表</h2>
+            <IconButton icon={<Plus className="size-4" />} label="新建会话" size="sm" variant="quiet" onClick={handleCreateSession} />
           </div>
 
           <div className="flex-1 overflow-y-auto p-2">
@@ -217,7 +218,7 @@ export function AiChatPage() {
                 ))}
               </div>
             ) : sessions.length === 0 ? (
-              <div className="p-4 text-center text-sm text-cosmic-dim">
+              <div className="p-4 text-center text-sm font-bold text-muted">
                 暂无会话，点击 + 创建
               </div>
             ) : (
@@ -226,14 +227,14 @@ export function AiChatPage() {
                   key={s.id}
                   type="button"
                   onClick={() => { setActiveSessionId(s.id); setSidebarOpen(false); }}
-                  className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                  className={`w-full rounded-control px-3 py-2 text-left text-sm transition-colors ${
                     activeSessionId === s.id
-                      ? "bg-cosmic-blue/20 text-white"
-                      : "text-cosmic-muted hover:bg-white/5 hover:text-white"
+                      ? "bg-purple/20 text-ink"
+                      : "text-muted hover:bg-purple/10 hover:text-ink"
                   }`}
                 >
-                  <div className="truncate">{s.title}</div>
-                  <div className="text-xs text-cosmic-dim">{s.createTime}</div>
+                  <div className="truncate font-bold">{s.title}</div>
+                  <div className="text-xs text-muted/70">{s.createTime}</div>
                 </button>
               ))
             )}
@@ -242,34 +243,36 @@ export function AiChatPage() {
       </aside>
 
       {/* Chat Area */}
-      <main className="flex flex-1 flex-col">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col">
         {activeSessionId === null ? (
           <div className="flex flex-1 items-center justify-center">
             <div className="text-center">
-              <Bot className="mx-auto mb-4 size-16 text-cosmic-blue opacity-40" />
-              <p className="text-lg text-cosmic-muted">选择一个会话或创建新会话</p>
-              <Button variant="primary" className="mt-4" onClick={handleCreateSession}>
-                <Plus className="mr-1 size-4" />
-                新建会话
-              </Button>
+              <Bot className="mx-auto mb-4 size-16 text-purple/40" />
+              <p className="text-lg font-bold text-muted">选择一个会话或创建新会话</p>
+              <div className="mt-4">
+                <Button tone="purple" onClick={handleCreateSession}>
+                  <Plus className="mr-1 size-4" />
+                  新建会话
+                </Button>
+              </div>
             </div>
           </div>
         ) : (
           <>
-            <div className="flex-1 overflow-y-auto px-4 py-6">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6">
               {loadingMessages ? (
                 <div className="mx-auto max-w-3xl space-y-4">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className={`flex ${i % 2 === 0 ? "justify-end" : "justify-start"}`}>
-                      <Skeleton className={`h-16 ${i % 2 === 0 ? "w-2/3" : "w-3/4"} rounded-2xl`} />
+                      <Skeleton className={`h-16 rounded-control ${i % 2 === 0 ? "w-2/3" : "w-3/4"}`} />
                     </div>
                   ))}
                 </div>
               ) : messages.length === 0 ? (
                 <div className="flex h-full items-center justify-center">
                   <div className="text-center">
-                    <Bot className="mx-auto mb-4 size-12 text-cosmic-blue opacity-30" />
-                    <p className="text-cosmic-muted">开始和 AI 咨询师对话吧</p>
+                    <Bot className="mx-auto mb-4 size-12 text-purple/40" />
+                    <p className="font-bold text-muted">开始和 AI 咨询师对话吧</p>
                   </div>
                 </div>
               ) : (
@@ -281,22 +284,22 @@ export function AiChatPage() {
                       className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
+                        className={`max-w-[85%] rounded-[18px] px-4 py-3 text-sm ${
                           msg.role === "user"
-                            ? "cosmic-btn-primary"
-                            : "cosmic-card border border-white/10"
+                            ? "bg-purple text-[var(--on-accent)]"
+                            : "cushion-card border border-[rgba(201,168,255,0.3)] bg-surface text-ink"
                         }`}
                       >
                         {/* Reasoning section (visible for assistant messages with reasoning) */}
                         {msg.role === "assistant" && msg.reasoning && (
-                          <div className="mb-3 rounded-lg bg-amber-500/5 border border-amber-500/15 overflow-hidden">
+                          <div className="mb-3 overflow-hidden rounded-control border border-[rgba(201,168,255,0.3)] bg-purple/10">
                             <button
                               type="button"
                               onClick={() => toggleReasoning(msg.id)}
-                              className="flex w-full items-center gap-2 px-3 py-2 text-xs text-amber-400/80 hover:bg-amber-500/10 transition-colors"
+                              className="flex w-full items-center gap-2 px-3 py-2 text-xs font-bold text-muted transition-colors hover:bg-purple/15"
                             >
                               <Brain className="size-3.5" />
-                              <span className="flex-1 text-left font-medium">思考过程</span>
+                              <span className="flex-1 text-left">思考过程</span>
                               {msg.reasoningExpanded !== false ? (
                                 <ChevronUp className="size-3.5" />
                               ) : (
@@ -304,7 +307,7 @@ export function AiChatPage() {
                               )}
                             </button>
                             {(msg.reasoningExpanded !== false) && (
-                              <div className="px-3 pb-3 text-xs text-amber-400/60 whitespace-pre-wrap leading-relaxed">
+                              <div className="px-3 pb-3 text-xs text-muted/80 whitespace-pre-wrap leading-relaxed">
                                 {msg.reasoning}
                               </div>
                             )}
@@ -314,16 +317,16 @@ export function AiChatPage() {
                         {/* Message content */}
                         {msg.content ? (
                           msg.role === "assistant" ? (
-                            <div className="prose prose-sm prose-invert max-w-none
-                              prose-headings:text-white prose-headings:font-semibold
-                              prose-p:text-cosmic-muted prose-p:leading-relaxed
-                              prose-strong:text-white prose-strong:font-semibold
-                              prose-a:text-cosmic-blue prose-a:no-underline hover:prose-a:underline
-                              prose-code:text-cosmic-gold prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-xs
-                              prose-pre:bg-white/5 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
-                              prose-blockquote:border-l-cosmic-blue/60 prose-blockquote:bg-white/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
-                              prose-li:text-cosmic-muted
-                              prose-hr:border-white/10
+                            <div className="prose prose-sm max-w-none
+                              prose-headings:text-ink prose-headings:font-bold
+                              prose-p:text-ink/80 prose-p:leading-relaxed
+                              prose-strong:text-ink prose-strong:font-bold
+                              prose-a:text-blue prose-a:no-underline hover:prose-a:underline
+                              prose-code:text-ink prose-code:bg-purple/20 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-xs
+                              prose-pre:bg-bg prose-pre:border prose-pre:border-[rgba(201,168,255,0.3)] prose-pre:rounded-xl prose-pre:text-ink
+                              prose-blockquote:border-l-blue/60 prose-blockquote:bg-bg prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+                              prose-li:text-ink/80
+                              prose-hr:border-[rgba(201,168,255,0.3)]
                               [&_*]:scroll-mt-24
                             ">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -334,8 +337,8 @@ export function AiChatPage() {
                             <p className="whitespace-pre-wrap">{msg.content}</p>
                           )
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 text-cosmic-dim">
-                            <span className="size-1.5 animate-pulse rounded-full bg-cosmic-gold" />
+                          <span className="inline-flex items-center gap-1.5 text-muted/70">
+                            <span className="size-1.5 animate-pulse rounded-full bg-purple" />
                             正在思考...
                           </span>
                         )}
@@ -348,7 +351,7 @@ export function AiChatPage() {
             </div>
 
             {/* Input Area */}
-            <div className="border-t border-white/10 bg-cosmic-card-bg/50 p-4 backdrop-blur-md">
+            <div className="shrink-0 border-t border-[rgba(201,168,255,0.3)] bg-bg/60 p-4">
               <div className="mx-auto flex max-w-3xl gap-3">
                 <input
                   ref={inputRef}
@@ -358,16 +361,16 @@ export function AiChatPage() {
                   onKeyDown={handleKeyDown}
                   placeholder="输入你的问题..."
                   disabled={sending}
-                  className="cosmic-input flex-1 rounded-xl px-4 py-3 text-sm"
+                  className="cushion-field flex-1 rounded-control bg-surface px-4 py-3 text-sm font-bold text-ink placeholder:text-muted focus-visible:cushion-field-focus focus-visible:outline-none"
                 />
-                <Button
-                  variant="primary"
-                  size="icon"
+                <IconButton
+                  icon={<Send className="size-4" />}
+                  label="发送"
+                  tone="purple"
+                  variant="solid"
                   onClick={handleSend}
                   disabled={sending || !input.trim()}
-                >
-                  <Send className="size-4" />
-                </Button>
+                />
               </div>
             </div>
           </>
