@@ -16,7 +16,7 @@ public class LoginController {
 
     private final ILoginService loginService;
 
-    /* ==================== 邮箱登录/注册（新增） ==================== */
+    /* ==================== 邮箱登录/注册 ==================== */
 
     /**
      * 发送邮箱验证码（注册/登录共用）
@@ -63,7 +63,7 @@ public class LoginController {
         );
     }
 
-    /* ==================== 忘记密码（新增） ==================== */
+    /* ==================== 忘记密码 ==================== */
 
     /**
      * 发送忘记密码验证码
@@ -104,7 +104,7 @@ public class LoginController {
         );
     }
 
-    /* ==================== 原有接口（保持兼容，但微信登录已禁用） ==================== */
+    /* ==================== 原有接口 ==================== */
 
     @PostMapping("/user/login")
     public Result<HashMap<Object,Object>> login(@RequestBody User user,
@@ -117,72 +117,8 @@ public class LoginController {
         return loginService.register(user);
     }
 
-    /**
-     * 小程序微信登录
-     * 返回：
-     *   - 已有账号: { code: 200, data: { token, userInfo } }
-     *   - 新用户: { code: 200, data: { needEmailVerify: true, openid, openidType: "mini", tempUserInfo } }
-     */
-    @PostMapping("/user/login/wx")
-    public Result<HashMap<Object,Object>> loginWx(@RequestBody HashMap<String, String> map) {
-        return loginService.loginWx(map.get("code"), map.get("userInfo"));
-    }
-
     @PostMapping("/user/logout")
     public Result<String> logout(@CurrentUserId Long userId, @RequestHeader(value = "token", required = false) String token) {
         return loginService.logout(userId, token);
-    }
-
-    /* ==================== 新增接口 ==================== */
-
-    /**
-     * 微信公众号扫码授权回调
-     * 前端：用户扫码后，微信会回调你的 redirect_uri，带上 code 参数
-     * 前端用这个 code 调用此接口
-     * 返回：
-     *   - 已有账号: { code: 200, data: { token, userInfo } }
-     *   - 新用户: { code: 200, data: { needEmailVerify: true, openid, openidType: "gzh" } }
-     */
-    @PostMapping("/user/login/wx/gzh/callback")
-    public Result<HashMap<Object,Object>> loginWxGzhCallback(@RequestBody HashMap<String, String> map) {
-        return loginService.loginWxGzh(map.get("code"));
-    }
-
-    /**
-     * 查询 OpenID 绑定状态
-     * 前端用于检查 openid 是否已绑定账号
-     */
-    @PostMapping("/user/wx/status")
-    public Result<HashMap<Object,Object>> getWxStatus(@RequestBody HashMap<String, String> map) {
-        return loginService.getWxStatus(map.get("openid"), map.get("openidType"));
-    }
-
-    /**
-     * 发送邮箱验证码
-     * 用于微信登录后的邮箱绑定流程
-     */
-    @PostMapping("/user/wx/email/send")
-    public Result<String> sendEmailVerifyCode(@RequestBody HashMap<String, String> map) {
-        return loginService.sendEmailVerifyCode(
-                map.get("email"),
-                map.get("openid"),
-                map.get("openidType")
-        );
-    }
-
-    /**
-     * 验证邮箱验证码并绑定账号
-     * 核心接口：完成邮箱验证 + 账号创建/绑定 + 返回 JWT Token
-     */
-    @PostMapping("/user/wx/email/bind")
-    public Result<HashMap<Object,Object>> bindEmailWithWx(@RequestBody HashMap<String, String> map) {
-        return loginService.bindEmailWithWx(
-                map.get("openid"),
-                map.get("openidType"),
-                map.get("email"),
-                map.get("code"),
-                map.get("nickname"),
-                map.get("headPath")
-        );
     }
 }
