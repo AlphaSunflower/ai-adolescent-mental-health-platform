@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart, Star } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { InteractionItem } from "@ai-adolescent-mental-health/domain";
@@ -64,40 +65,40 @@ export function FavoritesPage() {
   const isCollection = tab === "collections";
 
   const renderItem = (item: InteractionItem) => (
-    <div key={item.articleId} className="cosmic-card flex items-center gap-4 p-4">
+    <Card key={item.articleId} className="flex items-center gap-4 p-4">
       {item.coverUrl && (
         <img src={item.coverUrl} alt="" className="size-16 rounded-lg object-cover shrink-0" />
       )}
       <div className="flex-1 min-w-0">
         <Link
           href={`/library/article/${item.articleId}`}
-          className="font-medium text-white hover:text-cosmic-sky transition-colors line-clamp-1"
+          className="font-bold text-ink hover:text-blue transition-colors line-clamp-1"
         >
           {item.articleTitle}
         </Link>
-        <div className="mt-1 flex items-center gap-3 text-xs text-cosmic-dim">
+        <div className="mt-1 flex items-center gap-3 text-xs text-muted/70">
           <span>{item.authorNickname}</span>
           <span>{item.createTime}</span>
         </div>
       </div>
       <Button
-        variant="ghost"
-        size="xs"
+        variant="quiet"
+        size="sm"
         onClick={() => isCollection ? handleCancelCollection(item) : handleCancelLike(item)}
         disabled={cancelling === item.articleId}
       >
         {isCollection ? (
-          <><Star className="size-3.5 mr-1 fill-cosmic-gold text-cosmic-gold" />{cancelling === item.articleId ? "..." : "取消收藏"}</>
+          <><Star className="size-3.5 mr-1 fill-yellow text-yellow" />{cancelling === item.articleId ? "..." : "取消收藏"}</>
         ) : (
           <><Heart className="size-3.5 mr-1 fill-red-400 text-red-400" />{cancelling === item.articleId ? "..." : "取消点赞"}</>
         )}
       </Button>
-    </div>
+    </Card>
   );
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">收藏与点赞</h1>
+      <h1 className="mb-6 text-xl font-black text-ink">收藏与点赞</h1>
 
       <Tabs value={tab} onValueChange={(v) => { setTab(v); setPage(1); }}>
         <TabsList className="mb-6">
@@ -110,7 +111,7 @@ export function FavoritesPage() {
               {Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full rounded-xl" />)}
             </div>
           ) : items.length === 0 ? (
-            <div className="py-20 text-center text-cosmic-muted">
+            <div className="py-20 text-center text-muted">
               {isCollection ? "暂无收藏" : "暂未点赞"}
             </div>
           ) : (
@@ -120,9 +121,9 @@ export function FavoritesPage() {
           )}
           {total > 10 && (
             <div className="mt-4 flex justify-center gap-2">
-              <Button variant="ghost" size="icon-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
-              <span className="self-center text-sm text-cosmic-dim">{page} / {Math.ceil(total / 10)}</span>
-              <Button variant="ghost" size="icon-sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
+              <Button variant="quiet" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
+              <span className="self-center text-sm text-muted/70">{page} / {Math.ceil(total / 10)}</span>
+              <Button variant="quiet" size="sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
             </div>
           )}
         </TabsContent>

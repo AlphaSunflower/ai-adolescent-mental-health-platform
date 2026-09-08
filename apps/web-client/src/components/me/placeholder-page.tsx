@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft, Construction } from "lucide-react";
+import { Card } from "@/components/pouf/Card";
 
 interface PlaceholderPageProps {
   title: string;
@@ -20,16 +21,16 @@ export function PlaceholderPage({
     <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
       <Link
         href={backHref}
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-purple transition-colors"
       >
         <ArrowLeft className="size-4" />
         {backLabel}
       </Link>
-      <div className="cosmic-card p-12 text-center">
-        <Construction className="mx-auto mb-4 size-16 text-cosmic-gold opacity-40" />
-        <h1 className="mb-2 text-2xl font-bold text-white">{title}</h1>
-        <p className="text-cosmic-muted">{description}</p>
-      </div>
+      <Card className="p-12 text-center">
+        <Construction className="mx-auto mb-4 size-16 text-yellow opacity-40" />
+        <h1 className="mb-2 text-2xl font-black text-ink">{title}</h1>
+        <p className="text-muted">{description}</p>
+      </Card>
     </div>
   );
 }

@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FileText, Heart, Star, ShoppingBag, Calendar, ArrowRight, Pencil } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { UserProfile, Appointment } from "@/lib/types";
 
@@ -46,110 +48,110 @@ export function MePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-white">欢迎回来，{displayName}</h1>
-      <p className="mt-1 text-sm text-cosmic-muted">
+      <h1 className="text-2xl font-black text-ink">欢迎回来，{displayName}</h1>
+      <p className="mt-1 text-sm text-muted">
         {profile?.signature || "关注你的心理健康，从这里开始"}
       </p>
 
       {/* Quick action cards */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <Link href="/me/publish">
-          <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
-            <div className="mb-3 inline-flex rounded-lg bg-cosmic-sky/20 p-2">
-              <Pencil className="size-5 text-cosmic-sky" />
+          <Card className="group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
+            <div className="mb-3 inline-flex rounded-control bg-purple/20 p-2">
+              <Pencil className="size-5 text-purple" />
             </div>
-            <div className="text-lg font-bold text-white">发布文章</div>
-            <div className="mt-1 flex items-center gap-1 text-xs text-cosmic-dim group-hover:text-cosmic-sky">
+            <div className="text-lg font-bold text-ink">发布文章</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted/70 group-hover:text-purple">
               写文章 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
             </div>
-          </div>
+          </Card>
         </Link>
 
         <Link href="/me/articles">
-          <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
-            <div className="mb-3 inline-flex rounded-lg bg-purple-500/20 p-2">
-              <FileText className="size-5 text-purple-400" />
+          <Card className="group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
+            <div className="mb-3 inline-flex rounded-control bg-purple/20 p-2">
+              <FileText className="size-5 text-purple" />
             </div>
-            <div className="text-lg font-bold text-white">我的发布</div>
-            <div className="mt-1 flex items-center gap-1 text-xs text-cosmic-dim group-hover:text-cosmic-sky">
+            <div className="text-lg font-bold text-ink">我的发布</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted/70 group-hover:text-purple">
               管理文章 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
             </div>
-          </div>
+          </Card>
         </Link>
 
         <Link href="/me/favorites">
-          <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
-            <div className="mb-3 inline-flex rounded-lg bg-amber-500/20 p-2">
-              <Star className="size-5 text-amber-400" />
+          <Card className="group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
+            <div className="mb-3 inline-flex rounded-control bg-yellow/20 p-2">
+              <Star className="size-5 text-yellow" />
             </div>
-            <div className="text-lg font-bold text-white">我的收藏</div>
-            <div className="mt-1 flex items-center gap-1 text-xs text-cosmic-dim group-hover:text-cosmic-sky">
+            <div className="text-lg font-bold text-ink">我的收藏</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted/70 group-hover:text-purple">
               查看收藏 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
             </div>
-          </div>
+          </Card>
         </Link>
 
         <Link href="/me/likes">
-          <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
-            <div className="mb-3 inline-flex rounded-lg bg-pink-500/20 p-2">
-              <Heart className="size-5 text-pink-400" />
+          <Card className="group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
+            <div className="mb-3 inline-flex rounded-control bg-pink/20 p-2">
+              <Heart className="size-5 text-pink" />
             </div>
-            <div className="text-lg font-bold text-white">我的点赞</div>
-            <div className="mt-1 flex items-center gap-1 text-xs text-cosmic-dim group-hover:text-cosmic-sky">
+            <div className="text-lg font-bold text-ink">我的点赞</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted/70 group-hover:text-purple">
               查看点赞 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
             </div>
-          </div>
+          </Card>
         </Link>
 
         <Link href="/me/orders">
-          <div className="cosmic-card group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
-            <div className="mb-3 inline-flex rounded-lg bg-green-500/20 p-2">
-              <ShoppingBag className="size-5 text-green-400" />
+          <Card className="group cursor-pointer p-4 transition-all hover:-translate-y-0.5">
+            <div className="mb-3 inline-flex rounded-control bg-mint/20 p-2">
+              <ShoppingBag className="size-5 text-mint" />
             </div>
-            <div className="text-lg font-bold text-white">我的订单</div>
-            <div className="mt-1 flex items-center gap-1 text-xs text-cosmic-dim group-hover:text-cosmic-sky">
+            <div className="text-lg font-bold text-ink">我的订单</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-muted/70 group-hover:text-purple">
               查看订单 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
             </div>
-          </div>
+          </Card>
         </Link>
       </div>
 
       {/* Recent appointments */}
       <div className="mt-8">
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-white">
-            <Calendar className="size-5 text-cosmic-sky" />
+          <h2 className="flex items-center gap-2 text-lg font-black text-ink">
+            <Calendar className="size-5 text-purple" />
             近期预约
           </h2>
           <Link href="/me/psychology">
-            <Button variant="ghost" size="xs">
+            <Button variant="quiet" size="sm">
               查看全部 <ArrowRight className="ml-1 size-3" />
             </Button>
           </Link>
         </div>
 
         {recentAppointments.length === 0 ? (
-          <div className="cosmic-card p-8 text-center">
-            <p className="mb-4 text-sm text-cosmic-muted">暂无预约记录</p>
+          <Card className="p-8 text-center">
+            <p className="mb-4 text-sm text-muted">暂无预约记录</p>
             <Link href="/consultation/psychologist">
-              <Button variant="primary" size="sm">去预约咨询师</Button>
+              <Button tone="purple" variant="solid" size="sm">去预约咨询师</Button>
             </Link>
-          </div>
+          </Card>
         ) : (
           <div className="space-y-3">
             {recentAppointments.map((a) => (
-              <div key={a.id} className="cosmic-card flex items-center justify-between p-4">
+              <Card key={a.id} className="flex items-center justify-between p-4">
                 <div>
-                  <div className="font-medium text-white">{a.psychologistName}</div>
-                  <div className="mt-0.5 text-xs text-cosmic-dim">
+                  <div className="font-bold text-ink">{a.psychologistName}</div>
+                  <div className="mt-0.5 text-xs text-muted/70">
                     {a.date} {a.time} · {a.type}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm font-semibold text-cosmic-gold">¥{a.fee}</span>
-                  <span className="cosmic-tag text-xs">{a.status}</span>
+                  <span className="text-sm font-bold text-yellow">¥{a.fee}</span>
+                  <Badge variant="secondary" className="text-xs">{a.status}</Badge>
                 </div>
-              </div>
+              </Card>
             ))}
           </div>
         )}

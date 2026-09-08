@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Eye, Heart, MessageCircle, Clock, Pencil } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Badge } from "@/components/pouf/Badge";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 
 const STATUS_TABS = [
@@ -64,9 +65,9 @@ export function ArticlesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">我的发布</h1>
+        <h1 className="text-xl font-black text-ink">我的发布</h1>
         <Link href="/me/publish">
-          <Button variant="primary" size="xs">
+          <Button tone="purple" variant="solid" size="sm">
             <Pencil className="size-3.5 mr-1" />发布文章
           </Button>
         </Link>
@@ -77,19 +78,19 @@ export function ArticlesPage() {
         </TabsList>
         <TabsContent value={tab}>
           {items.length === 0 ? (
-            <div className="py-20 text-center text-cosmic-muted">暂无内容</div>
+            <div className="py-20 text-center text-muted">暂无内容</div>
           ) : (
             <div className="space-y-3">
               {items.map((item) => {
                 const s = statusLabel(item.status);
                 return (
-                  <div key={item.id} className="cosmic-card flex items-center gap-4 p-4">
+                  <Card key={item.id} className="flex items-center gap-4 p-4">
                     {item.coverUrl && <img src={item.coverUrl} alt="" className="size-16 rounded-lg object-cover shrink-0" />}
                     <div className="flex-1 min-w-0">
-                      <Link href={`/library/article/${item.id}`} className="font-medium text-white hover:text-cosmic-sky transition-colors line-clamp-1">
+                      <Link href={`/library/article/${item.id}`} className="font-bold text-ink hover:text-blue transition-colors line-clamp-1">
                         {item.title}
                       </Link>
-                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-cosmic-dim">
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted/70">
                         <Badge variant={s.variant} className="text-xs">{s.text}</Badge>
                         <span className="inline-flex items-center gap-1"><Eye className="size-3" />{item.viewCount}</span>
                         <span className="inline-flex items-center gap-1"><Heart className="size-3" />{item.likeCount}</span>
@@ -97,17 +98,17 @@ export function ArticlesPage() {
                         <span className="inline-flex items-center gap-1"><Clock className="size-3" />{item.createTime}</span>
                       </div>
                     </div>
-                    <Link href={`/library/article/${item.id}`}><Button variant="ghost" size="xs">查看</Button></Link>
-                  </div>
+                    <Link href={`/library/article/${item.id}`}><Button variant="quiet" size="sm">查看</Button></Link>
+                  </Card>
                 );
               })}
             </div>
           )}
           {total > 10 && (
             <div className="mt-4 flex justify-center gap-2">
-              <Button variant="ghost" size="icon-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
-              <span className="self-center text-sm text-cosmic-dim">{page} / {Math.ceil(total / 10)}</span>
-              <Button variant="ghost" size="icon-sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
+              <Button variant="quiet" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
+              <span className="self-center text-sm text-muted/70">{page} / {Math.ceil(total / 10)}</span>
+              <Button variant="quiet" size="sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
             </div>
           )}
         </TabsContent>

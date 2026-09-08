@@ -3,10 +3,13 @@
 import { useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { Camera, Mail, CheckCircle, AlertCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui/dialog";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
+import { Input } from "@/components/pouf/Input";
+import { Textarea } from "@/components/pouf/Textarea";
+import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/pouf/Dialog";
 import { api } from "@/lib/api";
 import { getToken } from "@/lib/session";
 import type { UserProfile } from "@/lib/types";
@@ -172,24 +175,24 @@ export function InfoPage() {
   }
 
   if (!profile) {
-    return <p className="text-cosmic-muted">无法加载用户信息</p>;
+    return <p className="text-muted">无法加载用户信息</p>;
   }
 
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">个人信息中心</h1>
+        <h1 className="text-xl font-black text-ink">个人信息中心</h1>
         {!editing && (
-          <Button variant="outline" size="sm" onClick={startEditing}>编辑信息</Button>
+          <Button variant="quiet" size="sm" onClick={startEditing}>编辑信息</Button>
         )}
       </div>
 
-      <div className="cosmic-card p-6 max-w-[700px]">
+      <Card className="p-6 max-w-[700px]">
         {/* Avatar */}
         <div className="mb-6 flex items-center gap-4">
           <div className="relative">
             <div
-              className="size-20 rounded-full overflow-hidden bg-cosmic-blue/20 flex items-center justify-center ring-2 ring-cosmic-gold/30 cursor-pointer"
+              className="size-20 rounded-full overflow-hidden bg-purple/20 flex items-center justify-center ring-2 ring-yellow/30 cursor-pointer"
               onClick={() => editing && fileInputRef.current?.click()}
             >
               {avatarPreview ? (
@@ -197,13 +200,13 @@ export function InfoPage() {
               ) : profile.headPath ? (
                 <img src={profile.headPath} alt="avatar" className="size-20 object-cover" />
               ) : (
-                <span className="text-3xl font-bold text-cosmic-sky">{(profile.nickname || profile.username || "U")[0]}</span>
+                <span className="text-3xl font-bold text-purple">{(profile.nickname || profile.username || "U")[0]}</span>
               )}
             </div>
             {editing && (
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="absolute bottom-0 right-0 size-7 rounded-full bg-cosmic-blue flex items-center justify-center text-white hover:bg-cosmic-blue/80 transition-colors"
+                className="absolute bottom-0 right-0 size-7 rounded-full bg-purple flex items-center justify-center text-white hover:bg-purple/80 transition-colors"
               >
                 <Camera className="size-3.5" />
               </button>
@@ -211,8 +214,8 @@ export function InfoPage() {
             <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
           </div>
           <div>
-            <p className="font-semibold text-white">{profile.nickname || profile.username}</p>
-            <p className="text-sm text-cosmic-muted">修改头像</p>
+            <p className="font-bold text-ink">{profile.nickname || profile.username}</p>
+            <p className="text-sm text-muted">修改头像</p>
           </div>
         </div>
 
@@ -221,36 +224,35 @@ export function InfoPage() {
           <div className="space-y-4">
             {/* Username (disabled) */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">用户名</label>
-              <input disabled value={profile.username || ""} className="cosmic-input w-full rounded-lg px-3 py-2 text-sm opacity-50" />
+              <label className="mb-1 block text-sm text-muted/70">用户名</label>
+              <Input disabled value={profile.username || ""} />
             </div>
 
             {/* Nickname */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">昵称 <span className="text-red-400">*</span></label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">昵称 <span className="text-red-400">*</span></label>
+              <Input
                 value={String(form.nickname || "")}
                 onChange={(e) => handleFieldChange("nickname", e.target.value)}
                 maxLength={20}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
                 placeholder="请输入昵称"
               />
-              <span className="mt-0.5 text-xs text-cosmic-dim">{String(form.nickname || "").length}/20</span>
+              <span className="mt-0.5 text-xs text-muted/70">{String(form.nickname || "").length}/20</span>
             </div>
 
             {/* Gender */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">性别</label>
+              <label className="mb-1 block text-sm text-muted/70">性别</label>
               <div className="flex gap-4">
                 {genderOptions.map((opt) => (
-                  <label key={opt.value} className="flex items-center gap-1.5 text-sm text-cosmic-muted cursor-pointer">
+                  <label key={opt.value} className="flex items-center gap-1.5 text-sm text-muted cursor-pointer">
                     <input
                       type="radio"
                       name="sex"
                       value={opt.value}
                       checked={Number(form.sex) === opt.value}
                       onChange={() => handleFieldChange("sex", opt.value)}
-                      className="accent-cosmic-blue"
+                      className="accent-purple"
                     />
                     {opt.label}
                   </label>
@@ -260,32 +262,32 @@ export function InfoPage() {
 
             {/* Birthday */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">生日</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">生日</label>
+              <Input
                 type="date"
                 value={String(form.birthday || "")}
                 onChange={(e) => handleFieldChange("birthday", e.target.value)}
-                className="cosmic-input w-full max-w-[200px] rounded-lg px-3 py-2 text-sm"
+                className="max-w-[200px]"
               />
             </div>
 
             {/* Phone */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">手机号</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">手机号</label>
+              <Input
                 value={String(form.phone || "")}
                 onChange={(e) => handleFieldChange("phone", e.target.value)}
-                className="cosmic-input w-full max-w-[300px] rounded-lg px-3 py-2 text-sm"
+                className="max-w-[300px]"
                 placeholder="请输入手机号"
               />
             </div>
 
             {/* Email */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">邮箱</label>
+              <label className="mb-1 block text-sm text-muted/70">邮箱</label>
               <div className="flex items-center gap-3">
-                <span className="text-sm text-white">{profile.email || "未设置"}</span>
-                <Button variant="ghost" size="xs" onClick={openEmailDialog} className="text-cosmic-sky hover:text-cosmic-sky/80">
+                <span className="text-sm text-ink">{profile.email || "未设置"}</span>
+                <Button variant="quiet" size="sm" onClick={openEmailDialog}>
                   更改邮箱
                 </Button>
               </div>
@@ -293,22 +295,21 @@ export function InfoPage() {
 
             {/* Signature */}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">个性签名</label>
-              <textarea
+              <label className="mb-1 block text-sm text-muted/70">个性签名</label>
+              <Textarea
                 value={String(form.signature || "")}
                 onChange={(e) => handleFieldChange("signature", e.target.value)}
                 maxLength={100}
-                rows={3}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm resize-none"
+                className="resize-none"
                 placeholder="请输入个性签名"
               />
-              <span className="mt-0.5 text-xs text-cosmic-dim">{String(form.signature || "").length}/100</span>
+              <span className="mt-0.5 text-xs text-muted/70">{String(form.signature || "").length}/100</span>
             </div>
 
             {/* Buttons */}
             <div className="flex gap-3 pt-2">
-              <Button variant="primary" onClick={handleSave} disabled={saving}>{saving ? "保存中..." : "保存修改"}</Button>
-              <Button variant="ghost" onClick={cancelEditing} disabled={saving}>取消</Button>
+              <Button variant="solid" onClick={handleSave} disabled={saving}>{saving ? "保存中..." : "保存修改"}</Button>
+              <Button variant="quiet" onClick={cancelEditing} disabled={saving}>取消</Button>
             </div>
           </div>
         ) : (
@@ -322,21 +323,21 @@ export function InfoPage() {
               { label: "手机号", value: profile.phone || "未设置" },
             ].map((row) => (
               <div key={row.label} className="flex items-center gap-4">
-                <span className="w-20 text-sm text-cosmic-dim shrink-0">{row.label}</span>
-                <span className="text-sm text-white">{row.value || "未设置"}</span>
+                <span className="w-20 text-sm text-muted/70 shrink-0">{row.label}</span>
+                <span className="text-sm text-ink">{row.value || "未设置"}</span>
               </div>
             ))}
             <div className="flex items-center gap-4">
-              <span className="w-20 text-sm text-cosmic-dim shrink-0">邮箱</span>
-              <span className="text-sm text-white">{profile.email || "未设置"}</span>
+              <span className="w-20 text-sm text-muted/70 shrink-0">邮箱</span>
+              <span className="text-sm text-ink">{profile.email || "未设置"}</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="w-20 text-sm text-cosmic-dim shrink-0">个性签名</span>
-              <span className="text-sm text-cosmic-muted">{profile.signature || "未设置"}</span>
+              <span className="w-20 text-sm text-muted/70 shrink-0">个性签名</span>
+              <span className="text-sm text-muted">{profile.signature || "未设置"}</span>
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Email Change Dialog */}
       <Dialog open={emailDialogOpen} onOpenChange={setEmailDialogOpen}>
@@ -344,33 +345,32 @@ export function InfoPage() {
           <DialogTitle>更改邮箱</DialogTitle>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">当前邮箱</label>
-              <p className="text-sm text-white">{profile.email || "未设置"}</p>
-              <p className="mt-1 text-xs text-cosmic-dim">本月剩余修改次数：{emailRemaining}/2</p>
+              <label className="mb-1 block text-sm text-muted/70">当前邮箱</label>
+              <p className="text-sm text-ink">{profile.email || "未设置"}</p>
+              <p className="mt-1 text-xs text-muted/70">本月剩余修改次数：{emailRemaining}/2</p>
             </div>
 
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">新邮箱</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">新邮箱</label>
+              <Input
                 type="email"
                 value={newEmail}
                 onChange={(e) => { setNewEmail(e.target.value); setEmailDialogError(""); }}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
                 placeholder="请输入新邮箱"
               />
             </div>
 
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">验证码</label>
+              <label className="mb-1 block text-sm text-muted/70">验证码</label>
               <div className="flex gap-2">
-                <input
+                <Input
                   value={emailCode}
                   onChange={(e) => { setEmailCode(e.target.value); setEmailDialogError(""); }}
-                  className="cosmic-input flex-1 rounded-lg px-3 py-2 text-sm"
+                  className="flex-1"
                   placeholder="6位验证码"
                   maxLength={6}
                 />
-                <Button variant="outline" size="sm" onClick={sendEmailCode} disabled={emailCountdown > 0 || emailCodeSending}>
+                <Button variant="quiet" size="sm" onClick={sendEmailCode} disabled={emailCountdown > 0 || emailCodeSending}>
                   {emailCountdown > 0 ? `${emailCountdown}s` : emailCodeSending ? "发送中..." : "发送验证码"}
                 </Button>
               </div>
@@ -384,10 +384,8 @@ export function InfoPage() {
             )}
 
             <div className="flex gap-2 pt-2">
-              <DialogClose asChild>
-                <Button variant="ghost" size="sm">取消</Button>
-              </DialogClose>
-              <Button variant="primary" size="sm" onClick={confirmEmailChange} disabled={saving || emailRemaining <= 0}>
+              <DialogClose>取消</DialogClose>
+              <Button variant="solid" size="sm" onClick={confirmEmailChange} disabled={saving || emailRemaining <= 0}>
                 {saving ? "确认中..." : "确认修改"}
               </Button>
             </div>

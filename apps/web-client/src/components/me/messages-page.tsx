@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Bell, UserPlus, Heart, MessageCircle, FileText } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 
@@ -34,11 +35,11 @@ const SOURCE_LABELS: Record<number, { text: string; variant: "secondary" | "succ
 const SourceIcon = ({ type }: { type: number }) => {
   const cls = "size-5";
   switch (type) {
-    case 1: return <UserPlus className={cls + " text-blue-400"} />;
-    case 2: return <Heart className={cls + " text-red-400"} />;
-    case 3: return <Heart className={cls + " text-pink-400"} />;
-    case 4: return <MessageCircle className={cls + " text-green-400"} />;
-    default: return <Bell className={cls + " text-cosmic-dim"} />;
+    case 1: return <UserPlus className={cls + " text-blue"} />;
+    case 2: return <Heart className={cls + " text-pink"} />;
+    case 3: return <Heart className={cls + " text-pink"} />;
+    case 4: return <MessageCircle className={cls + " text-mint"} />;
+    default: return <Bell className={cls + " text-muted/70"} />;
   }
 };
 
@@ -98,25 +99,25 @@ export function MessagesPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">我的消息</h1>
-        <Button variant="outline" size="sm" onClick={handleMarkAllRead}>全部已读</Button>
+        <h1 className="text-xl font-black text-ink">我的消息</h1>
+        <Button variant="quiet" size="sm" onClick={handleMarkAllRead}>全部已读</Button>
       </div>
 
       {items.length === 0 ? (
-        <div className="py-20 text-center text-cosmic-muted">暂无消息</div>
+        <div className="py-20 text-center text-muted">暂无消息</div>
       ) : (
         <div className="space-y-2">
           {items.map((msg) => {
             const src = SOURCE_LABELS[msg.sourceType];
             return (
-              <button
+              <Card
                 key={msg.id}
                 onClick={() => handleClick(msg)}
-                className={`cosmic-card flex items-center gap-4 p-4 w-full text-left transition-colors ${
-                  msg.isRead === 0 ? "ring-1 ring-cosmic-blue/30" : ""
+                className={`flex items-center gap-4 p-4 w-full text-left transition-colors ${
+                  msg.isRead === 0 ? "ring-1 ring-purple/40" : ""
                 }`}
               >
-                <div className="size-10 rounded-full bg-white/5 flex items-center justify-center shrink-0">
+                <div className="size-10 rounded-full bg-purple/10 flex items-center justify-center shrink-0">
                   {msg.fromUserAvatar ? (
                     <img src={msg.fromUserAvatar} alt="" className="size-10 rounded-full object-cover" />
                   ) : (
@@ -125,14 +126,14 @@ export function MessagesPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-white text-sm">{msg.title}</span>
+                    <span className="font-bold text-ink text-sm">{msg.title}</span>
                     {src && <Badge variant={src.variant} className="text-xs">{src.text}</Badge>}
                   </div>
-                  <p className="mt-0.5 text-xs text-cosmic-dim line-clamp-1">{msg.content}</p>
-                  <span className="mt-1 text-xs text-cosmic-dim">{msg.createTime}</span>
+                  <p className="mt-0.5 text-xs text-muted/70 line-clamp-1">{msg.content}</p>
+                  <span className="mt-1 text-xs text-muted/70">{msg.createTime}</span>
                 </div>
-                {msg.isRead === 0 && <div className="size-2 rounded-full bg-cosmic-blue shrink-0" />}
-              </button>
+                {msg.isRead === 0 && <div className="size-2 rounded-full bg-purple shrink-0" />}
+              </Card>
             );
           })}
         </div>
@@ -140,9 +141,9 @@ export function MessagesPage() {
 
       {total > 10 && (
         <div className="mt-4 flex justify-center gap-2">
-          <Button variant="ghost" size="icon-sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
-          <span className="self-center text-sm text-cosmic-dim">{page} / {Math.ceil(total / 10)}</span>
-          <Button variant="ghost" size="icon-sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
+          <Button variant="quiet" size="sm" disabled={page <= 1} onClick={() => setPage((p) => p - 1)}>‹</Button>
+          <span className="self-center text-sm text-muted/70">{page} / {Math.ceil(total / 10)}</span>
+          <Button variant="quiet" size="sm" disabled={page * 10 >= total} onClick={() => setPage((p) => p + 1)}>›</Button>
         </div>
       )}
     </div>

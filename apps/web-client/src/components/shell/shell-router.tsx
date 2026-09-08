@@ -7,7 +7,19 @@ import { AppShell } from "@/components/cosmic/app-shell";
 /** Routes that have graduated to the pouf clay shell. This list grows as each
  *  main route is migrated (P1) and is deleted entirely in P2 once every route
  *  is pouf, collapsing the dual shell to a single always-on PoufAppShell. */
-const POUF_ROUTES = new Set(["/home", "/ai", "/assessment", "/consultation"]);
+const POUF_ROUTES = new Set([
+  "/home",
+  "/ai",
+  "/assessment",
+  "/consultation",
+  "/me",
+  "/search",
+  "/xiaoai",
+  "/user",
+  "/apply",
+  "/legal",
+  "/library",
+]);
 
 /** Route-level shell selection. Graduated routes get the pouf clay shell; the
  *  rest keep the cosmic shell until the global migration lands. Prefix match so

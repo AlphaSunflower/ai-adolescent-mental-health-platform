@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 
@@ -59,15 +60,15 @@ export function PrivacyPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">隐私设置</h1>
-      <div className="cosmic-card max-w-[540px] p-6 space-y-5">
+      <h1 className="mb-6 text-xl font-black text-ink">隐私设置</h1>
+      <Card className="max-w-[540px] p-6 space-y-5">
         {PRIVACY_ITEMS.map((item) => (
           <div key={item.key} className="flex items-center justify-between">
-            <span className="text-sm text-cosmic-muted">{item.label}</span>
+            <span className="text-sm text-muted">{item.label}</span>
             <button
               onClick={() => toggle(item.key)}
               className={`relative h-6 w-11 rounded-full transition-colors ${
-                form[item.key] ? "bg-cosmic-blue" : "bg-white/20"
+                form[item.key] ? "bg-purple" : "bg-purple/15"
               }`}
             >
               <span
@@ -79,12 +80,12 @@ export function PrivacyPage() {
           </div>
         ))}
         <div className="pt-2">
-          <Button variant="primary" size="sm" onClick={handleSave} disabled={saving}>
+          <Button variant="solid" size="sm" onClick={handleSave} disabled={saving}>
             {saving ? "保存中..." : "保存设置"}
           </Button>
         </div>
-      </div>
-      <div className="mt-6 max-w-[540px] rounded-lg bg-cosmic-blue/5 border border-cosmic-blue/20 p-4 text-sm text-cosmic-dim">
+      </Card>
+      <div className="mt-6 max-w-[540px] rounded-control bg-purple/5 border border-purple/20 p-4 text-sm text-muted/70">
         温馨提示：设置"允许他人查看"后，其他用户可以在您的个人主页中查看对应的内容。关闭后，其他用户将无法查看这些信息。
       </div>
     </div>

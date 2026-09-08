@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
+import { Input } from "@/components/pouf/Input";
+import { Textarea } from "@/components/pouf/Textarea";
+import { Dialog, DialogContent, DialogTitle } from "@/components/pouf/Dialog";
 import { toast } from "sonner";
 import { Plus, Upload, X } from "lucide-react";
 import { api } from "@/lib/api";
@@ -255,14 +257,14 @@ export function PatientsPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-xl font-bold text-white">就诊人病历管理</h1>
-        <Button variant="primary" size="sm" onClick={() => openPatientDialog()}>
+        <h1 className="text-xl font-black text-ink">就诊人病历管理</h1>
+        <Button variant="solid" size="sm" onClick={() => openPatientDialog()}>
           <Plus className="size-4 mr-1" />添加就诊人
         </Button>
       </div>
 
       {patients.length === 0 ? (
-        <div className="py-20 text-center text-cosmic-muted">暂无就诊人信息，请添加</div>
+        <div className="py-20 text-center text-muted">暂无就诊人信息，请添加</div>
       ) : (
         <>
           <Tabs value={activePatientId} onValueChange={handleTabChange}>
@@ -275,34 +277,34 @@ export function PatientsPage() {
             <TabsContent value={activePatientId}>
               {currentPatient && (
                 <>
-                  <div className="cosmic-card mb-6 p-4">
+                  <Card className="mb-6 p-4">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <span className="text-cosmic-dim">姓名：</span>
-                        <span className="text-white">{currentPatient.name}</span>
+                        <span className="text-muted/70">姓名：</span>
+                        <span className="text-ink">{currentPatient.name}</span>
                       </div>
                       <div>
-                        <span className="text-cosmic-dim">年龄：</span>
-                        <span className="text-white">{calculateAge(currentPatient.birthday)}岁</span>
+                        <span className="text-muted/70">年龄：</span>
+                        <span className="text-ink">{calculateAge(currentPatient.birthday)}岁</span>
                       </div>
                       <div>
-                        <span className="text-cosmic-dim">性别：</span>
-                        <span className="text-white">{currentPatient.sex === 1 ? "男" : "女"}</span>
+                        <span className="text-muted/70">性别：</span>
+                        <span className="text-ink">{currentPatient.sex === 1 ? "男" : "女"}</span>
                       </div>
                       <div>
-                        <span className="text-cosmic-dim">关系：</span>
-                        <span className="text-white">{currentPatient.relationship}</span>
+                        <span className="text-muted/70">关系：</span>
+                        <span className="text-ink">{currentPatient.relationship}</span>
                       </div>
                       <div className="col-span-2 sm:col-span-4 flex gap-2">
-                        <Button variant="ghost" size="xs" onClick={() => openPatientDialog(currentPatient)}>修改</Button>
-                        <Button variant="ghost" size="xs" className="text-red-400 hover:text-red-300" onClick={() => deletePatient(currentPatient.id)}>删除</Button>
+                        <Button variant="quiet" size="sm" onClick={() => openPatientDialog(currentPatient)}>修改</Button>
+                        <Button variant="quiet" size="sm" onClick={() => deletePatient(currentPatient.id)}>删除</Button>
                       </div>
                     </div>
-                  </div>
+                  </Card>
 
                   <div className="mb-4 flex items-center justify-between">
-                    <h3 className="font-semibold text-white">就诊经历</h3>
-                    <Button variant="primary" size="sm" onClick={openAddRecord}>
+                    <h3 className="font-bold text-ink">就诊经历</h3>
+                    <Button variant="solid" size="sm" onClick={openAddRecord}>
                       <Plus className="size-4 mr-1" />新增就诊经历
                     </Button>
                   </div>
@@ -312,12 +314,12 @@ export function PatientsPage() {
                       {Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} className="h-14 w-full rounded-xl" />)}
                     </div>
                   ) : records.length === 0 ? (
-                    <div className="py-12 text-center text-cosmic-muted">暂无就诊记录</div>
+                    <div className="py-12 text-center text-muted">暂无就诊记录</div>
                   ) : (
-                    <div className="cosmic-card overflow-x-auto">
+                    <Card className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead>
-                          <tr className="border-b border-white/5 text-left text-cosmic-dim">
+                          <tr className="border-b border-purple/10 text-left text-muted/70">
                             <th className="px-4 py-3 font-medium w-[120px]">就诊日期</th>
                             <th className="px-4 py-3 font-medium w-[120px]">科室</th>
                             <th className="px-4 py-3 font-medium">医院</th>
@@ -327,20 +329,20 @@ export function PatientsPage() {
                         </thead>
                         <tbody>
                           {records.map((r) => (
-                            <tr key={r.id} className="border-b border-white/5 last:border-0">
-                              <td className="px-4 py-3 text-cosmic-dim">{r.visitDate}</td>
-                              <td className="px-4 py-3 text-white">{r.department}</td>
-                              <td className="px-4 py-3 text-white">{r.hospital}</td>
-                              <td className="px-4 py-3 text-cosmic-muted max-w-[200px] truncate">{r.symptoms}</td>
+                            <tr key={r.id} className="border-b border-purple/10 last:border-0">
+                              <td className="px-4 py-3 text-muted/70">{r.visitDate}</td>
+                              <td className="px-4 py-3 text-ink">{r.department}</td>
+                              <td className="px-4 py-3 text-ink">{r.hospital}</td>
+                              <td className="px-4 py-3 text-muted max-w-[200px] truncate">{r.symptoms}</td>
                               <td className="px-4 py-3 flex gap-2">
-                                <Button variant="ghost" size="xs" onClick={() => openViewRecord(r)}>详情</Button>
-                                <Button variant="ghost" size="xs" className="text-red-400 hover:text-red-300" onClick={() => deleteRecord(r.id)}>删除</Button>
+                                <Button variant="quiet" size="sm" onClick={() => openViewRecord(r)}>详情</Button>
+                                <Button variant="quiet" size="sm" onClick={() => deleteRecord(r.id)}>删除</Button>
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                    </div>
+                    </Card>
                   )}
                 </>
               )}
@@ -355,25 +357,24 @@ export function PatientsPage() {
           <DialogTitle>{patientForm.id ? "修改就诊人" : "添加就诊人"}</DialogTitle>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">姓名</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">姓名</label>
+              <Input
                 value={String(patientForm.name ?? "")}
                 onChange={(e) => setPatientForm((f) => ({ ...f, name: e.target.value }))}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="mb-2 block text-sm text-cosmic-dim">性别</label>
+              <label className="mb-2 block text-sm text-muted/70">性别</label>
               <div className="flex gap-4">
                 {[{ value: 1, label: "男" }, { value: 2, label: "女" }].map((opt) => (
-                  <label key={opt.value} className="flex items-center gap-1.5 text-sm text-cosmic-muted cursor-pointer">
+                  <label key={opt.value} className="flex items-center gap-1.5 text-sm text-muted cursor-pointer">
                     <input
                       type="radio"
                       name="patientSex"
                       value={opt.value}
                       checked={Number(patientForm.sex) === opt.value}
                       onChange={() => setPatientForm((f) => ({ ...f, sex: opt.value }))}
-                      className="accent-cosmic-blue"
+                      className="accent-purple"
                     />
                     {opt.label}
                   </label>
@@ -381,28 +382,27 @@ export function PatientsPage() {
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">出生日期</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">出生日期</label>
+              <Input
                 type="date"
                 value={String(patientForm.birthday ?? "")}
                 onChange={(e) => setPatientForm((f) => ({ ...f, birthday: e.target.value }))}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">关系</label>
+              <label className="mb-1 block text-sm text-muted/70">关系</label>
               <select
                 value={String(patientForm.relationship ?? "")}
                 onChange={(e) => setPatientForm((f) => ({ ...f, relationship: e.target.value }))}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
+                className="cushion-field h-11 w-full rounded-control bg-surface px-4 py-2.5 text-[15px] text-ink focus-visible:cushion-field-focus focus-visible:outline-none"
               >
                 <option value="">请选择关系</option>
                 {RELATION_OPTIONS.map((r) => <option key={r} value={r}>{r}</option>)}
               </select>
             </div>
             <div className="flex gap-2 pt-2">
-              <Button variant="ghost" size="sm" onClick={() => setPatientDialogOpen(false)}>取消</Button>
-              <Button variant="primary" size="sm" onClick={submitPatient} disabled={patientSaving}>
+              <Button variant="quiet" size="sm" onClick={() => setPatientDialogOpen(false)}>取消</Button>
+              <Button variant="solid" size="sm" onClick={submitPatient} disabled={patientSaving}>
                 {patientSaving ? "保存中..." : "确定"}
               </Button>
             </div>
@@ -416,49 +416,45 @@ export function PatientsPage() {
           <DialogTitle>{recordViewOnly ? "病历详情" : "新增就诊经历"}</DialogTitle>
           <div className="space-y-4">
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">就诊日期</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">就诊日期</label>
+              <Input
                 type="date"
                 value={String(recordForm.visitDate ?? "")}
                 onChange={(e) => setRecordForm((f) => ({ ...f, visitDate: e.target.value }))}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
                 disabled={recordViewOnly}
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">就诊科室</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">就诊科室</label>
+              <Input
                 value={String(recordForm.department ?? "")}
                 onChange={(e) => setRecordForm((f) => ({ ...f, department: e.target.value }))}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
                 disabled={recordViewOnly}
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">就诊医院</label>
-              <input
+              <label className="mb-1 block text-sm text-muted/70">就诊医院</label>
+              <Input
                 value={String(recordForm.hospital ?? "")}
                 onChange={(e) => setRecordForm((f) => ({ ...f, hospital: e.target.value }))}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
                 disabled={recordViewOnly}
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">病症</label>
-              <textarea
+              <label className="mb-1 block text-sm text-muted/70">病症</label>
+              <Textarea
                 value={String(recordForm.symptoms ?? "")}
                 onChange={(e) => setRecordForm((f) => ({ ...f, symptoms: e.target.value }))}
-                rows={3}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm resize-none"
+                className="resize-none"
                 disabled={recordViewOnly}
               />
             </div>
             {!recordViewOnly && (
               <div>
-                <label className="mb-1 block text-sm text-cosmic-dim">病历单图片</label>
+                <label className="mb-1 block text-sm text-muted/70">病历单图片</label>
                 <div className="flex flex-wrap gap-2">
                   {recordExistingImages.map((url, i) => (
-                    <div key={`existing-${i}`} className="relative size-16 rounded-lg overflow-hidden bg-white/5">
+                    <div key={`existing-${i}`} className="relative size-16 rounded-lg overflow-hidden bg-purple/10">
                       <img src={url} alt="" className="size-16 object-cover" />
                       <button
                         onClick={() => removeExistingImage(url)}
@@ -469,7 +465,7 @@ export function PatientsPage() {
                     </div>
                   ))}
                   {recordFiles.map((file, i) => (
-                    <div key={`new-${i}`} className="relative size-16 rounded-lg overflow-hidden bg-white/5">
+                    <div key={`new-${i}`} className="relative size-16 rounded-lg overflow-hidden bg-purple/10">
                       <img src={URL.createObjectURL(file)} alt="" className="size-16 object-cover" />
                       <button
                         onClick={() => removeFile(i)}
@@ -481,18 +477,18 @@ export function PatientsPage() {
                   ))}
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="size-16 rounded-lg border border-dashed border-white/20 flex items-center justify-center text-cosmic-dim hover:border-cosmic-sky/50 transition-colors"
+                    className="size-16 rounded-lg border border-dashed border-purple/20 flex items-center justify-center text-muted hover:border-purple/50 transition-colors"
                   >
                     <Upload className="size-5" />
                   </button>
                 </div>
                 <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={addFiles} className="hidden" />
-                <p className="mt-1 text-xs text-cosmic-dim">支持 JPG/PNG，单张不超过 3MB</p>
+                <p className="mt-1 text-xs text-muted/70">支持 JPG/PNG，单张不超过 3MB</p>
               </div>
             )}
             {recordViewOnly && recordExistingImages.length > 0 && (
               <div>
-                <label className="mb-1 block text-sm text-cosmic-dim">病历单图片</label>
+                <label className="mb-1 block text-sm text-muted/70">病历单图片</label>
                 <div className="flex flex-wrap gap-2">
                   {recordExistingImages.map((url, i) => (
                     <img key={i} src={url} alt="" className="size-16 rounded-lg object-cover" />
@@ -501,21 +497,20 @@ export function PatientsPage() {
               </div>
             )}
             <div>
-              <label className="mb-1 block text-sm text-cosmic-dim">备注</label>
-              <textarea
+              <label className="mb-1 block text-sm text-muted/70">备注</label>
+              <Textarea
                 value={String(recordForm.remarks ?? "")}
                 onChange={(e) => setRecordForm((f) => ({ ...f, remarks: e.target.value }))}
-                rows={2}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm resize-none"
+                className="resize-none"
                 disabled={recordViewOnly}
               />
             </div>
             <div className="flex gap-2 pt-2">
-              <Button variant="ghost" size="sm" onClick={() => setRecordDialogOpen(false)}>
+              <Button variant="quiet" size="sm" onClick={() => setRecordDialogOpen(false)}>
                 {recordViewOnly ? "关闭" : "取消"}
               </Button>
               {!recordViewOnly && (
-                <Button variant="primary" size="sm" onClick={submitRecord} disabled={recordSaving}>
+                <Button variant="solid" size="sm" onClick={submitRecord} disabled={recordSaving}>
                   {recordSaving ? "保存中..." : "确定"}
                 </Button>
               )}

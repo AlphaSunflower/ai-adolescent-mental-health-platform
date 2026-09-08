@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload, Check } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
+import { Card } from "@/components/pouf/Card";
 import { api, httpClient } from "@/lib/api";
 import { getToken } from "@/lib/session";
 
@@ -133,87 +134,87 @@ export function ApplyFormPage() {
   if (checking) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <p className="text-cosmic-muted">检查申请状态...</p>
+        <p className="text-muted">检查申请状态...</p>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 md:py-12">
-      <Link href="/apply" className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors">
+      <Link href="/apply" className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-purple transition-colors">
         <ArrowLeft className="size-4" /> 返回申请首页
       </Link>
 
-      <h1 className="cosmic-gradient-text mb-2 text-2xl font-bold">咨询师申请</h1>
+      <h1 className="mb-2 text-2xl font-black text-ink">咨询师申请</h1>
 
       {/* Step indicator */}
       <div className="mb-8 flex items-center gap-3">
         {["basic", "report"].map((s, i) => (
           <div key={s} className="flex items-center gap-3">
-            <div className={`flex items-center gap-2 text-sm ${step === s ? "text-cosmic-sky font-semibold" : step === "report" && i === 0 ? "text-green-400" : "text-cosmic-dim"}`}>
+            <div className={`flex items-center gap-2 text-sm ${step === s ? "text-blue font-semibold" : step === "report" && i === 0 ? "text-mint" : "text-muted/70"}`}>
               <span className={`flex size-7 items-center justify-center rounded-full text-xs font-bold ${
-                step === s ? "bg-cosmic-blue/30 text-cosmic-sky" : step === "report" && i === 0 ? "bg-green-400/20 text-green-400" : "bg-white/5 text-cosmic-dim"
+                step === s ? "bg-purple/20 text-blue" : step === "report" && i === 0 ? "bg-mint/20 text-mint" : "bg-purple/10 text-muted/70"
               }`}>
                 {step === "report" && i === 0 ? <Check className="size-3.5" /> : i + 1}
               </span>
               {s === "basic" ? "基本信息" : "案例报告"}
             </div>
-            {i === 0 && <div className="h-px w-12 bg-white/10" />}
+            {i === 0 && <div className="h-px w-12 bg-purple/10" />}
           </div>
         ))}
       </div>
 
       {step === "basic" && (
-        <div className="cosmic-card space-y-5 p-6">
+        <Card className="space-y-5 p-6">
           {BASIC_FIELDS.map((f) => (
             <div key={f.name}>
-              <label className="mb-1.5 block text-sm font-medium text-cosmic-header">
-                {f.label}{f.required && <span className="text-red-400 ml-0.5">*</span>}
+              <label className="mb-1.5 block text-sm font-medium text-ink">
+                {f.label}{f.required && <span className="text-pink ml-0.5">*</span>}
               </label>
               <input
                 type={f.type}
                 value={form[f.name] || ""}
                 onChange={(e) => set(f.name, e.target.value)}
                 placeholder={f.placeholder}
-                className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
+                className="cushion-field w-full rounded-control bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus-visible:cushion-field-focus focus-visible:outline-none"
               />
             </div>
           ))}
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-cosmic-header">简历上传</label>
-            <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 p-4 text-sm text-cosmic-muted hover:border-cosmic-sky/50 transition-colors">
+            <label className="mb-1.5 block text-sm font-medium text-ink">简历上传</label>
+            <label className="flex cursor-pointer items-center gap-2 rounded-control border border-dashed border-purple/30 p-4 text-sm text-muted hover:border-purple/50 transition-colors">
               <Upload className="size-4" />
               {uploading === "resume" ? "上传中..." : resumeUrl ? "已上传" : "点击上传简历文件"}
               <input type="file" accept=".pdf,.doc,.docx" onChange={async (e) => { const f = (e.target as HTMLInputElement).files?.[0]; if (!f) return; setUploading("resume"); const url = await uploadFile(f, "resume"); if (url) setResumeUrl(url); setUploading(""); }} disabled={uploading === "resume"} className="hidden" />
             </label>
-            {resumeUrl && <p className="mt-1 text-xs text-green-400">简历已上传</p>}
+            {resumeUrl && <p className="mt-1 text-xs text-mint">简历已上传</p>}
           </div>
 
-          <Button variant="primary" className="w-full" onClick={handleSubmitBasic} disabled={submitting}>
+          <Button tone="purple" block onClick={handleSubmitBasic} disabled={submitting}>
             {submitting ? "提交中..." : "下一步：案例报告"}
           </Button>
-        </div>
+        </Card>
       )}
 
       {step === "report" && (
-        <div className="cosmic-card space-y-5 p-6">
-          <p className="text-sm text-cosmic-muted">请上传相关证明材料，并撰写个案报告</p>
+        <Card className="space-y-5 p-6">
+          <p className="text-sm text-muted">请上传相关证明材料，并撰写个案报告</p>
 
           {PROOF_CATEGORIES.map((cat) => (
             <div key={cat.key}>
-              <label className="mb-1.5 block text-sm font-medium text-cosmic-header">{cat.label}</label>
+              <label className="mb-1.5 block text-sm font-medium text-ink">{cat.label}</label>
               {proofs[cat.key].length > 0 && (
                 <div className="mb-2 space-y-1">
                   {proofs[cat.key].map((url, idx) => (
-                    <div key={idx} className="flex items-center justify-between rounded bg-white/5 px-3 py-1.5 text-xs text-cosmic-muted">
+                    <div key={idx} className="flex items-center justify-between rounded-control bg-purple/10 px-3 py-1.5 text-xs text-muted">
                       <span className="truncate">{url.split("/").pop() || `文件 ${idx + 1}`}</span>
-                      <button onClick={() => removeProof(cat.key, idx)} className="text-red-400 hover:text-red-300 ml-2 shrink-0">删除</button>
+                      <button onClick={() => removeProof(cat.key, idx)} className="text-pink hover:text-pink ml-2 shrink-0">删除</button>
                     </div>
                   ))}
                 </div>
               )}
-              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 p-3 text-sm text-cosmic-muted hover:border-cosmic-sky/50 transition-colors">
+              <label className="flex cursor-pointer items-center gap-2 rounded-control border border-dashed border-purple/30 p-3 text-sm text-muted hover:border-purple/50 transition-colors">
                 <Upload className="size-4" />
                 {uploading === cat.key ? "上传中..." : `上传${cat.label}`}
                 <input type="file" accept=".jpg,.jpeg,.png,.pdf" onChange={(e) => handleFileUpload(cat.key, e)} disabled={uploading === cat.key} className="hidden" />
@@ -222,22 +223,22 @@ export function ApplyFormPage() {
           ))}
 
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-cosmic-header">
-              个案报告 <span className="text-red-400">*</span>
+            <label className="mb-1.5 block text-sm font-medium text-ink">
+              个案报告 <span className="text-pink">*</span>
             </label>
             <textarea
               value={selfNarration}
               onChange={(e) => setSelfNarration(e.target.value)}
               placeholder="请详细描述您的个案经验、咨询方法和反思..."
               rows={6}
-              className="cosmic-input w-full rounded-lg px-3 py-2 text-sm resize-y"
+              className="cushion-field w-full rounded-control bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus-visible:cushion-field-focus focus-visible:outline-none resize-y"
             />
           </div>
 
-          <Button variant="primary" className="w-full" onClick={handleSubmitReport} disabled={submitting}>
+          <Button tone="purple" block onClick={handleSubmitReport} disabled={submitting}>
             {submitting ? "提交中..." : "提交申请"}
           </Button>
-        </div>
+        </Card>
       )}
     </div>
   );

@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Upload } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/pouf/Button";
+import { Card } from "@/components/pouf/Card";
 import { api, httpClient } from "@/lib/api";
 import { getToken } from "@/lib/session";
 
@@ -72,43 +73,43 @@ export function ApplyBasicPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-8 md:py-12">
-      <Link href="/apply" className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors">
+      <Link href="/apply" className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-purple transition-colors">
         <ArrowLeft className="size-4" /> 返回申请首页
       </Link>
 
-      <h1 className="cosmic-gradient-text mb-2 text-2xl font-bold">基本信息</h1>
-      <p className="mb-8 text-sm text-cosmic-muted">请填写您的基本信息，带 * 为必填项</p>
+      <h1 className="mb-2 text-2xl font-black text-ink">基本信息</h1>
+      <p className="mb-8 text-sm text-muted">请填写您的基本信息，带 * 为必填项</p>
 
-      <div className="cosmic-card space-y-5 p-6">
+      <Card className="space-y-5 p-6">
         {FIELDS.map((f) => (
           <div key={f.name}>
-            <label className="mb-1.5 block text-sm font-medium text-cosmic-header">
-              {f.label}{f.required && <span className="text-red-400 ml-0.5">*</span>}
+            <label className="mb-1.5 block text-sm font-medium text-ink">
+              {f.label}{f.required && <span className="text-pink ml-0.5">*</span>}
             </label>
             <input
               type={f.type}
               value={form[f.name] || ""}
               onChange={(e) => set(f.name, e.target.value)}
               placeholder={f.placeholder}
-              className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
+              className="cushion-field w-full rounded-control bg-surface px-3 py-2 text-sm text-ink placeholder:text-muted focus-visible:cushion-field-focus focus-visible:outline-none"
             />
           </div>
         ))}
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-cosmic-header">简历上传</label>
-          <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/20 p-4 text-sm text-cosmic-muted hover:border-cosmic-sky/50 transition-colors">
+          <label className="mb-1.5 block text-sm font-medium text-ink">简历上传</label>
+          <label className="flex cursor-pointer items-center gap-2 rounded-control border border-dashed border-purple/30 p-4 text-sm text-muted hover:border-purple/50 transition-colors">
             <Upload className="size-4" />
             {uploading ? "上传中..." : resumeUrl ? "已上传" : "点击上传简历文件"}
             <input type="file" accept=".pdf,.doc,.docx" onChange={handleUpload} disabled={uploading} className="hidden" />
           </label>
-          {resumeUrl && <p className="mt-1 text-xs text-green-400">简历已上传</p>}
+          {resumeUrl && <p className="mt-1 text-xs text-mint">简历已上传</p>}
         </div>
 
-        <Button variant="primary" className="w-full" onClick={handleSubmit} disabled={submitting}>
+        <Button tone="purple" block onClick={handleSubmit} disabled={submitting}>
           {submitting ? "提交中..." : "提交基本信息"}
         </Button>
-      </div>
+      </Card>
     </div>
   );
 }

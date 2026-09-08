@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import { FileText, Clock, Video, CircleCheck, Eye, MessageCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Button } from "@/components/pouf/Button";
+import { Badge } from "@/components/pouf/Badge";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
+import { Dialog, DialogContent, DialogTitle } from "@/components/pouf/Dialog";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import type { Appointment, AppointmentStatus } from "@/lib/types";
@@ -55,10 +56,10 @@ export function MeOrdersPage() {
   };
 
   const statCards = [
-    { label: "全部订单", value: stats.total, icon: FileText, color: "text-blue-400" },
-    { label: "待处理", value: stats.pending, icon: Clock, color: "text-yellow-400" },
-    { label: "进行中", value: stats.ongoing, icon: Video, color: "text-cyan-400" },
-    { label: "已完成", value: stats.completed, icon: CircleCheck, color: "text-green-400" },
+    { label: "全部订单", value: stats.total, icon: FileText, color: "text-blue" },
+    { label: "待处理", value: stats.pending, icon: Clock, color: "text-yellow" },
+    { label: "进行中", value: stats.ongoing, icon: Video, color: "text-blue" },
+    { label: "已完成", value: stats.completed, icon: CircleCheck, color: "text-mint" },
   ];
 
   if (loading) {
@@ -75,19 +76,19 @@ export function MeOrdersPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">我的订单</h1>
+      <h1 className="mb-6 text-xl font-black text-ink">我的订单</h1>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         {statCards.map((card) => (
-          <div key={card.label} className="cosmic-card p-4 flex items-center gap-3">
-            <div className="rounded-lg bg-white/5 p-2">
+          <Card key={card.label} className="p-4 flex items-center gap-3">
+            <div className="rounded-control bg-purple/10 p-2">
               <card.icon className={`size-5 ${card.color}`} />
             </div>
             <div>
-              <p className="text-lg font-bold text-white">{card.value}</p>
-              <p className="text-xs text-cosmic-dim">{card.label}</p>
+              <p className="text-lg font-bold text-ink">{card.value}</p>
+              <p className="text-xs text-muted/70">{card.label}</p>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
 
@@ -100,39 +101,40 @@ export function MeOrdersPage() {
         </TabsList>
         <TabsContent value={tab}>
           {filtered.length === 0 ? (
-            <div className="py-20 text-center text-cosmic-muted">暂无订单记录</div>
+            <div className="py-20 text-center text-muted">暂无订单记录</div>
           ) : (
             <div className="space-y-3">
               {filtered.map((o) => (
-                <div key={o.id} className="cosmic-card p-4 transition-all hover:-translate-y-0.5">
+                <Card key={o.id} className="p-4 transition-all hover:-translate-y-0.5">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="font-semibold text-white">{o.psychologistName}</h3>
-                      <p className="text-sm text-cosmic-muted">就诊人: {o.patientName}</p>
+                      <h3 className="font-black text-ink">{o.psychologistName}</h3>
+                      <p className="text-sm text-muted">就诊人: {o.patientName}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant={STATUS_VARIANTS[o.status]}>{o.status}</Badge>
                       {(o.status === "进行中" || o.status === "已预约") && (
                         <Button
-                          variant="primary"
-                          size="xs"
+                          tone="purple"
+                          variant="solid"
+                          size="sm"
                           onClick={() => router.push(`/consultation/chat/${o.id}`)}
                         >
                           <MessageCircle className="size-3.5 mr-1" />
                           {o.type === "线上咨询" ? "进入咨询" : "详情"}
                         </Button>
                       )}
-                      <Button variant="ghost" size="xs" onClick={() => { setDetail(o); setDetailOpen(true); }}>
+                      <Button variant="quiet" size="sm" onClick={() => { setDetail(o); setDetailOpen(true); }}>
                         <Eye className="size-3.5 mr-1" />详情
                       </Button>
                     </div>
                   </div>
-                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-cosmic-dim">
+                  <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted/70">
                     <span>{o.date} {o.time}</span>
                     <span>{o.type}</span>
-                    <span className="font-semibold text-cosmic-gold">¥{o.fee}</span>
+                    <span className="font-semibold text-yellow">¥{o.fee}</span>
                   </div>
-                </div>
+                </Card>
               ))}
             </div>
           )}
@@ -144,7 +146,7 @@ export function MeOrdersPage() {
           <DialogTitle>订单详情</DialogTitle>
           {detail && (
             <div className="space-y-4">
-              <div className="rounded-lg bg-white/5 p-4 space-y-2">
+              <div className="rounded-control bg-purple/10 p-4 space-y-2">
                 {[
                   { label: "咨询师", value: detail.psychologistName },
                   { label: "就诊人", value: detail.patientName },
@@ -153,12 +155,12 @@ export function MeOrdersPage() {
                   { label: "订单金额", value: `¥${detail.fee}` },
                 ].map((row) => (
                   <div key={row.label} className="flex justify-between text-sm">
-                    <span className="text-cosmic-dim">{row.label}</span>
-                    <span className="text-white">{row.value}</span>
+                    <span className="text-muted/70">{row.label}</span>
+                    <span className="text-ink">{row.value}</span>
                   </div>
                 ))}
-                <div className="flex justify-between text-sm pt-1 border-t border-white/5">
-                  <span className="text-cosmic-dim">状态</span>
+                <div className="flex justify-between text-sm pt-1 border-t border-purple/10">
+                  <span className="text-muted/70">状态</span>
                   <Badge variant={STATUS_VARIANTS[detail.status]}>{detail.status}</Badge>
                 </div>
               </div>

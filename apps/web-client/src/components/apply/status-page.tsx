@@ -5,8 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Check, Clock, X, FileText, UserCheck, MessageSquare, Award } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 
 const STEPS = [
@@ -27,10 +28,10 @@ const RESULT_LABELS: Record<string, string> = {
 };
 
 function resultText(result: number | undefined): { label: string; color: string } {
-  if (result === 1) return { label: "通过", color: "text-green-400" };
-  if (result === 0) return { label: "未通过", color: "text-red-400" };
-  if (result === -1) return { label: "审核中", color: "text-yellow-400" };
-  return { label: "待处理", color: "text-cosmic-dim" };
+  if (result === 1) return { label: "通过", color: "text-mint" };
+  if (result === 0) return { label: "未通过", color: "text-pink" };
+  if (result === -1) return { label: "审核中", color: "text-yellow" };
+  return { label: "待处理", color: "text-muted/70" };
 }
 
 export function ApplyStatusPage() {
@@ -55,7 +56,7 @@ export function ApplyStatusPage() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-8 md:py-12">
         <Skeleton className="mb-4 h-5 w-24" />
-        <Skeleton className="mb-8 h-64 w-full rounded-xl" />
+        <Skeleton className="mb-8 h-64 w-full" />
       </div>
     );
   }
@@ -63,8 +64,8 @@ export function ApplyStatusPage() {
   if (error || !data) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
-        <p className="text-lg text-cosmic-muted">{error || "暂无申请记录"}</p>
-        <Link href="/apply" className="mt-4 inline-block text-cosmic-sky hover:underline">
+        <p className="text-lg text-muted">{error || "暂无申请记录"}</p>
+        <Link href="/apply" className="mt-4 inline-block text-blue hover:underline">
           返回申请首页
         </Link>
       </div>
@@ -83,16 +84,16 @@ export function ApplyStatusPage() {
     <div className="mx-auto max-w-2xl px-4 py-8 md:py-12">
       <Link
         href="/apply"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-purple transition-colors"
       >
         <ArrowLeft className="size-4" /> 返回申请首页
       </Link>
 
-      <h1 className="cosmic-gradient-text mb-2 text-2xl font-bold">申请状态</h1>
-      <p className="mb-8 text-sm text-cosmic-muted">当前状态：{statusName}</p>
+      <h1 className="mb-2 text-2xl font-black text-ink">申请状态</h1>
+      <p className="mb-8 text-sm text-muted">当前状态：{statusName}</p>
 
       {/* Steps progress */}
-      <div className="cosmic-card mb-6 p-6">
+      <Card className="mb-6 p-6">
         <div className="space-y-0">
           {STEPS.map((s, i) => {
             const Icon = s.icon;
@@ -106,33 +107,33 @@ export function ApplyStatusPage() {
                   <div
                     className={`flex size-9 items-center justify-center rounded-full text-sm ${
                       isCompleted
-                        ? "bg-green-400/20 text-green-400"
+                        ? "bg-mint/20 text-mint"
                         : isRejected
-                          ? "bg-red-400/20 text-red-400"
+                          ? "bg-pink/20 text-pink"
                           : isCurrent
-                            ? "bg-cosmic-blue/30 text-cosmic-sky ring-2 ring-cosmic-sky/50"
-                            : "bg-white/5 text-cosmic-dim"
+                            ? "bg-purple/20 text-blue ring-2 ring-blue/50"
+                            : "bg-purple/10 text-muted/70"
                     }`}
                   >
                     {isCompleted ? <Check className="size-4" /> : isRejected ? <X className="size-4" /> : s.key === "FILLING" && isCurrent ? <Clock className="size-4" /> : <Icon className="size-4" />}
                   </div>
                   {i < STEPS.length - 1 && (
-                    <div className={`mt-1 h-8 w-0.5 ${isCompleted ? "bg-green-400/30" : "bg-white/5"}`} />
+                    <div className={`mt-1 h-8 w-0.5 ${isCompleted ? "bg-mint/30" : "bg-purple/10"}`} />
                   )}
                 </div>
                 <div className="pb-6">
-                  <p className={`text-sm font-medium ${isCurrent ? "text-cosmic-sky" : isCompleted ? "text-green-400" : "text-cosmic-dim"}`}>
+                  <p className={`text-sm font-medium ${isCurrent ? "text-blue" : isCompleted ? "text-mint" : "text-muted/70"}`}>
                     {s.label}
                   </p>
                   {isRejected && rejectReason && (
-                    <p className="mt-1 text-xs text-red-400">驳回原因：{rejectReason}</p>
+                    <p className="mt-1 text-xs text-pink">驳回原因：{rejectReason}</p>
                   )}
                 </div>
               </div>
             );
           })}
         </div>
-      </div>
+      </Card>
 
       {/* Results */}
       {(["paperResult", "reportResult", "interviewResult"] as const).map((key) => {
@@ -140,25 +141,25 @@ export function ApplyStatusPage() {
         if (val === undefined) return null;
         const r = resultText(val);
         return (
-          <div key={key} className="cosmic-card mb-3 p-4 flex items-center justify-between">
-            <span className="text-sm text-cosmic-header">{RESULT_LABELS[key]}</span>
+          <Card key={key} className="mb-3 p-4 flex items-center justify-between">
+            <span className="text-sm text-ink">{RESULT_LABELS[key]}</span>
             <span className={`text-sm font-semibold ${r.color}`}>{r.label}</span>
-          </div>
+          </Card>
         );
       })}
 
       {/* Interview info */}
       {interviewTime && (
-        <div className="cosmic-card mb-3 p-4">
-          <p className="text-sm text-cosmic-header">面试时间：{interviewTime}</p>
-          {interviewLocation && <p className="mt-1 text-sm text-cosmic-muted">地点：{interviewLocation}</p>}
-        </div>
+        <Card className="mb-3 p-4">
+          <p className="text-sm text-ink">面试时间：{interviewTime}</p>
+          {interviewLocation && <p className="mt-1 text-sm text-muted">地点：{interviewLocation}</p>}
+        </Card>
       )}
 
       {/* Continue button */}
       {(status === "FILLING" || status === "REVIEWING" || step === "REPORT") && status !== "REJECTED" && (
         <div className="mt-6 text-center">
-          <Button variant="primary" onClick={() => router.push("/apply/form")}>
+          <Button tone="purple" onClick={() => router.push("/apply/form")}>
             {status === "FILLING" ? "继续填写申请" : "继续申请"}
           </Button>
         </div>

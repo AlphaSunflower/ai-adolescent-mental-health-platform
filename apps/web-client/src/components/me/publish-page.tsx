@@ -6,8 +6,10 @@ import MDEditor from "@uiw/react-md-editor";
 import { getCommands, getExtraCommands } from "@uiw/react-md-editor/commands-cn";
 import "@uiw/react-md-editor/markdown-editor.css";
 import { Upload, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
+import { Input } from "@/components/pouf/Input";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { getToken } from "@/lib/session";
@@ -119,33 +121,32 @@ export function PublishPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-xl font-bold text-white">发布文章</h1>
+      <h1 className="mb-6 text-xl font-black text-ink">发布文章</h1>
 
-      <div className="cosmic-card max-w-[900px] p-6 space-y-5">
+      <Card className="max-w-[900px] p-6 space-y-5">
         {/* Title */}
         <div>
-          <label className="mb-1 block text-sm text-cosmic-dim">文章标题 <span className="text-red-400">*</span></label>
-          <input
+          <label className="mb-1 block text-sm text-muted/70">文章标题 <span className="text-red-400">*</span></label>
+          <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             maxLength={100}
             placeholder="请输入文章标题"
-            className="cosmic-input w-full rounded-lg px-3 py-2 text-sm"
           />
-          <span className="mt-0.5 text-xs text-cosmic-dim">{title.length}/100</span>
+          <span className="mt-0.5 text-xs text-muted/70">{title.length}/100</span>
         </div>
 
         {/* Cover */}
         <div>
-          <label className="mb-1 block text-sm text-cosmic-dim">封面图片</label>
+          <label className="mb-1 block text-sm text-muted/70">封面图片</label>
           <div
             onClick={() => fileInputRef.current?.click()}
-            className="size-[180px] rounded-lg border-2 border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-cosmic-sky/50 transition-colors overflow-hidden"
+            className="size-[180px] rounded-lg border-2 border-dashed border-purple/20 flex items-center justify-center cursor-pointer hover:border-purple/50 transition-colors overflow-hidden"
           >
             {coverPreview ? (
               <img src={coverPreview} alt="cover" className="size-full object-cover" />
             ) : (
-              <div className="text-center text-cosmic-dim">
+              <div className="text-center text-muted">
                 <Upload className="size-6 mx-auto mb-1" />
                 <span className="text-xs">点击上传封面</span>
               </div>
@@ -159,17 +160,17 @@ export function PublishPage() {
               <X className="size-3 inline mr-0.5" />移除封面
             </button>
           )}
-          <p className="mt-1 text-xs text-cosmic-dim">支持 JPG/PNG，建议尺寸 800x450，不超过 3MB</p>
+          <p className="mt-1 text-xs text-muted/70">支持 JPG/PNG，建议尺寸 800x450，不超过 3MB</p>
           <input ref={fileInputRef} type="file" accept="image/jpeg,image/png" onChange={handleCoverChange} className="hidden" />
         </div>
 
         {/* Tag */}
         <div>
-          <label className="mb-1 block text-sm text-cosmic-dim">文章标签 <span className="text-red-400">*</span></label>
+          <label className="mb-1 block text-sm text-muted/70">文章标签 <span className="text-red-400">*</span></label>
           <select
             value={tagId ?? ""}
             onChange={(e) => setTagId(e.target.value ? Number(e.target.value) : undefined)}
-            className="cosmic-input w-full max-w-[200px] rounded-lg px-3 py-2 text-sm"
+            className="cushion-field h-11 w-full max-w-[200px] rounded-control bg-surface px-4 py-2.5 text-[15px] text-ink focus-visible:cushion-field-focus focus-visible:outline-none"
           >
             <option value="">请选择标签</option>
             {tags.map((tag) => <option key={tag.id} value={tag.id}>{tag.name}</option>)}
@@ -177,9 +178,9 @@ export function PublishPage() {
         </div>
 
         {/* Content */}
-        <div data-color-mode="dark">
-          <label className="mb-2 block text-sm text-cosmic-dim">文章内容 <span className="text-red-400">*</span></label>
-          <div className="rounded-xl border border-white/15 overflow-hidden">
+        <div>
+          <label className="mb-2 block text-sm text-muted/70">文章内容 <span className="text-red-400">*</span></label>
+          <div className="rounded-xl border border-purple/15 overflow-hidden">
             <MDEditor
               value={content}
               onChange={(val) => setContent(val ?? "")}
@@ -190,17 +191,17 @@ export function PublishPage() {
               extraCommands={getExtraCommands()}
             />
           </div>
-          <p className="mt-1 text-xs text-cosmic-dim">支持 Markdown 格式，可拖拽或粘贴图片</p>
+          <p className="mt-1 text-xs text-muted/70">支持 Markdown 格式，可拖拽或粘贴图片</p>
         </div>
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">
-          <Button variant="primary" onClick={handleSubmit} disabled={submitting}>
+          <Button variant="solid" onClick={handleSubmit} disabled={submitting}>
             {submitting ? "提交中..." : "提交审核"}
           </Button>
-          <Button variant="ghost" onClick={() => router.push("/me/articles")}>取消</Button>
+          <Button variant="quiet" onClick={() => router.push("/me/articles")}>取消</Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

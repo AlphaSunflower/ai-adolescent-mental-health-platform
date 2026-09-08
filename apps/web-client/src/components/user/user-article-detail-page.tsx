@@ -7,8 +7,9 @@ import { ArrowLeft, User, ThumbsUp, ThumbsDown, Heart, Share2, Eye, Clock } from
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { ArticleDetail } from "@/lib/types";
 
@@ -60,8 +61,8 @@ export function UserArticleDetailPage() {
   if (notFound || !article) {
     return (
       <div className="mx-auto max-w-4xl px-4 py-20 text-center">
-        <p className="text-lg text-cosmic-muted">文章不存在或已删除</p>
-        <Link href="/library?tab=community" className="mt-4 inline-block text-cosmic-sky hover:underline">
+        <p className="text-lg text-muted">文章不存在或已删除</p>
+        <Link href="/library?tab=community" className="mt-4 inline-block text-blue hover:underline">
           返回心声广场
         </Link>
       </div>
@@ -72,30 +73,30 @@ export function UserArticleDetailPage() {
     <div className="mx-auto max-w-4xl px-4 py-8 md:py-12">
       <Link
         href="/library?tab=community"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-muted hover:text-blue transition-colors"
       >
         <ArrowLeft className="size-4" /> 返回心声广场
       </Link>
 
       {/* Article header */}
-      <h1 className="mb-4 text-2xl font-bold text-white md:text-3xl">{article.title}</h1>
+      <h1 className="mb-4 text-2xl font-black text-ink md:text-3xl">{article.title}</h1>
 
       {/* Author info */}
       <div className="mb-6 flex items-center gap-3">
         <Link href={`/user/${userId}`} className="shrink-0">
-          <div className="size-10 rounded-full bg-cosmic-blue/20 flex items-center justify-center hover:ring-2 hover:ring-cosmic-sky/50 transition-all">
+          <div className="size-10 rounded-full bg-purple/20 flex items-center justify-center hover:ring-2 hover:ring-blue/50 transition-all">
             {article.authorAvatar ? (
               <img src={article.authorAvatar} alt="" className="size-10 rounded-full object-cover" />
             ) : (
-              <User className="size-5 text-cosmic-sky" />
+              <User className="size-5 text-blue" />
             )}
           </div>
         </Link>
         <div>
-          <Link href={`/user/${userId}`} className="text-sm font-medium text-cosmic-header hover:text-cosmic-sky transition-colors">
+          <Link href={`/user/${userId}`} className="text-sm font-bold text-ink hover:text-blue transition-colors">
             {article.authorName}
           </Link>
-          <div className="flex items-center gap-3 text-xs text-cosmic-dim mt-0.5">
+          <div className="flex items-center gap-3 text-xs text-muted/70 mt-0.5">
             <span className="flex items-center gap-1"><Clock className="size-3" />{article.createTime}</span>
             <span className="flex items-center gap-1"><Eye className="size-3" />{article.viewCount}</span>
           </div>
@@ -103,36 +104,36 @@ export function UserArticleDetailPage() {
       </div>
 
       {/* Article content */}
-      <div className="cosmic-card mb-6 p-6 md:p-8">
+      <Card className="mb-6 p-6 md:p-8">
         {article.content ? (
-          <div className="prose prose-invert max-w-none
-            prose-headings:text-white prose-headings:font-semibold
+          <div className="prose prose-sm max-w-none
+            prose-headings:text-ink prose-headings:font-bold
             prose-h1:text-2xl prose-h1:mt-8 prose-h1:mb-4
-            prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-white/10 prose-h2:pb-2
+            prose-h2:text-xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-[rgba(201,168,255,0.3)] prose-h2:pb-2
             prose-h3:text-lg prose-h3:mt-6 prose-h3:mb-3
-            prose-p:text-cosmic-muted prose-p:leading-relaxed prose-p:my-3
-            prose-a:text-cosmic-sky prose-a:no-underline hover:prose-a:underline
-            prose-strong:text-white prose-strong:font-semibold
-            prose-code:text-cosmic-sky prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
-            prose-pre:bg-black/30 prose-pre:border prose-pre:border-white/10 prose-pre:rounded-xl
-            prose-blockquote:border-l-cosmic-blue/60 prose-blockquote:bg-white/5 prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-cosmic-muted
-            prose-li:text-cosmic-muted prose-li:my-1
+            prose-p:text-ink/80 prose-p:leading-relaxed prose-p:my-3
+            prose-a:text-blue prose-a:no-underline hover:prose-a:underline
+            prose-strong:text-ink prose-strong:font-bold
+            prose-code:text-ink prose-code:bg-purple/20 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:text-xs prose-code:before:content-none prose-code:after:content-none
+            prose-pre:bg-bg prose-pre:border prose-pre:border-[rgba(201,168,255,0.3)] prose-pre:rounded-xl prose-pre:text-ink
+            prose-blockquote:border-l-blue/60 prose-blockquote:bg-bg prose-blockquote:py-3 prose-blockquote:px-4 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-blockquote:text-ink/80
+            prose-li:text-ink/80 prose-li:my-1
             prose-img:rounded-xl prose-img:my-4
-            prose-hr:border-white/10
+            prose-hr:border-[rgba(201,168,255,0.3)]
           ">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{article.content}</ReactMarkdown>
           </div>
         ) : (
-          <p className="text-cosmic-muted text-sm">暂无正文内容</p>
+          <p className="text-muted text-sm">暂无正文内容</p>
         )}
-      </div>
+      </Card>
 
       {/* Interaction bar */}
-      <div className="cosmic-card flex items-center justify-center gap-4 p-4">
+      <Card className="flex items-center justify-center gap-4 p-4">
         <button
           onClick={() => handleInteract(0)}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-            article.liked ? "text-cosmic-sky bg-cosmic-blue/20" : "text-cosmic-dim hover:text-cosmic-sky hover:bg-white/5"
+            article.liked ? "text-blue bg-purple/20" : "text-muted/70 hover:text-blue hover:bg-purple/10"
           }`}
         >
           <ThumbsUp className="size-4" />
@@ -141,7 +142,7 @@ export function UserArticleDetailPage() {
         <button
           onClick={() => handleInteract(1)}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-            article.disliked ? "text-red-400 bg-red-400/10" : "text-cosmic-dim hover:text-red-400 hover:bg-white/5"
+            article.disliked ? "text-pink bg-pink/10" : "text-muted/70 hover:text-pink hover:bg-purple/10"
           }`}
         >
           <ThumbsDown className="size-4" />
@@ -149,7 +150,7 @@ export function UserArticleDetailPage() {
         <button
           onClick={() => handleInteract(2)}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-            article.collected ? "text-cosmic-gold bg-cosmic-gold/10" : "text-cosmic-dim hover:text-cosmic-gold hover:bg-white/5"
+            article.collected ? "text-yellow bg-yellow/10" : "text-muted/70 hover:text-yellow hover:bg-purple/10"
           }`}
         >
           <Heart className={`size-4 ${article.collected ? "fill-current" : ""}`} />
@@ -160,11 +161,11 @@ export function UserArticleDetailPage() {
             navigator.clipboard.writeText(window.location.href);
             toast.success("链接已复制");
           }}
-          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-cosmic-dim hover:text-cosmic-sky hover:bg-white/5 transition-colors"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm text-muted/70 hover:text-blue hover:bg-purple/10 transition-colors"
         >
           <Share2 className="size-4" />
         </button>
-      </div>
+      </Card>
     </div>
   );
 }
