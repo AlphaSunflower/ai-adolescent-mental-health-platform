@@ -184,7 +184,7 @@ public class PsychologistApplyServiceImpl extends ServiceImpl<PsychologistApplyM
         apply.setRealName(request.getRealName());
         apply.setPhone(request.getPhone());
         apply.setCountry(request.getCountry() != null ? request.getCountry() : "中国");
-        apply.setContactWechat(request.getContactWechat());
+        apply.setContactMethod(request.getContactMethod());
         apply.setCaseHours(request.getCaseHours());
         apply.setSupervisionHours(request.getSupervisionHours());
         apply.setConsultationPrice(request.getConsultationPrice());
@@ -490,7 +490,7 @@ public class PsychologistApplyServiceImpl extends ServiceImpl<PsychologistApplyM
         vo.setRealName(apply.getRealName());
         vo.setPhone(apply.getPhone());
         vo.setCountry(apply.getCountry());
-        vo.setContactWechat(apply.getContactWechat());
+        vo.setContactMethod(apply.getContactMethod());
         vo.setCaseHours(apply.getCaseHours());
         vo.setSupervisionHours(apply.getSupervisionHours());
         vo.setConsultationPrice(apply.getConsultationPrice());
