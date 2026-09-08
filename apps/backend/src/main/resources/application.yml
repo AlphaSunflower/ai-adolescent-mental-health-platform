@@ -55,15 +55,6 @@ dashscope:
   api:
     key: ${DASHSCOPE_API_KEY}
 
-wx:
-  appid: ${WX_APP_ID}
-  secret: ${WX_APP_SECRET}
-
-wx-gzh:
-  appid: ${WX_GZH_APP_ID}
-  secret: ${WX_GZH_SECRET}
-  callback-base-url: ${WX_GZH_CALLBACK_BASE_URL}
-
 send:
   mail:
     host: ${MAIL_HOST}

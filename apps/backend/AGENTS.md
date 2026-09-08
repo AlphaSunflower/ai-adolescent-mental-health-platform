@@ -48,7 +48,7 @@ pnpm --filter @ai-adolescent-mental-health/backend clean
 - Profile 配置：`application-local.yml`（本地开发，已加入 `.gitignore`）；`application-dev.yml`、`application-test.yml` 等不提交，由 CI/CD 环境变量替代。
 - **dotenv 支持**：项目使用 `me.paulschwarz:springboot3-dotenv` 自动加载 `.env` 文件中的变量。类路径或工作目录下的 `.env` 会在 Spring 启动早期被注入为 PropertySource，无需手动 `spring.config.import`。
 - **默认值策略**：基础设施变量（`DB_MYSQL_HOST`/`PORT`、`DB_REDIS_HOST`/`PORT`）在 `application.yml` 中使用 `${VAR:default}` 语法提供合理回退值；OSS 等可选服务使用空字符串回退；密钥类变量（`JWT_SECRET`、API keys）在 `application-local.yml` 中有开发用占位值，生产环境必须通过环境变量或 `.env` 注入。
-- 关键变量：`DB_MYSQL_*`、`DB_REDIS_*`、`ALIYUN_OSS_*`、`JWT_SECRET`、`DASHSCOPE_API_KEY`、`WX_APP_ID`、`WX_APP_SECRET`、`WX_GZH_APP_ID`、`WX_GZH_SECRET`、`WX_GZH_CALLBACK_BASE_URL`、`MAIL_*`。
+- 关键变量：`DB_MYSQL_*`、`DB_REDIS_*`、`ALIYUN_OSS_*`、`JWT_SECRET`、`DASHSCOPE_API_KEY`、`MAIL_*`。
 - MySQL 库名通过 `DB_MYSQL_DATABASE` 配置；schema 变更需同步 `infra/sql/`。
 
 ## 五、AI 约束
@@ -59,7 +59,7 @@ pnpm --filter @ai-adolescent-mental-health/backend clean
 4. **WebSocket 缓冲区**：`spring.websocket.max-*-message-buffer-size` 当前为 5MB，改动需评估对前端实时消息/语音的影响。
 5. **认证统一使用 Sa-Token**：不要引入 Spring Security 等平行鉴权框架。
 6. **AI 对话走 DashScope 封装**：`xiaoai` 域内已封装 DashScope 调用，新增 AI 能力应在此域扩展，不要在其他域直连外部 LLM。
-7. **外部 HTTP 调用**：使用项目既有的客户端封装（如微信 OAuth、OSS SDK），不要引入新 HTTP 客户端。
+7. **外部 HTTP 调用**：使用项目既有的客户端封装（如 OSS SDK），不要引入新 HTTP 客户端。
 
 ## 六、本地运行最低依赖
 
