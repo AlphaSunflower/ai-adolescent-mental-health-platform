@@ -67,7 +67,7 @@ pnpm --filter @ai-adolescent-mental-health/admin-portal dev
 对应各 app 的命令约定（由 `scripts/run-workspace-bin.cjs` 桥接）：
 
 - 后端：`pnpm dev` → `mvnw spring-boot:run`，`pnpm build` → `mvnw clean package -DskipTests`
-- Web 用户端：`pnpm dev` → `next dev --port 3100`，`pnpm build` → `next build`
+- Web 用户端：`pnpm dev` → `next dev --port 3300`，`pnpm build` → `next build`
 - Web 管理端：`pnpm dev` → `next dev --port 3101`，`pnpm build` → `next build`
 
 ## 常用脚本
@@ -124,7 +124,7 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 
 ## 常见问题
 
-- **首次 `pnpm dev` 报端口占用**：后端默认 `server.port=8080`，当前 Web 用户端默认 `3100`，当前 Web 管理端默认 `3101`，请先确认占用情况。
+- **首次 `pnpm dev` 报端口占用**：后端默认 `server.port=8080`，当前 Web 用户端默认 `3300`，当前 Web 管理端默认 `3101`，请先确认占用情况。
 
 ## 分支与协作
 
@@ -143,5 +143,5 @@ Turbo 的 `build` 与 `test` 任务均依赖 `^build`（上游工作区先构建
 - 面向 AI 编码助手（Claude Code / Codex / Cursor 等）的上下文速查：[AGENTS.md](AGENTS.md)
 - 各 app 单独的 AI 指引：
   - [apps/backend/AGENTS.md](apps/backend/AGENTS.md)
-  - [apps/web-client/AGENTS.md](apps/web-client/AGENTS.md)
+  - [apps/web-client/AGENTS.md](apps/web-client/AGENTS.md) — 用户端 pouf 页面设计规范见 [apps/web-client/design.md](apps/web-client/design.md)
   - [apps/admin-portal/AGENTS.md](apps/admin-portal/AGENTS.md)
