@@ -14,7 +14,7 @@
   },
   "dependencies": {
     "@ai-adolescent-mental-health/domain": "workspace:*",
-    "axios": "^1.13.5"
+    "axios": "^1.16.0"
   },
   "devDependencies": {
     "typescript": "^5",

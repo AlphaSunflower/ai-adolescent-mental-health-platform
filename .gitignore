@@ -45,3 +45,9 @@ apps/backend/src/test/resources/application-*.properties
 # Local tool artifacts
 .codegraph/
 .hermes/
+.playwright-mcp/
+
+# Local scratch & screenshots (not source)
+ai-pouf.png
+login-current.png
+home_assets.txt
