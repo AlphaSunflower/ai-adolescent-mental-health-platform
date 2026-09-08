@@ -46,7 +46,7 @@ jobs:
       DB_MYSQL_PASSWORD: root
       DB_REDIS_HOST: 127.0.0.1
       DB_REDIS_PORT: 6379
-      JWT_SECRET: ci-test-jwt-secret
+      JWT_SECRET: ci-test-jwt-secret-atleast-32bytes-2026
       DASHSCOPE_API_KEY: ci-test-dashscope-key
       WX_APP_ID: ci-test-wx-app-id
       WX_APP_SECRET: ci-test-wx-app-secret
