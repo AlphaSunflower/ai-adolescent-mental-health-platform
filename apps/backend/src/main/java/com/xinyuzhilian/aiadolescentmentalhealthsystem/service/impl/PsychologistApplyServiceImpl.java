@@ -184,7 +184,7 @@ public class PsychologistApplyServiceImpl extends ServiceImpl<PsychologistApplyM
         apply.setRealName(request.getRealName());
         apply.setPhone(request.getPhone());
         apply.setCountry(request.getCountry() != null ? request.getCountry() : "中国");
-        apply.setContactWechat(request.getContactWechat());
+        apply.setContactMethod(request.getContactMethod());
         apply.setCaseHours(request.getCaseHours());
         apply.setSupervisionHours(request.getSupervisionHours());
         apply.setConsultationPrice(request.getConsultationPrice());
@@ -422,7 +422,7 @@ public class PsychologistApplyServiceImpl extends ServiceImpl<PsychologistApplyM
             this.updateById(apply);
 
             sysMessageService.sendMessage(apply.getUserId(), "入驻申请资料审核通过",
-                    "恭喜！您的入驻申请资料审核通过。请在1周内完成笔试考核，考核时间及相关事宜将通过微信与您沟通确认。", 1);
+                    "恭喜！您的入驻申请资料审核通过。请在1周内完成笔试考核，考核时间及相关事宜将通过平台消息与您沟通确认。", 1);
             return Result.success("资料审核通过，已进入笔试阶段");
         }
         return Result.error("申请不存在");
@@ -490,7 +490,7 @@ public class PsychologistApplyServiceImpl extends ServiceImpl<PsychologistApplyM
         vo.setRealName(apply.getRealName());
         vo.setPhone(apply.getPhone());
         vo.setCountry(apply.getCountry());
-        vo.setContactWechat(apply.getContactWechat());
+        vo.setContactMethod(apply.getContactMethod());
         vo.setCaseHours(apply.getCaseHours());
         vo.setSupervisionHours(apply.getSupervisionHours());
         vo.setConsultationPrice(apply.getConsultationPrice());

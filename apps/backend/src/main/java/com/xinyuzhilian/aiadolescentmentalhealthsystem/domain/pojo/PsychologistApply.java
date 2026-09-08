@@ -59,9 +59,9 @@ public class PsychologistApply implements Serializable {
     @TableField("country")
     private String country;
 
-    @ApiModelProperty(value = "微信/邮箱联系方式")
+    @ApiModelProperty(value = "联系方式")
     @TableField("contact_wechat")
-    private String contactWechat;
+    private String contactMethod;
 
     @ApiModelProperty(value = "咨询个案时长(less_500/500_1000/1000_3000/more_3000)")
     @TableField("case_hours")

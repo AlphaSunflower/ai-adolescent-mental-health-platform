@@ -330,8 +330,9 @@ create table if not exists xinyuzhilian.user
     deleted            tinyint(1) default 0                 null comment '逻辑删除(0-未删除, 1-已删除)',
     create_time        datetime   default CURRENT_TIMESTAMP null comment '创建时间',
     update_time        datetime   default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP comment '更新时间',
+    -- DEPRECATED: wx_id 已废弃（微信模块已移除），保留列以兼容旧数据
     wx_id              varchar(64)                          null comment '微信OpenID',
-    wx_gzh_id          varchar(64)                          null comment '微信公众号OpenID',
+        wx_gzh_id          varchar(64)                          null comment '微信公众号OpenID',
     member_type        tinyint(1) default 0                 null comment '会员类型(0-非会员,1-VIP,2-SVIP)',
     member_expire_date datetime                             null comment '会员过期时间',
     constraint uk_username

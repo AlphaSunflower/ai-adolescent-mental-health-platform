@@ -63,7 +63,6 @@ Turbo 管线（[turbo.json](turbo.json)）：`build` 依赖 `^build`；`test` �
 后端直接依赖的三方能力（对应变量见 `apps/backend/src/main/resources/application.yml`）：
 
 - 阿里云百炼 **DashScope**（`DASHSCOPE_API_KEY`）——小艾 AI 对话
-- **微信小程序/公众号**（`WX_APP_ID`/`WX_APP_SECRET`/`WX_GZH_APP_ID`/`WX_GZH_SECRET`/`WX_GZH_CALLBACK_BASE_URL`）——登录与回调
 - **阿里云 OSS**（`ALIYUN_OSS_*`）——文件存储
 - **QQ 邮箱 SMTP**（`MAIL_*`）——验证码/通知邮件
 - **MySQL / Redis / RabbitMQ**（`DB_MYSQL_*`/`DB_REDIS_*`）——数据层

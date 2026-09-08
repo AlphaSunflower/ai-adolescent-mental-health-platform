@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 /**
  * 邮箱验证码表
- * 用于存储邮箱验证码及其关联的微信 OpenID
+ * 用于存储邮箱验证码
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -40,14 +40,6 @@ public class EmailVerifyCode implements Serializable {
     @ApiModelProperty(value = "场景: bind_email-绑定邮箱, change_email-更换邮箱")
     @TableField("scene")
     private String scene;
-
-    @ApiModelProperty(value = "发起验证时的微信OpenID")
-    @TableField("openid")
-    private String openid;
-
-    @ApiModelProperty(value = "openid类型: mini-小程序, gzh-公众号")
-    @TableField("openid_type")
-    private String openidType;
 
     @ApiModelProperty(value = "过期时间")
     @TableField("expire_time")

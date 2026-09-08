@@ -150,7 +150,7 @@ React 薄包在 `src/components/pouf/`（本体 chrome 在 `pouf.css`）：
 - 不要用 cosmic 残留：`cosmic-*`、`.cosmic-card/.cosmic-btn/…`、`--color-cosmic-*`、星空/星星 keyframe；深蓝夜空、白字、金色渐变。
 - 不要把白字放粉彩填充上；用 `text-[var(--on-accent)]` 或 `--on-accent-muted`。
 - 不要 `bg-${tone}` 动态拼接类名——Tailwind 不生成，须静态映射（见 `pouf Progress` 的 `toneBg`）。
-- 不要用 Tailwind `shadow-*` 组装黏土阴影（破坏快照）；用 `cushion-*` 或原样 `[box-shadow:var(--pouf-*)]`。
+- 不要用 Tailwind `shadow-*` 组装黏土阴影（破坏快照）；用 `cushion-*` 或原样 ``box-shadow: var(--pouf-*)``。
 - 不要引 Framer/React Spring；`pouf.css` 覆盖到的 overlay 用 `@base-ui/react`。
 - 不要往 `globals.css` 加新 `@theme` 色；进 `pouf.css`。
 

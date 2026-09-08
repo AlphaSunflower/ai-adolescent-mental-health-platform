@@ -46,7 +46,7 @@ public class PsychologistApplyVO {
     private String country;
 
     @ApiModelProperty(value = "联系方式")
-    private String contactWechat;
+    private String contactMethod;
 
     @ApiModelProperty(value = "咨询个案时长")
     private String caseHours;

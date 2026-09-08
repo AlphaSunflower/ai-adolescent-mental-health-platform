@@ -50,7 +50,7 @@ public class UserController {
             return Result.error("邮箱格式不正确");
         }
         try {
-            emailVerifyService.sendVerifyCode(newEmail, null, null, IEmailVerifyService.SCENE_CHANGE_EMAIL);
+            emailVerifyService.sendVerifyCode(newEmail, IEmailVerifyService.SCENE_CHANGE_EMAIL);
             return Result.success("验证码已发送到 " + maskEmail(newEmail), null);
         } catch (RuntimeException e) {
             return Result.error(e.getMessage());
