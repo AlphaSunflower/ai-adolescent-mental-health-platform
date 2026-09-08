@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 
 /**
  * 邮箱验证码表
- * 用于存储邮箱验证码及其关联的微信 OpenID
+ * 用于存储邮箱验证码
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
