@@ -8,8 +8,6 @@ import { tokens } from "@/lib/design-tokens";
 interface AdminOverview {
   totalUsers: number;
   monthlyNewUsers: number;
-  totalHospitals: number;
-  totalDoctors: number;
   totalPsychologists: number;
   totalArticles: number;
   totalAssessments: number;
@@ -200,10 +198,9 @@ export function AdminDashboard() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: tokens.spacingBase, marginBottom: tokens.spacingBase }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: tokens.spacingBase, marginBottom: tokens.spacingBase }}>
         <StatCard label="用户总数"   value={d.totalUsers}          icon="用" variant="primary" />
         <StatCard label="本月新增"   value={d.monthlyNewUsers}      icon="新" variant="success" />
-        <StatCard label="医院数量"   value={d.totalHospitals}       icon="院" variant="warning" />
         <StatCard label="咨询师"     value={d.totalPsychologists ?? 0} icon="咨" variant="danger" />
       </div>
 

@@ -277,9 +277,6 @@ export function ArticleDetailPage() {
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-ink">{detail.authorName}</span>
                   {detail.authorRole === 4 && <Badge variant="gold" className="text-xs">官方</Badge>}
-                  {detail.authorRole === 3 && detail.hospitalName && (
-                    <Badge variant="secondary" className="text-xs">{detail.hospitalName}</Badge>
-                  )}
                 </div>
                 <div className="mt-1 flex items-center gap-4 text-xs text-muted/70">
                   <span>发布时间：{detail.createTime}</span>

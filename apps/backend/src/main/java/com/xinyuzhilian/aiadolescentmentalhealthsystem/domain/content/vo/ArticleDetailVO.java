@@ -20,5 +20,4 @@ public class ArticleDetailVO {
     private String authorName;
     private String authorAvatar;
     private Integer authorRole;
-    private String hospitalName;
 }

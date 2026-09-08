@@ -5,9 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.config.RedisCache;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.common.PageResult;
-import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.pojo.DoctorPatientRelation;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.pojo.User;
-import com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.DoctorPatientRelationMapper;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.mapper.UserMapper;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IEmailVerifyService;
 import com.xinyuzhilian.aiadolescentmentalhealthsystem.service.IUserService;
@@ -17,11 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * 用户信息服务实现类
@@ -33,7 +29,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
-    private final DoctorPatientRelationMapper relationMapper;
     private final PasswordEncoder passwordEncoder;
     private final IEmailVerifyService emailVerifyService;
     private final RedisCache redisCache;
@@ -60,43 +55,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return this.getUserInfo(userId);
         }
         return null;
-    }
-
-    @Override
-    public PageResult<User> getPatientsByDoctorId(Long doctorId, Integer page, Integer size) {
-        Page<DoctorPatientRelation> pageParam = new Page<>(page, size);
-        LambdaQueryWrapper<DoctorPatientRelation> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(DoctorPatientRelation::getDoctorId, doctorId);
-        
-        Page<DoctorPatientRelation> relationPage = relationMapper.selectPage(pageParam, wrapper);
-        
-        if (relationPage.getRecords().isEmpty()) {
-            return new PageResult<>();
-        }
-
-        List<Long> patientIds = relationPage.getRecords().stream()
-                .map(DoctorPatientRelation::getPatientId)
-                .collect(Collectors.toList());
-        
-        List<User> patients = this.listByIds(patientIds);
-        if (patients != null) {
-            patients.forEach(p -> {
-                p.setPassword(null);
-                if (p.getPhone() != null && p.getPhone().length() > 7) {
-                    p.setPhone(p.getPhone().substring(0, 3) + "****" + p.getPhone().substring(7));
-                }
-            });
-        } else {
-            patients = new ArrayList<>();
-        }
-
-        PageResult<User> result = new PageResult<>();
-        result.setRecords(patients);
-        result.setTotal(relationPage.getTotal());
-        result.setSize(relationPage.getSize());
-        result.setCurrent(relationPage.getCurrent());
-        result.setPages(relationPage.getPages());
-        return result;
     }
 
     @Override

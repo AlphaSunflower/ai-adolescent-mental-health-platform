@@ -1,6 +1,6 @@
 # 心愈智联 — 青少年心理健康 AI 平台
 
-`pnpm + Turborepo` monorepo。AI 问诊「小艾」、真人咨询、量表评估、内容库、医院/咨询师目录。多端共存于 `apps/*`，面向 AI 的完整约束见 [AGENTS.md](AGENTS.md)。
+`pnpm + Turborepo` monorepo。AI 问诊「小艾」、真人咨询、量表评估、内容库、心理咨询师目录。多端共存于 `apps/*`，面向 AI 的完整约束见 [AGENTS.md](AGENTS.md)。
 
 ## 工作区与端口
 
@@ -8,7 +8,7 @@
 | --- | --- | --- | --- |
 | `apps/backend` | Spring Boot 3.5.9 / Java 17 | 8080 | 后端 API，所有端共享 |
 | `apps/web-client` | Next.js 16 / React 19 / Tailwind 4 | **3300** | 青少年/家长用户端，**pouf 黏土设计** |
-| `apps/admin-portal` | Next.js 16 / React 19 | **3101** | 运营/医院/医生/咨询师管理端 |
+| `apps/admin-portal` | Next.js 16 / React 19 | **3101** | 运营/心理咨询师管理端 |
 
 共享 SQL 在 `infra/sql/`。
 

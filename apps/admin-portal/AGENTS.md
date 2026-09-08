@@ -21,16 +21,11 @@ src/
 │   │   ├── layout.tsx          # AuthGuard[4] + AdminLayout
 │   │   ├── dashboard/          # 工作概览 (AdminDashboard)
 │   │   ├── content/            # articles, courses, assessments, books, audit
-│   │   ├── system/             # quotes, tags, feedbacks, complaints, meme, platform-income
-│   │   ├── hospitals/          # 医院管理
+│   │   ├── system/             # quotes, tags, feedbacks, meme, platform-income
 │   │   ├── users/              # 用户管理
 │   │   ├── psychologist/       # 咨询师管理 + 资料审核
 │   │   ├── psychologist-fields/     # 擅长领域字典
 │   │   └── psychologist-qualifications/ # 资质字典
-│   ├── hospital/               # 医院管理员 (role=3)
-│   │   └── dashboard, doctors, departments, feedbacks, complaints
-│   ├── doctor/                 # 医生 (role=2)
-│   │   └── dashboard, workbench, schedule, patients
 │   └── psychologist-admin/     # 咨询师自助 (isPsychologist=1)
 │       └── workbench, schedule, appointments, income, chat, profile
 ├── components/admin/
@@ -39,13 +34,10 @@ src/
 │   ├── AdminSidebar.tsx        # 深色侧边栏 (#304156)
 │   ├── AdminHeader.tsx         # 顶栏（用户信息 + 退出）
 │   ├── LoginPage.tsx           # 登录页（sonner toast 提示）
-│   ├── dashboard/              # AdminDashboard, HospitalDashboard, DoctorDashboard
+│   ├── dashboard/              # AdminDashboard
 │   ├── content/                # Article*, Course*, Assessment*, Book*, Audit*, Field*, Qualification*
-│   ├── system/                 # Tag*, Quote*, Feedback*, Complaint*, Meme*, PlatformIncome*
+│   ├── system/                 # Tag*, Quote*, Feedback*, Meme*, PlatformIncome*
 │   ├── users/                  # UserList
-│   ├── hospitals/              # HospitalList
-│   ├── doctor/                 # DoctorList, DepartmentList, 医院投诉/反馈
-│   ├── doctor-workbench/       # Workbench, PatientArchives, ScheduleManager
 │   ├── psychologist/           # PsychSchedule, PsychAppointments, PsychChat, PsychIncome, PsychProfile
 │   └── psychologist-admin/     # PsychologistAdmin, ProfileAudit
 └── lib/

@@ -6,7 +6,7 @@
 ## 一、仓库定位
 
 - 项目：`ai-adolescent-mental-health-platform`；形态：`pnpm + Turborepo` monorepo。
-- 业务：青少年心理健康 AI 平台（AI 问诊「小艾」、真人咨询、量表评估、内容库、医院与咨询师目录）。
+- 业务：青少年心理健康 AI 平台（AI 问诊「小艾」、真人咨询、量表评估、内容库、心理咨询师目录）。
 - 主干：`main`。
 
 ## 二、工作区拓扑

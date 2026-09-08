@@ -92,9 +92,6 @@ public class SecurityConfig {
                                 "/user/forgot/send",
                                 "/user/forgot/verify",
                                 "/user/forgot/reset").permitAll()
-                        // SSE 流式输出需要认证（经 Authorization header 的 Bearer token，前端不应把 JWT 放进 URL）
-                        .requestMatchers("/consultation/message/stream/**").authenticated()
-                        .requestMatchers("/api/consultation/message/stream/**").authenticated()
                         // 心理咨询消息 SSE 需要认证
                         .requestMatchers("/psychologist/message/stream/**").authenticated()
                         .requestMatchers("/api/psychologist/message/stream/**").authenticated()

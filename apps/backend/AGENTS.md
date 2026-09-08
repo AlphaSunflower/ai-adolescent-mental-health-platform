@@ -19,7 +19,6 @@ com.xinyuzhilian.aiadolescentmentalhealthsystem
 ├── book           # 心理读物、评论、评分
 ├── consultation   # 真人心理咨询（预约、会话）
 ├── content        # 心理内容（文章/资讯）
-├── hospital       # 医院目录
 ├── psychologist   # 心理咨询师资料、排班
 ├── user           # 用户账户、资料、权限
 ├── stats          # 数据统计与看板
