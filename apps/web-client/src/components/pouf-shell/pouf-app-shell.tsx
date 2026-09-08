@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { PoufNavBar } from "./pouf-nav-bar";
 import { PoufFooter } from "./pouf-footer";
-import { PoufBackground } from "./pouf-background";
 import { FeedbackDialogProvider } from "@/components/feedback/feedback-dialog";
 
 /** Full-height "immersive" routes that must fill the viewport (a chat / console
@@ -27,11 +26,9 @@ export function PoufAppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <FeedbackDialogProvider>
-      {/* Full-screen pouf background: bright soft gradient + blurred glows, with
-          a gentle particle field floating above. One global effect for the whole
-          app — every route reads the same surface. */}
-      <PoufBackground />
-
+      {/* The full-screen pouf background is rendered ONCE at the root layout
+          (app/layout.tsx) so every route — auth and main alike — reads the same
+          global surface. Nothing is repeated here. */}
       <div
         className={`relative z-10 flex flex-col font-pouf text-ink ${
           immersive ? "h-[100dvh] overflow-hidden" : "min-h-[100dvh]"
