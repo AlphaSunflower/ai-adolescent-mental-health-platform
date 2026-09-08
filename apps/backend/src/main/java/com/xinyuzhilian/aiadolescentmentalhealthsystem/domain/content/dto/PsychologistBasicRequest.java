@@ -22,8 +22,8 @@ public class PsychologistBasicRequest {
     @ApiModelProperty(value = "国家/地区")
     private String country;
 
-    @ApiModelProperty(value = "微信/邮箱联系方式")
-    private String contactWechat;
+    @ApiModelProperty(value = "联系方式")
+    private String contactMethod;
 
     @ApiModelProperty(value = "咨询个案时长(less_500/500_1000/1000_3000/more_3000)")
     private String caseHours;

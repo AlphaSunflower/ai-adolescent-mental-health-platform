@@ -14,7 +14,7 @@ const BASIC_FIELDS: { name: string; label: string; type: string; required?: bool
   { name: "realName", label: "真实姓名", type: "text", required: true, placeholder: "请输入真实姓名" },
   { name: "phone", label: "联系电话", type: "tel", required: true, placeholder: "请输入联系电话" },
   { name: "country", label: "所在国家/地区", type: "text", placeholder: "如：中国" },
-  { name: "contactWechat", label: "微信号", type: "text", required: true, placeholder: "请输入微信号" },
+  { name: "contactMethod", label: "联系方式", type: "text", required: true, placeholder: "请输入联系方式" },
   { name: "caseHours", label: "个案小时数", type: "text", placeholder: "如：500" },
   { name: "supervisionHours", label: "督导小时数", type: "text", placeholder: "如：100" },
   { name: "consultationPrice", label: "咨询价格（元）", type: "number", placeholder: "如：300" },
@@ -102,7 +102,7 @@ export function ApplyFormPage() {
   const handleSubmitBasic = async () => {
     if (!form.realName?.trim()) { toast.error("请输入真实姓名"); return; }
     if (!form.phone?.trim()) { toast.error("请输入联系电话"); return; }
-    if (!form.contactWechat?.trim()) { toast.error("请输入微信号"); return; }
+    if (!form.contactMethod?.trim()) { toast.error("请输入联系方式"); return; }
     if (!form.education?.trim()) { toast.error("请输入教育背景"); return; }
     setSubmitting(true);
     try {
