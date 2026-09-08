@@ -24,12 +24,16 @@ export function PoufAppShell({ children }: { children: React.ReactNode }) {
   const immersive = IMMERSIVE_ROUTES.some(
     (r) => pathname === r || pathname.startsWith(r + "/"),
   );
+  // /ai is the one immersive route that wants the calmer background (gradient +
+  // glows only, no particle drift) so the chat reads cleanly. Everything else
+  // keeps the full particle field.
+  const calmerBackground = pathname === "/ai";
 
   return (
     <FeedbackDialogProvider>
       {/* Full-screen pouf background: bright soft gradient + blurred glows, with
           a gentle particle field floating above. */}
-      <PoufBackground />
+      <PoufBackground showParticles={!calmerBackground} />
 
       <div
         className={`relative z-10 flex flex-col font-pouf text-ink ${
