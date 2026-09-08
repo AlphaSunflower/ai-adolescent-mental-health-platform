@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import ChunkReloadGuard from "@/components/ChunkReloadGuard";
+import { PoufBackground } from "@/components/pouf-shell/pouf-background";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +31,7 @@ export default function RootLayout({
         <link rel="icon" href="/xinyuzhilian.svg" />
       </head>
       <body className="h-full antialiased">
+        <PoufBackground />
         {children}
         <ChunkReloadGuard />
         <Toaster position="top-center" />
