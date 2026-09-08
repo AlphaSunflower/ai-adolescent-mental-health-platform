@@ -174,7 +174,7 @@ export function PoufNavBar() {
       <div className="flex items-center gap-2">
         {loggedIn && user ? (
           <>
-            {/* Message badge */}
+            {/* Message center */}
             <span className="hidden sm:inline-flex">
               <IconButton
                 label="消息"
@@ -182,6 +182,7 @@ export function PoufNavBar() {
                 tone="purple"
                 variant="quiet"
                 size="sm"
+                onClick={() => router.push("/me/messages")}
               />
             </span>
 
