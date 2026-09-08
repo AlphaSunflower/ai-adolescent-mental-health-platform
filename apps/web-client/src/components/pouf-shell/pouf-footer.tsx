@@ -87,24 +87,6 @@ export function PoufFooter() {
             </ul>
           </div>
 
-          {/* QR Codes */}
-          <div className="text-center lg:text-left">
-            <h4 className="mb-4 text-base font-black text-ink">关注我们</h4>
-            <div className="flex justify-center gap-6 lg:justify-start">
-              <div className="text-center">
-                <div className="mx-auto mb-2 flex size-[100px] items-center justify-center rounded-control bg-surface/70 text-xs font-bold text-muted cushion-field">
-                  小程序码
-                </div>
-                <span className="text-xs font-bold text-muted">微信小程序</span>
-              </div>
-              <div className="text-center">
-                <div className="mx-auto mb-2 flex size-[100px] items-center justify-center rounded-control bg-surface/70 text-xs font-bold text-muted cushion-field">
-                  公众号码
-                </div>
-                <span className="text-xs font-bold text-muted">微信公众号</span>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Copyright */}
