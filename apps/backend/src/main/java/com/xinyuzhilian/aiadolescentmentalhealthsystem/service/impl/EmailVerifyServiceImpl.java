@@ -50,7 +50,7 @@ public class EmailVerifyServiceImpl implements IEmailVerifyService {
 
     @Override
     @Async
-    public void sendVerifyCode(String email, String openid, String openidType, String scene) {
+    public void sendVerifyCode(String email, String scene) {
         String safeEmail = maskEmail(email);
         String dailyKey = SEND_DAILY_KEY + email;
         String freqKey = SEND_FREQ_KEY + email;
@@ -92,8 +92,6 @@ public class EmailVerifyServiceImpl implements IEmailVerifyService {
         verifyRecord.setEmail(email);
         verifyRecord.setCode(code);
         verifyRecord.setScene(scene);
-        verifyRecord.setOpenid(openid);
-        verifyRecord.setOpenidType(openidType);
         verifyRecord.setExpireTime(LocalDateTime.now().plusMinutes(CODE_EXPIRE_MINUTES));
         verifyRecord.setUsed(0);
         emailVerifyCodeMapper.insert(verifyRecord);

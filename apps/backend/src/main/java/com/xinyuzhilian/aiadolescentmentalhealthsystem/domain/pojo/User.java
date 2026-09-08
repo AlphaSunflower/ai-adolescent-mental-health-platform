@@ -94,15 +94,6 @@ public class User implements Serializable {
     @TableField("status")
     private Integer status;
 
-    @ApiModelProperty(value = "微信OpenID")
-    @TableField("wx_id")
-    private String wxId;
-
-    @ApiModelProperty(value = "微信公众号OpenID")
-    @TableField("wx_gzh_id")
-    private String wxGzhId;
-
-
     @ApiModelProperty(value = "邮箱是否已验证(0-否,1-是)")
     @TableField("email_verified")
     private Integer emailVerified;

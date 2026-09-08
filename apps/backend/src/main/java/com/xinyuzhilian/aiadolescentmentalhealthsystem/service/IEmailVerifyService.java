@@ -10,7 +10,6 @@ public interface IEmailVerifyService {
     /**
      * 场景常量
      */
-    String SCENE_BIND_EMAIL = "bind_email";
     String SCENE_REGISTER = "register";
     String SCENE_LOGIN = "login";
     String SCENE_FORGOT_PASSWORD = "forgot_password";
@@ -20,11 +19,9 @@ public interface IEmailVerifyService {
      * 发送邮箱验证码
      *
      * @param email      目标邮箱
-     * @param openid     微信OpenID（可为空，用于后续绑定）
-     * @param openidType OpenID类型：mini-小程序，gzh-公众号
-     * @param scene      场景，如 bind_email
+     * @param scene      场景，如 register、login
      */
-    void sendVerifyCode(String email, String openid, String openidType, String scene);
+    void sendVerifyCode(String email, String scene);
 
     /**
      * 验证邮箱验证码是否正确（不消耗验证码）

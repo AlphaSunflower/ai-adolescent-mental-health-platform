@@ -41,14 +41,6 @@ public class EmailVerifyCode implements Serializable {
     @TableField("scene")
     private String scene;
 
-    @ApiModelProperty(value = "发起验证时的微信OpenID")
-    @TableField("openid")
-    private String openid;
-
-    @ApiModelProperty(value = "openid类型: mini-小程序, gzh-公众号")
-    @TableField("openid_type")
-    private String openidType;
-
     @ApiModelProperty(value = "过期时间")
     @TableField("expire_time")
     private LocalDateTime expireTime;

@@ -28,9 +28,7 @@ class EmailVerifyServiceTest {
     private RedisTemplate<String, Object> redisTemplate;
 
     private static final String TEST_EMAIL = "test@example.com";
-    private static final String TEST_OPENID = "test_openid_12345";
-    private static final String TEST_OPENID_TYPE = "mini";
-    private static final String TEST_SCENE = IEmailVerifyService.SCENE_BIND_EMAIL;
+    private static final String TEST_SCENE = IEmailVerifyService.SCENE_REGISTER;
 
     @BeforeEach
     void clearRedisState() {
@@ -57,7 +55,7 @@ class EmailVerifyServiceTest {
 
         // 1. 发送验证码
         assertDoesNotThrow(() -> {
-            emailVerifyService.sendVerifyCode(TEST_EMAIL, TEST_OPENID, TEST_OPENID_TYPE, TEST_SCENE);
+            emailVerifyService.sendVerifyCode(TEST_EMAIL, TEST_SCENE);
         });
 
         // 2. 验证验证码存在（通过数据库查询，这里省略DB直接验证）
