@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Calendar, Users, Stethoscope, ArrowRight } from "lucide-react";
+import { Calendar, Users, ArrowRight } from "lucide-react";
 import { Card } from "@/components/pouf/Card";
 
 function ServiceBlob({ blob, icon: Icon }: { blob: string; icon: typeof Users }) {
@@ -27,17 +27,6 @@ export function ConsultationHubPage() {
             <p className="mb-4 text-sm font-bold text-muted">认证心理咨询师，在线/到院可选</p>
             <span className="inline-flex items-center gap-1 text-sm font-bold text-purple group-hover:text-purple">
               查看咨询师 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
-            </span>
-          </Card>
-        </Link>
-
-        <Link href="/consultation/doctor">
-          <Card className="group h-full cursor-pointer p-6 transition-all duration-300 hover:-translate-y-1">
-            <ServiceBlob blob="bg-blue tone-blue" icon={Stethoscope} />
-            <h3 className="mb-1 font-black text-ink">医生问诊</h3>
-            <p className="mb-4 text-sm font-bold text-muted">精神科医生在线问诊，专业诊疗</p>
-            <span className="inline-flex items-center gap-1 text-sm font-bold text-purple group-hover:text-purple">
-              了解详情 <ArrowRight className="size-3 transition-transform group-hover:translate-x-1" />
             </span>
           </Card>
         </Link>

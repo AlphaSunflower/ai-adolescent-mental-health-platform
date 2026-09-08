@@ -18,7 +18,6 @@ export type {
   LibraryItem,
   LibraryItemType,
   PageResult,
-  PatientContact,
   Psychologist,
   UserProfile,
   UserRole,

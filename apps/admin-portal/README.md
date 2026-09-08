@@ -19,9 +19,7 @@
 
 | 角色 | role 值 | 路由前缀 | 说明 |
 |------|---------|----------|------|
-| 超级管理员 | 4 | `/admin/*` | 全部管理功能，管理所有医院/医生/咨询师/用户/内容 |
-| 医院管理员 | 3 | `/hospital/*` | 管理本院医生、科室、投诉、反馈 |
-| 医生 | 2 | `/doctor/*` | 查看排班、患者档案、工作台 |
+| 超级管理员 | 4 | `/admin/*` | 全部管理功能，管理咨询师/用户/内容等 |
 | 心理咨询师 | `isPsychologist=1` | `/psychologist-admin/*` | 预约管理、排班、在线聊天、收入、个人资料 |
 
 角色守卫通过 `AuthGuard` 组件在每个 layout.tsx 中实现，无权限时自动跳转对应仪表盘，未登录跳转 `/login`。
@@ -31,20 +29,13 @@
 ### 超级管理员
 - **仪表盘**：平台总览统计卡片 + 月度趋势折线图
 - **用户管理**：用户 CRUD、搜索、分页、角色分配
-- **医院管理**：医院 CRUD、搜索、状态管理
 - **心理咨询师管理**：咨询师 CRUD、状态启停、擅长领域/资质子管理
 - **资质审核**：咨询师资料变更审核队列（通过/驳回）
 - **领域/资质字典**：擅长领域与资质字典表 CRUD
 - **内容管理**：文章（Markdown 编辑）、课程（第三方/自有）、书籍（评论管理）、测评（JSON 题库）
-- **审核中心**：双 Tab 文章审核 + 投诉审核
+- **审核中心**：文章审核
 - **平台收入**：收入统计、ECharts 趋势图 + 饼图、收入明细列表
-- **系统管理**：名言、标签、反馈、投诉、梗词典
-
-### 医院管理员
-- 仪表盘、医生管理、科室管理、咨询反馈、投诉处理
-
-### 医生
-- 仪表盘、工作台、排班视图、患者档案
+- **系统管理**：名言、标签、反馈、梗词典
 
 ### 心理咨询师
 - 工作台、7 日排班管理、预约处理（接受/拒绝/开始/完成）、在线聊天、收入统计、个人资料编辑 + 头像上传
@@ -57,12 +48,10 @@
 
 /admin/dashboard                     → 超级管理员仪表盘
 /admin/users                          → 用户管理
-/admin/hospitals                      → 医院管理
 /admin/psychologist                   → 心理咨询师管理
 /admin/psychologist/audit             → 资料审核
 /admin/psychologist-fields            → 擅长领域字典
 /admin/psychologist-qualifications    → 资质字典
-/admin/complaints                     → 投诉管理
 /admin/consultation-income            → 咨询收入明细
 /admin/meme                           → 梗管理
 /admin/platform/income                → 平台收入统计
@@ -82,17 +71,6 @@
 /admin/system/quotes                  → 名言管理
 /admin/system/tags                    → 标签管理
 /admin/system/feedbacks               → 反馈管理
-
-/hospital/dashboard                   → 医院仪表盘
-/hospital/doctors                     → 医生管理
-/hospital/departments                 → 科室管理
-/hospital/feedbacks                   → 咨询反馈
-/hospital/complaints                  → 投诉管理
-
-/doctor/dashboard                     → 医生仪表盘
-/doctor/workbench                     → 工作台
-/doctor/schedule                      → 排班管理
-/doctor/patients                      → 患者档案
 
 /psychologist-admin/workbench         → 咨询师工作台
 /psychologist-admin/schedule          → 排班管理
@@ -146,15 +124,13 @@ apps/admin-portal/
     │   ├── (auth)/login/       # 登录页
     │   ├── admin/              # 超级管理员路由组 (role=4)
     │   │   ├── layout.tsx      # AuthGuard(4) + AdminLayout
-    │   │   ├── dashboard/ users/ hospitals/
+    │   │   ├── dashboard/ users/
     │   │   ├── psychologist/ psychologist/audit/
     │   │   ├── psychologist-fields/ psychologist-qualifications/
-    │   │   ├── complaints/ consultation-income/ meme/
+    │   │   ├── consultation-income/ meme/
     │   │   ├── platform/income/
     │   │   ├── content/  # articles, courses, assessments, books, audit
     │   │   └── system/   # quotes, tags, feedbacks
-    │   ├── hospital/           # 医院管理员 (role=3)
-    │   ├── doctor/             # 医生 (role=2)
     │   └── psychologist-admin/ # 咨询师 (isPsychologist=1)
     ├── components/admin/
     │   ├── AuthGuard.tsx       # Token + 角色校验
@@ -162,13 +138,10 @@ apps/admin-portal/
     │   ├── AdminSidebar.tsx    # 角色菜单（深色侧边栏）
     │   ├── AdminHeader.tsx     # 用户信息 + 退出
     │   ├── LoginPage.tsx       # 登录表单
-    │   ├── dashboard/          # 四个角色仪表盘
+    │   ├── dashboard/          # 超级管理员仪表盘
     │   ├── content/            # Article*, Course*, Assessment*, Book*, Audit*, Field*, Qualification*
-    │   ├── system/             # Tag*, Quote*, Feedback*, Complaint*, Meme*, PlatformIncome*, ConsultationIncomeDetail*
+    │   ├── system/             # Tag*, Quote*, Feedback*, Meme*, PlatformIncome*, ConsultationIncomeDetail*
     │   ├── users/              # UserList
-    │   ├── hospitals/          # HospitalList
-    │   ├── doctor/             # DoctorList, DepartmentList, HospitalComplaints, HospitalFeedbackManager
-    │   ├── doctor-workbench/   # Workbench, PatientArchives, ScheduleManager
     │   ├── psychologist/       # PsychSchedule, PsychAppointments, PsychChat, PsychIncome, PsychProfile
     │   └── psychologist-admin/ # PsychologistAdmin, ProfileAudit
     └── lib/
@@ -251,7 +224,7 @@ export function ResourceManager() {
 
 ### 角色与状态码
 
-**角色定义**：1=普通用户, 2=医生, 3=医院管理员, 4=超级管理员
+**角色定义**：1=普通用户, 4=超级管理员；心理咨询师以 `isPsychologist=1` 标记区分。
 
 **咨询师**通过 `isPsychologist` 标志识别，无独立 role 值。
 

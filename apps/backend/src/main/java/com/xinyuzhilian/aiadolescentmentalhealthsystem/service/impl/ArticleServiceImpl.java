@@ -32,7 +32,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final UserMapper userMapper;
     private final CourseMapper courseMapper;
     private final AssessmentTemplateMapper assessmentMapper;
-    private final HospitalMapper hospitalMapper;
     private final UserArticleMapper userArticleMapper;
     private final ArticleTagMapper articleTagMapper;
     private final IUserArticleService userArticleService;
@@ -75,12 +74,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public PageResult<Article> getAdminArticles(Integer page, Integer size, String title, Long userId, Integer role) {
         Page<Article> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<Article> wrapper = new LambdaQueryWrapper<>();
-        
-        // 如果是医院管理员（角色3），只查询自己发布的文章
-        if (role == 3) {
-            wrapper.eq(Article::getAuthorId, userId);
-        }
-        
+
         if (title != null && !title.isEmpty()) {
             wrapper.like(Article::getTitle, title);
         }
@@ -98,7 +92,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     /**
      * 管理员获取所有文章（包括管理员文章和用户文章）
      * 超级管理员(role=4)可以查看所有文章
-     * 医院管理员(role=3)只能查看自己发布的官方文章
      * 用户文章由超级管理员统一管理
      */
     @Override
@@ -108,11 +101,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         // 1. 获取管理员文章
         Page<Article> adminPageParam = new Page<>(page, size);
         LambdaQueryWrapper<Article> adminWrapper = new LambdaQueryWrapper<>();
-
-        // 医院管理员只能看自己发布的
-        if (role != null && role == 3) {
-            adminWrapper.eq(Article::getAuthorId, userId);
-        }
 
         if (title != null && !title.isEmpty()) {
             adminWrapper.like(Article::getTitle, title);
@@ -306,15 +294,6 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
                 vo.setAuthorName(author.getNickname());
                 vo.setAuthorAvatar(author.getHeadPath());
                 vo.setAuthorRole(author.getRole());
-                
-                // 如果是医院管理员（角色3），查询所属医院名称
-                if (author.getRole() == 3) {
-                    Hospital hospital = hospitalMapper.selectOne(new LambdaQueryWrapper<Hospital>()
-                            .eq(Hospital::getAdminUserId, author.getId()));
-                    if (hospital != null) {
-                        vo.setHospitalName(hospital.getName());
-                    }
-                }
             }
         }
 

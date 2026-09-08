@@ -16,7 +16,6 @@ import type {
   LibraryItem,
   LibraryItemType,
   PageResult,
-  PatientContact,
   Psychologist,
   UserProfile,
 } from "@ai-adolescent-mental-health/domain";
@@ -151,17 +150,6 @@ function mapUserProfile(value: unknown, fallbackNickname = "用户"): UserProfil
     signature: asString(data.signature, undefined as unknown as string) || undefined,
     headPath: asString(data.headPath, undefined as unknown as string) || undefined,
     role: data.role as UserProfile["role"],
-  };
-}
-
-function mapPatient(value: unknown): PatientContact {
-  const data = asRecord(value);
-  return {
-    id: asNumber(data.id),
-    name: asString(data.name, "未命名就诊人"),
-    relationship: asString(data.relationship, "未设置"),
-    sex: asNumber(data.sex),
-    birthday: asString(data.birthday),
   };
 }
 
@@ -372,7 +360,6 @@ function mapArticleDetail(value: unknown): ArticleDetail {
     authorName: asString(data.authorName ?? data.author ?? data.userNickname ?? article.authorName ?? article.author, "心愈智联"),
     authorAvatar: asString(data.authorAvatar ?? data.userAvatar ?? article.authorAvatar ?? data.avatar ?? "", ""),
     authorRole: asNumber(data.authorRole ?? article.authorRole),
-    hospitalName: asString(data.hospitalName ?? article.hospitalName, ""),
     liked: asBoolean(data.liked ?? article.liked),
     disliked: asBoolean(data.disliked ?? article.disliked),
     collected: asBoolean(data.collected ?? article.collected),
@@ -539,20 +526,6 @@ export function createApiClient(http: HttpClient) {
       resetPassword: (username: string, email: string, code: string, newPassword: string, confirmPassword: string) =>
         http.post<string>("/user/forgot/reset", { username, email, code, newPassword, confirmPassword }),
     },
-    patient: {
-      list: async () => asArray(await http.get<unknown[]>("/patient/list")).map(mapPatient),
-      add: (payload: Omit<PatientContact, "id">) => http.post<string>("/patient/add", payload),
-      update: (payload: PatientContact) => http.put<string>("/patient/update", payload),
-      delete: (id: number) => http.delete<string>(`/patient/${id}`),
-    },
-    medicalRecord: {
-      list: (patientId: number) => http.get<unknown[]>(`/medical-record/list/${patientId}`),
-      add: (record: Record<string, unknown>, images?: string[]) =>
-        http.post<string>("/medical-record/add", { record, images: images ?? [] }),
-      update: (record: Record<string, unknown>, images?: string[]) =>
-        http.put<string>("/medical-record/update", { record, images: images ?? [] }),
-      delete: (id: number) => http.delete<string>(`/medical-record/${id}`),
-    },
     message: {
       list: async (params?: { page?: number; size?: number }) =>
         http.get<PageResult<unknown>>("/user/messages", { query: { page: params?.page ?? 1, size: params?.size ?? 10 } }),
@@ -679,7 +652,6 @@ export function createApiClient(http: HttpClient) {
     },
     feedback: {
       platform: () => http.get<PageResult<unknown>>("/feedback/platform/my", { query: { page: 1, size: 100 } }),
-      consultation: () => http.get<PageResult<unknown>>("/feedback/consultation/my", { query: { page: 1, size: 100 } }),
       submitPlatform: (data: { content: string }) => http.post<string>("/feedback/platform", data),
     },
     ai: {

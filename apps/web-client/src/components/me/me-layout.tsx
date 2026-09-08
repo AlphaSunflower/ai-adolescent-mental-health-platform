@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import {
   User, FileText, Lock, Star, ClipboardCheck, MessageSquare,
-  Users, LogOut, Bell, Bookmark
+  LogOut, Bell, Bookmark
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/pouf/Avatar";
 import { Button } from "@/components/pouf/Button";
@@ -22,7 +22,6 @@ const MENU_ITEMS = [
   { href: "/me/messages", icon: Bell, label: "我的消息" },
   { href: "/me/assessments", icon: ClipboardCheck, label: "我的测评记录" },
   { href: "/me/favorites", icon: Bookmark, label: "收藏与点赞" },
-  { href: "/me/patients", icon: Users, label: "就诊人病历管理" },
   { href: "/me/feedback", icon: MessageSquare, label: "我的反馈" },
 ];
 

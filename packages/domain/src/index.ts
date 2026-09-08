@@ -28,20 +28,6 @@ export type UserProfile = {
   role?: UserRole | number;
 };
 
-export type PatientContact = {
-  id: number;
-  name: string;
-  relationship: string;
-  sex: number;
-  birthday: string;
-  /** 显示用：关系别名 */
-  relation?: string;
-  /** 显示用：年龄 */
-  age?: number;
-  /** 显示用：性别文字 */
-  gender?: string;
-};
-
 export type Psychologist = {
   id: number;
   name: string;
@@ -169,7 +155,6 @@ export type ArticleDetail = {
   authorName: string;
   authorAvatar?: string;
   authorRole?: number;
-  hospitalName?: string;
   liked: boolean;
   disliked: boolean;
   collected: boolean;

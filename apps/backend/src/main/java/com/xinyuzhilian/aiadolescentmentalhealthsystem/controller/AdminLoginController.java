@@ -36,10 +36,10 @@ public class AdminLoginController {
         LoginUser loginUser = (LoginUser) authenticated.getPrincipal();
         User user = loginUser.getUser();
 
-        // 2. Role check: only roles 2,3,4 and isPsychologist=1
+        // 2. Role check: only super admin (role 4) and psychologist accounts
         int role = user.getRole() != null ? user.getRole() : 1;
         boolean isPsychologist = user.getIsPsychologist() != null && user.getIsPsychologist() == 1;
-        if (role < 2 && !isPsychologist) {
+        if (role != 4 && !isPsychologist) {
             return Result.error(403, "非管理员账号，无法登录管理端");
         }
 

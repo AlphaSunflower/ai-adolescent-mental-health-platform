@@ -1,6 +1,6 @@
 # 青少年心理健康 AI 平台（ai-adolescent-mental-health-platform）
 
-本仓库是一套面向青少年心理健康场景的 AI 辅助平台，包含 AI 问诊助手「小艾」、真人心理咨询、心理量表评估、心理内容库、医院与心理咨询师目录等业务域，多端覆盖 Web 用户端、Web 管理端、Android 客户端与微信小程序。
+本仓库是一套面向青少年心理健康场景的 AI 辅助平台，包含 AI 问诊助手「小艾」、真人心理咨询、心理量表评估、心理内容库、心理咨询师目录等业务域，多端覆盖 Web 用户端、Web 管理端、Android 客户端与微信小程序。
 
 仓库采用 `pnpm + Turborepo` 组织成 monorepo，不同技术栈（Java / Next.js / Vue / Kotlin / WeChat MiniProgram）共存于 `apps/*` 下，由根目录统一编排与依赖锁定。
 
@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | 后端 API | Spring Boot 3.5.9 / Java 17 | `apps/backend` | 所有客户端共享的核心服务 |
 | Web 用户端（当前） | Next.js 16 / React 19 / Tailwind CSS 4 | `apps/web-client` | 面向青少年及家长用户 |
-| Web 管理端（当前） | Next.js 16 / React 19 / TypeScript | `apps/admin-portal` | 运营/医院/医生/心理咨询师/管理员使用 |
+| Web 管理端（当前） | Next.js 16 / React 19 / TypeScript | `apps/admin-portal` | 运营/心理咨询师/管理员使用 |
 | 手机端（规划中） | 待填充（拟 uniapp） | `apps/mobile` | 面向青少年及家长用户（规划中） |
 | 家长端（规划中） | 待填充 | `apps/parent-portal` | 面向家长用户（规划中） |
 

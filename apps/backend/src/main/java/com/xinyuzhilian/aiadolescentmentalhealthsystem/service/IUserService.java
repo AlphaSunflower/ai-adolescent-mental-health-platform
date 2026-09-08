@@ -16,8 +16,7 @@ import com.xinyuzhilian.aiadolescentmentalhealthsystem.domain.common.PageResult;
 public interface IUserService extends IService<User> {
     User getUserInfo(Long userId);
     User updateUserInfo(Long userId, User user);
-    PageResult<User> getPatientsByDoctorId(Long doctorId, Integer page, Integer size);
-    
+
     // Admin methods
     PageResult<User> getUsers(Integer page, Integer size, String username, Integer status);
     void saveUser(User user);
