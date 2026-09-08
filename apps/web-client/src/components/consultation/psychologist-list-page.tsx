@@ -8,10 +8,9 @@ import {
   Medal, Phone, MessageCircle, Video, Users
 } from "lucide-react";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/pouf/Button";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { Psychologist } from "@/lib/types";
 
@@ -38,11 +37,11 @@ function RatingStars({ value, size = "sm" }: { value: number; size?: "sm" | "md"
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
-          className={i < stars ? "text-cosmic-gold fill-current" : "text-cosmic-dim"}
+          className={i < stars ? "text-yellow fill-current" : "text-muted/40"}
           style={size === "md" ? { width: 18, height: 18 } : { width: 14, height: 14 }}
         />
       ))}
-      <span className="ml-1 text-cosmic-muted">{value.toFixed(1)}</span>
+      <span className="ml-1 font-bold text-muted">{value.toFixed(1)}</span>
     </span>
   );
 }
@@ -170,36 +169,36 @@ export function PsychologistListPage() {
     const services = getDisplayServices(p);
 
     return (
-      <div className="cosmic-card group flex h-full flex-col p-5 transition-all duration-300 hover:-translate-y-1 relative">
+      <Card className="group relative flex h-full flex-col p-5 transition-all duration-300 hover:-translate-y-1">
         {/* Favorite button */}
         <button
           type="button"
           onClick={(e) => handleToggleFavorite(e, p)}
-          className="absolute right-3 top-3 z-10 rounded-full p-1.5 transition-colors hover:bg-white/10"
+          className="absolute right-3 top-3 z-10 rounded-full p-1.5 transition-colors hover:bg-purple/10"
           title={p.isFavorite ? "取消收藏" : "收藏"}
         >
-          <Heart className={`size-4 ${p.isFavorite ? "fill-cosmic-gold text-cosmic-gold" : "text-cosmic-dim"}`} />
+          <Heart className={`size-4 ${p.isFavorite ? "fill-yellow text-yellow" : "text-muted/60"}`} />
         </button>
 
         <div className="mb-4 flex items-start gap-4">
           {/* Avatar + online status */}
           <div className="relative shrink-0">
             <div
-              className="size-16 rounded-full flex items-center justify-center"
+              className="flex size-16 items-center justify-center rounded-full"
               style={{
-                background: "rgba(100, 149, 237, 0.2)",
-                boxShadow: "0 0 0 3px rgba(255, 215, 0, 0.3)",
+                background: "rgba(201, 168, 255, 0.25)",
+                boxShadow: "0 0 0 3px rgba(201, 168, 255, 0.35)",
               }}
             >
               {p.avatar ? (
                 <img src={p.avatar} alt={p.name} className="size-16 rounded-full object-cover" />
               ) : (
-                <span className="text-2xl font-bold text-cosmic-sky">{p.name[0]}</span>
+                <span className="text-2xl font-black text-purple">{p.name[0]}</span>
               )}
             </div>
             <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
-              <span className={`inline-block rounded-full px-1.5 py-0.5 text-[10px] font-medium ${
-                p.availableToday ? "bg-green-500/80 text-white" : "bg-gray-500/60 text-gray-300"
+              <span className={`inline-block rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                p.availableToday ? "bg-mint text-[var(--on-accent)]" : "bg-purple/15 text-muted"
               }`}>
                 {p.availableToday ? "在线" : "离线"}
               </span>
@@ -208,8 +207,8 @@ export function PsychologistListPage() {
 
           {/* Name + info */}
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-white">{p.name}</h3>
-            <p className="text-xs text-cosmic-muted">{p.title}</p>
+            <h3 className="font-black text-ink">{p.name}</h3>
+            <p className="text-xs font-bold text-muted">{p.title}</p>
             <div className="mt-1">
               <RatingStars value={p.rating} />
             </div>
@@ -217,22 +216,22 @@ export function PsychologistListPage() {
         </div>
 
         {/* Info: City, Certifications, Experience */}
-        <div className="mb-4 flex-1 space-y-1.5 text-xs text-cosmic-muted">
+        <div className="mb-4 flex-1 space-y-1.5 text-xs font-bold text-muted">
           {p.city && (
             <div className="flex items-center gap-1">
-              <MapPin className="size-3 text-cosmic-sky shrink-0" />
+              <MapPin className="size-3 shrink-0 text-blue" />
               <span>{p.city}</span>
             </div>
           )}
           {p.fields.length > 0 && (
             <div className="flex items-center gap-1">
-              <Medal className="size-3 text-cosmic-gold shrink-0" />
+              <Medal className="size-3 shrink-0 text-yellow" />
               <span className="line-clamp-1">{p.fields.slice(0, 3).join("、")}</span>
             </div>
           )}
           {p.yearsExperience != null && p.yearsExperience > 0 && (
             <div className="flex items-center gap-1">
-              <Clock className="size-3 text-cosmic-sky shrink-0" />
+              <Clock className="size-3 shrink-0 text-blue" />
               <span>{p.yearsExperience} 年咨询经验</span>
             </div>
           )}
@@ -242,11 +241,11 @@ export function PsychologistListPage() {
         </div>
 
         {/* Services + Price */}
-        <div className="mb-3 border-t border-white/10 pt-3">
+        <div className="mb-3 border-t border-[rgba(201,168,255,0.3)] pt-3">
           {services.map((s) => (
             <div key={s.type} className="flex items-center justify-between text-sm">
-              <span className="text-cosmic-muted">{s.label}</span>
-              <span className="font-semibold text-cosmic-gold">
+              <span className="text-muted">{s.label}</span>
+              <span className="font-black text-purple">
                 ¥{s.price?.toFixed(0) ?? "0"}/次
               </span>
             </div>
@@ -255,15 +254,15 @@ export function PsychologistListPage() {
 
         {/* Action buttons */}
         <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" size="xs" onClick={(e) => handleToggleFavorite(e, p)}>
-            <Heart className={`mr-1 size-3 ${p.isFavorite ? "fill-cosmic-gold text-cosmic-gold" : ""}`} />
+          <Button variant="quiet" size="sm" onClick={(e) => handleToggleFavorite(e, p)}>
+            <Heart className={`mr-1 size-3 ${p.isFavorite ? "fill-yellow text-yellow" : ""}`} />
             {p.isFavorite ? "已收藏" : "收藏"}
           </Button>
-          <Button variant="primary" size="xs" onClick={(e) => handleBookingClick(e, p)}>
+          <Button tone="purple" size="sm" onClick={(e) => handleBookingClick(e, p)}>
             立即预约
           </Button>
         </div>
-      </div>
+      </Card>
     );
   };
 
@@ -271,32 +270,32 @@ export function PsychologistListPage() {
     const services = getDisplayServices(p);
 
     return (
-      <div className="cosmic-card group flex flex-col gap-3 p-3 transition-all duration-300 hover:-translate-y-0.5 relative sm:flex-row sm:gap-5 sm:p-4">
+      <Card className="group relative flex flex-col gap-3 p-3 transition-all duration-300 hover:-translate-y-0.5 sm:flex-row sm:gap-5 sm:p-4">
         <div className="flex items-start gap-3 sm:contents">
           <button
             type="button"
             onClick={(e) => handleToggleFavorite(e, p)}
-            className="absolute right-3 top-3 z-10 rounded-full p-1.5 transition-colors hover:bg-white/10"
+            className="absolute right-3 top-3 z-10 rounded-full p-1.5 transition-colors hover:bg-purple/10"
           >
-            <Heart className={`size-4 ${p.isFavorite ? "fill-cosmic-gold text-cosmic-gold" : "text-cosmic-dim"}`} />
+            <Heart className={`size-4 ${p.isFavorite ? "fill-yellow text-yellow" : "text-muted/60"}`} />
           </button>
 
           <div className="flex shrink-0 flex-col items-center gap-1">
             <div
-              className="size-14 rounded-full flex items-center justify-center sm:size-16"
+              className="flex size-14 items-center justify-center rounded-full sm:size-16"
               style={{
-                background: "rgba(100, 149, 237, 0.2)",
-                boxShadow: "0 0 0 3px rgba(255, 215, 0, 0.3)",
+                background: "rgba(201, 168, 255, 0.25)",
+                boxShadow: "0 0 0 3px rgba(201, 168, 255, 0.35)",
               }}
             >
               {p.avatar ? (
                 <img src={p.avatar} alt={p.name} className="size-14 rounded-full object-cover sm:size-16" />
               ) : (
-                <span className="text-xl font-bold text-cosmic-sky sm:text-2xl">{p.name[0]}</span>
+                <span className="text-xl font-black text-purple sm:text-2xl">{p.name[0]}</span>
               )}
             </div>
-            <span className={`rounded-full px-1.5 py-0.5 text-[10px] ${
-              p.availableToday ? "bg-green-500/80 text-white" : "bg-gray-500/60 text-gray-300"
+            <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+              p.availableToday ? "bg-mint text-[var(--on-accent)]" : "bg-purple/15 text-muted"
             }`}>
               {p.availableToday ? "在线" : "离线"}
             </span>
@@ -305,13 +304,13 @@ export function PsychologistListPage() {
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <Link href={`/consultation/psychologist/${p.id}`} className="font-semibold text-white hover:text-cosmic-nav-hover">
+            <Link href={`/consultation/psychologist/${p.id}`} className="font-black text-ink hover:text-purple">
               {p.name}
             </Link>
-            <span className="text-xs text-cosmic-muted">{p.title}</span>
+            <span className="text-xs font-bold text-muted">{p.title}</span>
           </div>
           <div className="mt-1"><RatingStars value={p.rating} /></div>
-          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs text-cosmic-dim">
+          <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-1 text-xs font-bold text-muted/70">
             {p.city && (
               <span className="inline-flex items-center gap-1">
                 <MapPin className="size-3 shrink-0" />{p.city}
@@ -319,7 +318,7 @@ export function PsychologistListPage() {
             )}
             {p.fields.length > 0 && (
               <span className="inline-flex items-center gap-1">
-                <Medal className="size-3 shrink-0 text-cosmic-gold" />
+                <Medal className="size-3 shrink-0 text-yellow" />
                 {p.fields.slice(0, 3).join("、")}
               </span>
             )}
@@ -332,40 +331,40 @@ export function PsychologistListPage() {
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-row items-center justify-between border-t border-white/10 pt-3 sm:flex-col sm:items-end sm:justify-between sm:border-t-0 sm:pt-0">
+        <div className="flex shrink-0 flex-row items-center justify-between border-t border-[rgba(201,168,255,0.3)] pt-3 sm:flex-col sm:items-end sm:justify-between sm:border-t-0 sm:pt-0">
           <div className="text-right">
             {services.map((s) => (
               <div key={s.type} className="text-sm">
-                <span className="text-cosmic-muted">{s.label}</span>
-                <span className="ml-2 font-semibold text-cosmic-gold">¥{s.price?.toFixed(0) ?? "0"}</span>
+                <span className="text-muted">{s.label}</span>
+                <span className="ml-2 font-black text-purple">¥{s.price?.toFixed(0) ?? "0"}</span>
               </div>
             ))}
           </div>
-          <Button variant="primary" size="xs" onClick={(e) => handleBookingClick(e, p)}>
+          <Button tone="purple" size="sm" onClick={(e) => handleBookingClick(e, p)}>
             立即预约
           </Button>
         </div>
-      </div>
+      </Card>
     );
   };
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
-      <h1 className="cosmic-page-title mb-2 text-2xl">预约咨询心理师</h1>
-      <p className="mb-8 text-cosmic-muted">找到最适合您的心理咨询师</p>
+      <h1 className="mb-2 text-2xl font-black text-ink">预约咨询心理师</h1>
+      <p className="mb-8 text-muted">找到最适合您的心理咨询师</p>
 
       {/* Filter Toolbar */}
-      <div className="cosmic-card mb-6 p-4">
+      <Card className="mb-6 p-4">
         <div className="flex flex-wrap items-center gap-3">
           {/* Search */}
           <div className="relative w-full sm:w-56">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cosmic-dim" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
             <input
               type="text"
               value={searchKeyword}
               onChange={(e) => handleSearchChange(e.target.value)}
               placeholder="搜索心理师姓名或地址..."
-              className="cosmic-input h-9 w-full rounded-lg pl-10 pr-4 text-sm"
+              className="cushion-field h-9 w-full rounded-control bg-surface pl-10 pr-4 text-sm font-bold text-ink placeholder:text-muted focus-visible:cushion-field-focus focus-visible:outline-none"
             />
           </div>
 
@@ -373,7 +372,7 @@ export function PsychologistListPage() {
           <select
             value={gender}
             onChange={(e) => { setGender(e.target.value); setPage(1); }}
-            className="cosmic-input h-9 rounded-lg bg-white/10 px-3 text-sm text-cosmic-muted"
+            className="cushion-field h-9 rounded-control bg-surface px-3 text-sm font-bold text-ink"
           >
             <option value="">性别</option>
             <option value="1">男咨询师</option>
@@ -384,7 +383,7 @@ export function PsychologistListPage() {
           <select
             value={ratingFilter}
             onChange={(e) => { setRatingFilter(e.target.value); setPage(1); }}
-            className="cosmic-input h-9 rounded-lg bg-white/10 px-3 text-sm text-cosmic-muted"
+            className="cushion-field h-9 rounded-control bg-surface px-3 text-sm font-bold text-ink"
           >
             <option value="">评分</option>
             <option value="4.5">&gt;4.5</option>
@@ -400,31 +399,31 @@ export function PsychologistListPage() {
               value={priceMin}
               onChange={(e) => setPriceMin(e.target.value)}
               placeholder="最低价"
-              className="cosmic-input h-9 w-20 rounded-lg px-2 text-sm"
+              className="cushion-field h-9 w-20 rounded-control bg-surface px-2 text-sm font-bold text-ink placeholder:text-muted"
             />
-            <span className="text-cosmic-dim">-</span>
+            <span className="text-muted">-</span>
             <input
               type="number"
               value={priceMax}
               onChange={(e) => setPriceMax(e.target.value)}
               placeholder="最高价"
-              className="cosmic-input h-9 w-20 rounded-lg px-2 text-sm"
+              className="cushion-field h-9 w-20 rounded-control bg-surface px-2 text-sm font-bold text-ink placeholder:text-muted"
             />
           </div>
 
           {/* Reset */}
-          <Button variant="outline" size="xs" onClick={handleReset}>
+          <Button variant="quiet" size="sm" onClick={handleReset}>
             <RotateCcw className="mr-1 size-3" />
             重置
           </Button>
 
           {/* View toggle */}
-          <div className="ml-auto flex items-center rounded-lg bg-white/5 p-0.5">
+          <div className="ml-auto flex items-center rounded-control bg-purple/10 p-0.5">
             <button
               type="button"
               onClick={() => setViewMode("grid")}
               className={`rounded-md p-1.5 transition-colors ${
-                viewMode === "grid" ? "bg-cosmic-blue/30 text-white" : "text-cosmic-dim hover:text-white"
+                viewMode === "grid" ? "bg-purple/30 text-ink" : "text-muted hover:text-ink"
               }`}
             >
               <LayoutGrid className="size-4" />
@@ -433,7 +432,7 @@ export function PsychologistListPage() {
               type="button"
               onClick={() => setViewMode("list")}
               className={`rounded-md p-1.5 transition-colors ${
-                viewMode === "list" ? "bg-cosmic-blue/30 text-white" : "text-cosmic-dim hover:text-white"
+                viewMode === "list" ? "bg-purple/30 text-ink" : "text-muted hover:text-ink"
               }`}
             >
               <List className="size-4" />
@@ -442,40 +441,40 @@ export function PsychologistListPage() {
         </div>
 
         {/* Sort row */}
-        <div className="mt-3 flex items-center gap-2 border-t border-white/10 pt-3">
-          <span className="text-xs text-cosmic-dim">排序：</span>
+        <div className="mt-3 flex items-center gap-2 border-t border-[rgba(201,168,255,0.3)] pt-3">
+          <span className="text-xs font-bold text-muted">排序：</span>
           {SORT_OPTIONS.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => { setSortBy(opt.value); setPage(1); }}
-              className={`rounded-full px-3 py-1 text-xs transition-colors ${
+              className={`rounded-full px-3 py-1 text-xs font-bold transition-colors ${
                 sortBy === opt.value
-                  ? "bg-cosmic-blue/20 text-cosmic-sky"
-                  : "text-cosmic-dim hover:text-white"
+                  ? "bg-purple/20 text-purple"
+                  : "text-muted hover:text-ink"
               }`}
             >
               {opt.label}
             </button>
           ))}
-          <span className="ml-auto text-xs text-cosmic-dim">共 {total} 位</span>
+          <span className="ml-auto text-xs font-bold text-muted">共 {total} 位</span>
         </div>
-      </div>
+      </Card>
 
       {/* Content */}
       {loading ? (
         <div className={viewMode === "grid" ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-4" : "space-y-3"}>
           {Array.from({ length: viewMode === "grid" ? 8 : 4 }).map((_, i) => (
-            <div key={i} className="cosmic-card p-5">
+            <Card key={i} className="p-5">
               <Skeleton className="mb-3 size-16 rounded-full" />
               <Skeleton className="mb-2 h-5 w-32" />
               <Skeleton className="mb-1 h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
-            </div>
+            </Card>
           ))}
         </div>
       ) : psychologists.length === 0 ? (
-        <div className="py-20 text-center text-cosmic-muted">
+        <div className="py-20 text-center text-muted">
           <Search className="mx-auto mb-4 size-12 opacity-30" />
           <p>暂无符合条件的心理咨询师</p>
         </div>
@@ -501,8 +500,8 @@ export function PsychologistListPage() {
           {totalPages > 1 && (
             <div className="mt-8 flex items-center justify-center gap-2">
               <Button
-                variant="outline"
-                size="xs"
+                variant="quiet"
+                size="sm"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
               >
@@ -515,20 +514,20 @@ export function PsychologistListPage() {
                     key={pageNum}
                     type="button"
                     onClick={() => setPage(pageNum)}
-                    className={`size-8 rounded-lg text-sm transition-colors ${
+                    className={`size-8 rounded-control text-sm font-bold transition-colors ${
                       page === pageNum
-                        ? "bg-cosmic-blue/30 text-white"
-                        : "text-cosmic-dim hover:bg-white/5 hover:text-white"
+                        ? "bg-purple/30 text-ink"
+                        : "text-muted hover:bg-purple/10 hover:text-ink"
                     }`}
                   >
                     {pageNum}
                   </button>
                 );
               })}
-              {totalPages > 5 && <span className="text-cosmic-dim">...</span>}
+              {totalPages > 5 && <span className="text-muted">...</span>}
               <Button
-                variant="outline"
-                size="xs"
+                variant="quiet"
+                size="sm"
                 disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >

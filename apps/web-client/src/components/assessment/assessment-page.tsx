@@ -4,15 +4,16 @@ import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ClipboardCheck, Clock, FileText, ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/pouf/Tabs";
+import { Button } from "@/components/pouf/Button";
+import { Progress } from "@/components/pouf/Progress";
+import { Skeleton } from "@/components/pouf/Skeleton";
+import { Badge } from "@/components/pouf/Badge";
+import { Card } from "@/components/pouf/Card";
 import { api } from "@/lib/api";
 import type { AssessmentTemplate, AssessmentRecord, AssessmentRiskLevel } from "@/lib/types";
 
-const RISK_COLORS: Record<AssessmentRiskLevel, "gold" | "warning" | "destructive" | "secondary"> = {
+const RISK_TONE: Record<AssessmentRiskLevel, "gold" | "warning" | "destructive" | "secondary"> = {
   "日常筛查": "secondary",
   "情绪压力": "warning",
   "睡眠关注": "gold",
@@ -34,12 +35,12 @@ function AssessmentTemplatesTab({ onStart }: { onStart: (template: AssessmentTem
     return (
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="cosmic-card p-5">
+          <Card key={i} className="p-5">
             <Skeleton className="mb-3 h-5 w-20" />
             <Skeleton className="mb-2 h-6 w-3/4" />
             <Skeleton className="mb-1 h-4 w-full" />
             <Skeleton className="h-4 w-1/2" />
-          </div>
+          </Card>
         ))}
       </div>
     );
@@ -47,7 +48,7 @@ function AssessmentTemplatesTab({ onStart }: { onStart: (template: AssessmentTem
 
   if (templates.length === 0) {
     return (
-      <div className="py-20 text-center text-cosmic-muted">
+      <div className="py-20 text-center text-muted">
         <ClipboardCheck className="mx-auto mb-4 size-12 opacity-30" />
         <p>暂无可用测评模板</p>
       </div>
@@ -57,19 +58,19 @@ function AssessmentTemplatesTab({ onStart }: { onStart: (template: AssessmentTem
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {templates.map((t) => (
-        <div
+        <Card
           key={t.id}
-          className="cosmic-card group cursor-pointer p-5 transition-all duration-300 hover:-translate-y-1"
+          className="group cursor-pointer p-5 transition-all duration-300 hover:-translate-y-1"
           onClick={() => onStart(t)}
         >
-          <Badge variant={RISK_COLORS[t.riskLevel]} className="mb-3">
+          <Badge variant={RISK_TONE[t.riskLevel]} className="mb-3">
             {t.riskLevel}
           </Badge>
-          <h3 className="mb-2 font-semibold text-white group-hover:text-cosmic-nav-hover transition-colors">
+          <h3 className="mb-2 font-black text-ink transition-colors group-hover:text-purple">
             {t.title}
           </h3>
-          <p className="mb-3 line-clamp-2 text-sm text-cosmic-muted">{t.description}</p>
-          <div className="flex items-center gap-4 text-xs text-cosmic-dim">
+          <p className="mb-3 line-clamp-2 text-sm font-bold text-muted">{t.description}</p>
+          <div className="flex items-center gap-4 text-xs font-bold text-muted/70">
             <span className="inline-flex items-center gap-1">
               <FileText className="size-3" />
               {t.questionCount} 题
@@ -79,7 +80,7 @@ function AssessmentTemplatesTab({ onStart }: { onStart: (template: AssessmentTem
               约 {t.duration}
             </span>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );
@@ -120,7 +121,7 @@ function AssessmentQuestionForm({
 
   if (questions.length === 0) {
     return (
-      <div className="py-20 text-center text-cosmic-muted">
+      <div className="py-20 text-center text-muted">
         <AlertCircle className="mx-auto mb-4 size-12 opacity-30" />
         <p>该测评暂无题目</p>
       </div>
@@ -130,15 +131,15 @@ function AssessmentQuestionForm({
   return (
     <div className="mx-auto max-w-2xl">
       <div className="mb-6">
-        <div className="mb-2 flex items-center justify-between text-sm text-cosmic-muted">
+        <div className="mb-2 flex items-center justify-between text-sm font-bold text-muted">
           <span>第 {currentIndex + 1} / {questions.length} 题</span>
           <span>{Math.round(progress)}%</span>
         </div>
-        <Progress value={progress} className="h-1.5" />
+        <Progress value={progress} tone="purple" className="h-1.5" />
       </div>
 
-      <div className="cosmic-card p-6 md:p-8">
-        <h3 className="mb-6 text-lg font-semibold text-white">
+      <Card className="p-6 md:p-8">
+        <h3 className="mb-6 text-lg font-black text-ink">
           {currentIndex + 1}. {currentQuestion.title}
         </h3>
 
@@ -150,10 +151,10 @@ function AssessmentQuestionForm({
                 key={option.value}
                 type="button"
                 onClick={() => selectOption(currentQuestion.id, option.value)}
-                className={`w-full rounded-xl border px-4 py-3 text-left text-sm transition-all ${
+                className={`w-full rounded-control border px-4 py-3 text-left text-sm font-bold transition-all ${
                   isSelected
-                    ? "border-cosmic-gold/60 bg-cosmic-gold/10 text-cosmic-gold"
-                    : "border-white/10 bg-white/5 text-cosmic-muted hover:border-white/20 hover:bg-white/10"
+                    ? "border-purple/50 bg-purple/10 text-ink"
+                    : "border-[rgba(201,168,255,0.3)] bg-surface text-muted hover:border-purple/40 hover:bg-purple/5"
                 }`}
               >
                 {option.label}
@@ -164,7 +165,8 @@ function AssessmentQuestionForm({
 
         <div className="mt-8 flex items-center justify-between">
           <Button
-            variant="outline"
+            tone="purple"
+            variant="quiet"
             size="sm"
             onClick={goPrev}
             disabled={currentIndex === 0}
@@ -174,7 +176,7 @@ function AssessmentQuestionForm({
 
           {currentIndex < questions.length - 1 ? (
             <Button
-              variant="primary"
+              tone="purple"
               size="sm"
               onClick={goNext}
               disabled={!hasAnswered}
@@ -183,7 +185,7 @@ function AssessmentQuestionForm({
             </Button>
           ) : (
             <Button
-              variant="primary"
+              tone="purple"
               size="sm"
               disabled={!hasAnswered || submitting}
               onClick={() => onSubmit(answers)}
@@ -192,7 +194,7 @@ function AssessmentQuestionForm({
             </Button>
           )}
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
@@ -212,11 +214,11 @@ function AssessmentHistoryTab() {
     return (
       <div className="space-y-3">
         {Array.from({ length: 3 }).map((_, i) => (
-          <div key={i} className="cosmic-card p-4">
+          <Card key={i} className="p-4">
             <Skeleton className="mb-2 h-5 w-40" />
             <Skeleton className="mb-1 h-4 w-full" />
             <Skeleton className="h-4 w-1/2" />
-          </div>
+          </Card>
         ))}
       </div>
     );
@@ -224,7 +226,7 @@ function AssessmentHistoryTab() {
 
   if (records.length === 0) {
     return (
-      <div className="py-20 text-center text-cosmic-muted">
+      <div className="py-20 text-center text-muted">
         <FileText className="mx-auto mb-4 size-12 opacity-30" />
         <p>暂无测评记录</p>
       </div>
@@ -234,16 +236,16 @@ function AssessmentHistoryTab() {
   return (
     <div className="space-y-3">
       {records.map((r) => (
-        <div key={r.id} className="cosmic-card p-4 transition-all hover:-translate-y-0.5">
+        <Card key={r.id} className="p-4 transition-all hover:-translate-y-0.5">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-white">{r.title}</h3>
-            <span className="text-sm text-cosmic-dim">{r.createTime}</span>
+            <h3 className="font-black text-ink">{r.title}</h3>
+            <span className="text-sm font-bold text-muted/70">{r.createTime}</span>
           </div>
           <div className="mt-2 flex items-center gap-4 text-sm">
-            <span className="text-cosmic-gold font-semibold">得分: {r.score}</span>
-            <span className="text-cosmic-muted">{r.result}</span>
+            <span className="font-black text-purple">得分: {r.score}</span>
+            <span className="font-bold text-muted">{r.result}</span>
           </div>
-        </div>
+        </Card>
       ))}
     </div>
   );
@@ -295,13 +297,13 @@ export function AssessmentPage() {
         <button
           type="button"
           onClick={() => { setActiveTemplate(null); setTab("templates"); }}
-          className="mb-6 inline-flex items-center gap-1 text-sm text-cosmic-muted hover:text-cosmic-sky transition-colors"
+          className="mb-6 inline-flex items-center gap-1 text-sm font-bold text-muted transition-colors hover:text-purple"
         >
           <ArrowLeft className="size-4" />
           返回测评列表
         </button>
-        <h1 className="cosmic-page-title mb-2 text-2xl">{activeTemplate.title}</h1>
-        <p className="mb-8 text-sm text-cosmic-muted">{activeTemplate.description}</p>
+        <h1 className="mb-2 text-2xl font-black text-ink">{activeTemplate.title}</h1>
+        <p className="mb-8 text-sm font-bold text-muted">{activeTemplate.description}</p>
         <AssessmentQuestionForm
           template={activeTemplate}
           onSubmit={handleSubmit}
@@ -313,10 +315,10 @@ export function AssessmentPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 md:py-12">
-      <h1 className="cosmic-page-title mb-8 text-2xl">心理测评</h1>
+      <h1 className="mb-8 text-2xl font-black text-ink">心理测评</h1>
 
       <Tabs value={tab} onValueChange={handleTabChange}>
-        <TabsList className="mb-8 inline-flex">
+        <TabsList className="mb-8">
           <TabsTrigger value="templates">测评列表</TabsTrigger>
           <TabsTrigger value="history">测评历史</TabsTrigger>
         </TabsList>
