@@ -55,12 +55,12 @@ export default function OfficialFooter() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-10 md:flex-row md:gap-16">
-          <div>
+        <div className="flex flex-col gap-10 md:flex-row md:gap-14">
+          <div className="min-w-0">
             <h3 className="text-sm font-bold">联系我们</h3>
             <ul className="mt-5 space-y-3 text-sm text-[var(--bg)]/75">
               {CONTACTS.map((contact) => (
-                <li key={contact.label}>
+                <li key={contact.label} className="whitespace-nowrap">
                   {contact.label}：{contact.value}
                 </li>
               ))}
@@ -70,7 +70,7 @@ export default function OfficialFooter() {
             <h3 className="text-sm font-bold">导航</h3>
             <ul className="mt-5 space-y-3 text-sm">
               {FOOTER_NAV.map((item) => (
-                <li key={item}>
+                <li key={item} className="whitespace-nowrap">
                   <a
                     href="#"
                     className="text-[var(--bg)]/75 transition-colors hover:text-white"
