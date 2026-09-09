@@ -76,9 +76,10 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v5
         with:
-          # 与根 package.json 的 packageManager 一致，避免
-          # “Multiple versions of pnpm specified” 冲突（ERR_PNPM_BAD_PM_VERSION）。
-          version: 12.3.4
+          # 不要显式写 version：action-setup 会对 version 与 package.json 的
+          # packageManager(pnpm@12.3.4+sha512...) 做字面比对，即便版本号相同也会因
+          # 字符串不同而报 "Multiple versions of pnpm specified"。省略 version 让它直接
+          # 读取 package.json 的 packageManager，单一来源，永不冲突。
           run_install: false
 
       - name: Set up Node.js
