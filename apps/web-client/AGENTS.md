@@ -124,3 +124,13 @@ pnpm --filter @ai-adolescent-mental-health/web-client clean      # rimraf .next
 `(main)` 内 `me/*` 下含：`articles`、`assessments`、`fans`、`favorites`、`feedback`、`follow`、`followings`、`info`、`likes`、`messages`、`orders`、`patients`、`privacy`、`psychology`、`publish`；`user/[userId]` 下有 `article/[articleId]`、`follow`；`apply/*` 下有 `basic/form/status`。
 
 未匹配路由（全局 404）走根 `not-found.tsx`，渲染 `components/effects/not-found-brick-breaker`（可玩的砖块消除小游戏，pouf 风格，无新增依赖）。
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
