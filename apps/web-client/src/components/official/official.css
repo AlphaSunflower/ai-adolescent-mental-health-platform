@@ -64,3 +64,55 @@
   background-size: 13px 13px;
   background-position: center;
 }
+
+/* ── React Bits 改编组件样式（reactbits.dev）── */
+
+/* ShinyText：微光扫过（适配按钮场景：底色 ink、白色高光带扫过文字） */
+.official-shiny-text {
+  background: linear-gradient(
+    120deg,
+    var(--on-accent) 40%,
+    #ffffff 50%,
+    var(--on-accent) 60%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: official-shine 5s linear infinite;
+}
+@keyframes official-shine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .official-shiny-text {
+    animation: none;
+  }
+}
+
+/* SpotlightCard：鼠标跟随聚光（仅 hover 时显现，无自主运动） */
+.official-spotlight-card {
+  position: relative;
+  overflow: hidden;
+}
+.official-spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    360px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
+    var(--spotlight-color, rgba(201, 168, 255, 0.22)),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.official-spotlight-card:hover::before {
+  opacity: 1;
+}
