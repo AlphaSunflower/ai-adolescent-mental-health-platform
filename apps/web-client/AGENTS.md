@@ -23,6 +23,7 @@ src/
 │   ├── layout.tsx                # 根布局：PoufBackground（背景全局渲染一次）+ ChunkReloadGuard + sonner Toaster
 │   ├── globals.css               # @import tailwindcss + pouf.css + @fontsource-variable/nunito
 │   ├── page.tsx                  # / → redirect /home
+│   ├── not-found.tsx             # 全局 404：pouf 砖块消除小游戏（NotFoundBrickBreaker）
 │   ├── (auth)/                   # 认证（无壳，Shuffle 品牌字，force-dynamic）
 │   │   ├── layout.tsx
 │   │   └── login|register|forgot-password/page.tsx
@@ -33,12 +34,13 @@ src/
 ├── components/
 │   ├── pouf/                     # pouf 原语：Button/IconButton, Card, Dialog, Input, Textarea, Tabs, Skeleton, Progress, Badge, Avatar, tone.ts, pouf.css
 │   ├── pouf-shell/               # pouf-app-shell / pouf-nav-bar / pouf-footer / pouf-background
-│   ├── effects/                  # Particles（背景粒子，ogl）/ Shuffle（品牌字）
+│   ├── effects/                  # Particles（背景粒子，ogl）/ Shuffle（品牌字）/ not-found-brick-breaker（404 砖块游戏）
 │   ├── feedback/                 # feedback-dialog.tsx（FeedbackDialogProvider + useFeedbackDialog）
 │   ├── home/ library/ ai/ assessment/ search/ consultation/ xiaoai/ me/ user/ apply/ legal/ auth/
 │   └── ChunkReloadGuard.tsx
 └── lib/
     ├── api.ts                    # 统一 API 客户端（基于 @ai-adolescent-mental-health/api-client）
+    ├── games/brick-breaker.ts    # 404 砖块消除游戏引擎（纯 TS，无依赖，pouf 适配版复用）
     ├── session.ts                # localStorage 认证会话（token/.user）
     ├── types.ts                  # 类型重导出（@ai-adolescent-mental-health/domain）
     ├── utils.ts                  # cn()（clsx + tailwind-merge）
@@ -120,3 +122,5 @@ pnpm --filter @ai-adolescent-mental-health/web-client clean      # rimraf .next
 **沉浸式路由**（隐藏 Footer、壳层钉 `100dvh` 防双滚动条）：`/ai`、`/xiaoai-listen`、`/consultation/chat`——由 `pouf-app-shell.tsx` 的 `IMMERSIVE_ROUTES` 常量控制。
 
 `(main)` 内 `me/*` 下含：`articles`、`assessments`、`fans`、`favorites`、`feedback`、`follow`、`followings`、`info`、`likes`、`messages`、`orders`、`patients`、`privacy`、`psychology`、`publish`；`user/[userId]` 下有 `article/[articleId]`、`follow`；`apply/*` 下有 `basic/form/status`。
+
+未匹配路由（全局 404）走根 `not-found.tsx`，渲染 `components/effects/not-found-brick-breaker`（可玩的砖块消除小游戏，pouf 风格，无新增依赖）。
