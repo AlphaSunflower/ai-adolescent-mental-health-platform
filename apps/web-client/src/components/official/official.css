@@ -1,61 +1,11 @@
 /*
- * 官网（/index）专用样式 —— 基于 pouf 变量体系的科技感扩展。
+ * 官网（/index）专用样式 —— 基于 pouf 变量体系的克制风格（M2.5）。
  * 仅官网组件使用，类名 official-* 命名空间防冲突；不改动 globals.css / pouf.css。
  */
 
 /* 品牌字「心愈智联」：Noto Sans SC Brand 为四字子集，仅用于四字词组 */
 .official-brand-font {
   font-family: "Noto Sans SC Brand", var(--font);
-}
-
-/* 网格光效底纹（紫罗兰细网格 + 径向渐隐遮罩） */
-.official-grid-bg {
-  background-image:
-    linear-gradient(rgba(201, 168, 255, 0.16) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(201, 168, 255, 0.16) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: radial-gradient(ellipse 85% 65% at 50% 38%, black 25%, transparent 78%);
-  -webkit-mask-image: radial-gradient(ellipse 85% 65% at 50% 38%, black 25%, transparent 78%);
-}
-
-/* 玻璃拟态卡片 */
-.official-glass {
-  background: rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.65);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  box-shadow: 0 8px 32px rgba(58, 46, 92, 0.08);
-}
-
-/* 品牌渐变文字 */
-.official-gradient-text {
-  background: linear-gradient(120deg, var(--purple), var(--pink) 55%, var(--blue));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-/* 悬浮动效（原生 CSS，遵循 reduced-motion） */
-@keyframes official-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
-}
-.official-float {
-  animation: official-float 6s ease-in-out infinite;
-}
-.official-float-slow {
-  animation: official-float 9s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .official-float,
-  .official-float-slow {
-    animation: none;
-  }
 }
 
 /* 二维码样式化占位块：点阵底纹（非真实二维码，素材待补充） */
