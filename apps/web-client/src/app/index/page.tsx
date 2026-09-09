@@ -4,6 +4,7 @@ import FeaturesSection from "@/components/official/features-section";
 import CultureSection from "@/components/official/culture-section";
 import DownloadSection from "@/components/official/download-section";
 import QrcodeSection from "@/components/official/qrcode-section";
+import OfficialFooter from "@/components/official/official-footer";
 import "@/components/official/official.css";
 
 /**
@@ -20,8 +21,8 @@ export default function OfficialSitePage() {
         <CultureSection />
         <DownloadSection />
         <QrcodeSection />
-        {/* M2 增量组装中：footer 接入后完成 */}
       </main>
+      <OfficialFooter />
     </div>
   );
 }
