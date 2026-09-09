@@ -42,6 +42,8 @@
 @media (prefers-reduced-motion: reduce) {
   .official-shiny-text {
     animation: none;
+    /* 静态定位到高光带扫入前的位置，文字整体呈底色不发白 */
+    background-position: 200% center;
   }
 }
 
