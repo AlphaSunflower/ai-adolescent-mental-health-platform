@@ -47,7 +47,11 @@ export default function OfficialFooter() {
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-12 px-6 py-16 md:grid-cols-[1.1fr_1fr_auto]">
         <div>
           <div className="flex items-center gap-2">
-            <img src="/xinyuzhilian.svg" alt="心愈智联 Logo" className="h-9 w-9" />
+            <img
+              src="/logo-white.png"
+              alt="心愈智联 Logo"
+              className="h-8 w-auto object-contain"
+            />
             <span className="official-brand-font text-2xl font-bold">心愈智联</span>
           </div>
           <p className="mt-4 text-sm text-[var(--bg)]/70">

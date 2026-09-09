@@ -32,7 +32,11 @@ export default function OfficialNavbar() {
           }}
           className="flex items-center gap-2"
         >
-          <img src="/xinyuzhilian.svg" alt="心愈智联 Logo" className="h-8 w-8" />
+          <img
+            src="/logo.png"
+            alt="心愈智联 Logo"
+            className="h-9 w-auto object-contain"
+          />
           <span className="official-brand-font text-xl font-bold text-[var(--ink)]">
             心愈智联
           </span>
