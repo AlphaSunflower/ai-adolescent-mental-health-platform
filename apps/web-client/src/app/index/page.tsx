@@ -3,6 +3,7 @@ import HeroSection from "@/components/official/hero-section";
 import FeaturesSection from "@/components/official/features-section";
 import CultureSection from "@/components/official/culture-section";
 import DownloadSection from "@/components/official/download-section";
+import QrcodeSection from "@/components/official/qrcode-section";
 import "@/components/official/official.css";
 
 /**
@@ -18,7 +19,8 @@ export default function OfficialSitePage() {
         <FeaturesSection />
         <CultureSection />
         <DownloadSection />
-        {/* M2 增量组装中：qrcode / footer 逐个接入 */}
+        <QrcodeSection />
+        {/* M2 增量组装中：footer 接入后完成 */}
       </main>
     </div>
   );
