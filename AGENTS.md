@@ -44,7 +44,7 @@ Turbo 管线（[turbo.json](turbo.json)）：`build` 依赖 `^build`；`test` �
 
 ## 四、变更约束（AI 严格遵守）
 
-1. **不要修改 `pnpm-lock.yaml`**，除非用户明确要求升级/新增依赖。
+1. **不要修改 `pnpm-lock.yaml`**，除非用户明确要求升级/新增依赖。仓库由 corepack 固定 `pnpm 12.3.4`（根 `package.json` `packageManager` 已升级），锁文件为 pnpm 12 格式；pnpm 12 的构建脚本白名单走 `pnpm-workspace.yaml` 的 `allowBuilds`（未批准会拦截安装，报 approval 提示）。
 2. **不要擅自新增平行 AI 规约文件**（`CLAUDE.md`、`.cursorrules`、`.github/copilot-instructions.md` 等）；统一用 `AGENTS.md`。
 3. **不要跨 app 复制源文件**；各端独立演进，共享 SQL/常量放 `infra/`。
 4. **修改根级配置先说明理由**：`turbo.json`、`pnpm-workspace.yaml`、根 `package.json`、`apps/backend/src/main/resources/application*.yml`。

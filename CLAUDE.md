@@ -25,7 +25,7 @@ pnpm test:backend
 
 ## AI 黄金规则（改代码前务必核对 AGENTS.md）
 
-1. 不改 `pnpm-lock.yaml`，除非用户明确要求升级/新增依赖。
+1. 不改 `pnpm-lock.yaml`，除非用户明确要求升级/新增依赖。仓库固定 `pnpm 12.3.4`（corepack），锁文件为 pnpm 12 格式；构建脚本白名单走 `pnpm-workspace.yaml` 的 `allowBuilds`。
 2. 不加平行 AI 规约文件（本仓库统一 `AGENTS.md`）。
 3. 不跨 app 复制源文件；共享 SQL/常量放 `infra/`。
 4. 改根级配置（`turbo.json`、`pnpm-workspace.yaml`、根 `package.json`、`application*.yml`）先说明理由。
