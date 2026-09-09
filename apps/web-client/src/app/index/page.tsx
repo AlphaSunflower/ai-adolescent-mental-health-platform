@@ -1,4 +1,5 @@
 import OfficialNavbar from "@/components/official/official-navbar";
+import HeroSection from "@/components/official/hero-section";
 import "@/components/official/official.css";
 
 /**
@@ -10,7 +11,8 @@ export default function OfficialSitePage() {
     <div className="relative min-h-dvh text-[var(--ink)]">
       <OfficialNavbar />
       <main>
-        {/* M2 增量组装中：hero / features / culture / download / qrcode / footer 逐个接入 */}
+        <HeroSection />
+        {/* M2 增量组装中：features / culture / download / qrcode / footer 逐个接入 */}
       </main>
     </div>
   );
