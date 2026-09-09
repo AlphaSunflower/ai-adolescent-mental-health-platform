@@ -48,7 +48,7 @@ export default function OfficialFooter() {
         <div>
           <div className="flex items-center gap-2">
             <img
-              src="/logo-white.png"
+              src="/logo.png"
               alt="心愈智联 Logo"
               className="h-8 w-auto object-contain"
             />

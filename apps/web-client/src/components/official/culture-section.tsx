@@ -9,9 +9,9 @@ export default function CultureSection() {
 
       <div className="mt-16 flex flex-col items-center">
         <img
-          src="/xinyuzhilian.svg"
+          src="/logo.png"
           alt="心愈智联 Logo"
-          className="h-20 w-20"
+          className="h-20 w-auto object-contain"
         />
         <p className="official-brand-font mt-8 text-4xl font-black tracking-wide text-[var(--ink)]">
           心愈智联
