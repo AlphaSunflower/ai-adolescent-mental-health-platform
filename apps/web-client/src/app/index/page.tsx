@@ -1,6 +1,7 @@
 import OfficialNavbar from "@/components/official/official-navbar";
 import HeroSection from "@/components/official/hero-section";
 import FeaturesSection from "@/components/official/features-section";
+import CultureSection from "@/components/official/culture-section";
 import "@/components/official/official.css";
 
 /**
@@ -14,7 +15,8 @@ export default function OfficialSitePage() {
       <main>
         <HeroSection />
         <FeaturesSection />
-        {/* M2 增量组装中：culture / download / qrcode / footer 逐个接入 */}
+        <CultureSection />
+        {/* M2 增量组装中：download / qrcode / footer 逐个接入 */}
       </main>
     </div>
   );
