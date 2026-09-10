@@ -1,3 +1,5 @@
+import SideRays from "./side-rays";
+
 // 联系方式逐字来自《官网需呈现内容》第八节「联系我们」（存档注释不入文案）。
 const CONTACTS = [
   { label: "电话", value: "157766972859" },
@@ -39,8 +41,22 @@ function QrTile({ name, src }: { name: string; src: string }) {
 
 export default function OfficialFooter() {
   return (
-    <footer className="mt-28 bg-[#4A4266] text-[#FBFAFF]">
-      <div className="mx-auto grid max-w-5xl grid-cols-1 gap-12 px-6 py-16 md:grid-cols-[1.1fr_1fr_auto]">
+    <footer className="official-footer relative mt-28 overflow-hidden bg-[#4A4266] text-[#FBFAFF]">
+      <SideRays
+        speed={1.5}
+        rayColor1="#A99CFF"
+        rayColor2="#7BE1D1"
+        intensity={2.4}
+        spread={2}
+        origin="bottom-right"
+        tilt={-18}
+        saturation={1.3}
+        blend={0.6}
+        falloff={1.9}
+        opacity={0.8}
+      />
+
+      <div className="official-footer__inner relative z-10 mx-auto grid max-w-5xl grid-cols-1 gap-12 px-6 py-16 md:grid-cols-[1.1fr_1fr_auto]">
         <div>
           <div className="flex items-center gap-2">
             <img
@@ -93,7 +109,7 @@ export default function OfficialFooter() {
         </div>
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="official-footer__bottom relative z-10 border-t border-white/10">
         <p className="mx-auto max-w-5xl px-6 py-5 text-center text-xs text-[#FBFAFF]/60">
           心愈智联 — 青少年心理健康 AI 平台
         </p>

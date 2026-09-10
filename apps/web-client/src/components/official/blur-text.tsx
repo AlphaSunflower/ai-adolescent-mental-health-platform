@@ -1,64 +1,149 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { useRef } from "react";
+import { motion, type Transition } from "motion/react";
+import {
+  createElement,
+  type ElementType,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-/**
- * 改编自 React Bits「BlurText」（reactbits.dev，GSAP 实现）。
- * 逐词（无空格文本逐字）模糊浮现入场，一次性动画；
- * prefers-reduced-motion 时直接呈现完整文本。
- */
-export default function BlurText({
-  text,
-  className,
-  delay = 0,
-  duration = 0.8,
-  ease = "power3.out",
-  stagger = 0.08,
-}: {
-  text: string;
-  className?: string;
+type BlurTextProps = {
+  text?: string;
   delay?: number;
-  duration?: number;
-  ease?: string;
-  stagger?: number;
-}) {
-  const containerRef = useRef<HTMLSpanElement>(null);
-  const segments = text.includes(" ") ? text.split(/(\s+)/) : Array.from(text);
+  className?: string;
+  as?: ElementType;
+  animateBy?: "words" | "letters";
+  direction?: "top" | "bottom";
+  threshold?: number;
+  rootMargin?: string;
+  animationFrom?: Record<string, string | number>;
+  animationTo?: Array<Record<string, string | number>>;
+  easing?: (value: number) => number;
+  onAnimationComplete?: () => void;
+  stepDuration?: number;
+};
 
-  useGSAP(
-    () => {
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      if (!containerRef.current) return;
-      gsap.from(containerRef.current.querySelectorAll("[data-blur-segment]"), {
-        opacity: 0,
-        y: 18,
-        filter: "blur(10px)",
-        ease,
-        duration,
-        delay,
-        stagger,
-        onComplete() {
-          // 动画结束后清除 inline filter，避免残留合成层
-          gsap.set(this.targets(), { clearProps: "filter,transform,opacity" });
-        },
-      });
-    },
-    { scope: containerRef, dependencies: [text, delay, duration, ease, stagger] },
+const buildKeyframes = (
+  from: Record<string, string | number>,
+  steps: Array<Record<string, string | number>>,
+) => {
+  const keys = new Set([
+    ...Object.keys(from),
+    ...steps.flatMap((step) => Object.keys(step)),
+  ]);
+  const keyframes: Record<string, Array<string | number>> = {};
+  keys.forEach((key) => {
+    keyframes[key] = [from[key], ...steps.map((step) => step[key])];
+  });
+  return keyframes;
+};
+
+export default function BlurText({
+  text = "",
+  delay = 200,
+  className = "",
+  as: Component = "span",
+  animateBy = "words",
+  direction = "top",
+  threshold = 0.1,
+  rootMargin = "0px",
+  animationFrom,
+  animationTo,
+  easing = (value: number) => value,
+  onAnimationComplete,
+  stepDuration = 0.35,
+}: BlurTextProps) {
+  const elements =
+    animateBy === "words" ? text.split(" ") : text.split("");
+  const [inView, setInView] = useState(false);
+  const ref = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setInView(true);
+        observer.unobserve(entry.target);
+      },
+      { threshold, rootMargin },
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [rootMargin, threshold]);
+
+  const defaultFrom = useMemo(
+    () =>
+      direction === "top"
+        ? { filter: "blur(10px)", opacity: 0, y: -50 }
+        : { filter: "blur(10px)", opacity: 0, y: 50 },
+    [direction],
   );
 
-  return (
-    <span ref={containerRef} className={className}>
-      {segments.map((segment, index) =>
-        /^\s+$/.test(segment) ? (
-          segment
-        ) : (
-          <span key={index} data-blur-segment className="inline-block will-change-transform">
-            {segment}
-          </span>
-        ),
-      )}
-    </span>
+  const defaultTo = useMemo(
+    () => [
+      {
+        filter: "blur(5px)",
+        opacity: 0.5,
+        y: direction === "top" ? 5 : -5,
+      },
+      { filter: "blur(0px)", opacity: 1, y: 0 },
+    ],
+    [direction],
+  );
+
+  const fromSnapshot = animationFrom ?? defaultFrom;
+  const toSnapshots = animationTo ?? defaultTo;
+  const stepCount = toSnapshots.length + 1;
+  const totalDuration = stepDuration * (stepCount - 1);
+  const times = Array.from(
+    { length: stepCount },
+    (_, index) => (stepCount === 1 ? 0 : index / (stepCount - 1)),
+  );
+  const animateKeyframes = buildKeyframes(fromSnapshot, toSnapshots);
+
+  return createElement(
+    Component,
+    {
+      ref,
+      className,
+      style: {
+        display: "flex",
+        flexWrap: "wrap",
+      },
+    },
+    elements.map((segment, index) => {
+      const spanTransition: Transition = {
+        duration: totalDuration,
+        times,
+        delay: (index * delay) / 1000,
+        ease: easing,
+      };
+
+      return (
+        <motion.span
+          key={`${segment}-${index}`}
+          initial={fromSnapshot}
+          animate={inView ? animateKeyframes : fromSnapshot}
+          transition={spanTransition}
+          onAnimationComplete={
+            index === elements.length - 1 ? onAnimationComplete : undefined
+          }
+          style={{
+            display: "inline-block",
+            willChange: "transform, filter, opacity",
+          }}
+        >
+          {segment === " " ? "\u00A0" : segment}
+          {animateBy === "words" && index < elements.length - 1
+            ? "\u00A0"
+            : null}
+        </motion.span>
+      );
+    }),
   );
 }

@@ -58,6 +58,8 @@ export default function MindConstellation({
     let dpr = 1;
     let animationFrame = 0;
     let particles: Particle[] = [];
+    let smoothScrollProgress = 0;
+    let lastScrollY = window.scrollY;
     const pointer = { x: 0, y: 0, active: false };
     const ripples: Ripple[] = [];
     const motionScale = reducedMotion ? 0.46 : 1;
@@ -115,6 +117,13 @@ export default function MindConstellation({
 
       const heroRect = interactionTarget.getBoundingClientRect();
       const scrollProgress = clamp(-heroRect.top / (height * 0.72), 0, 1);
+      if (Math.abs(window.scrollY - lastScrollY) > 2) {
+        pointer.active = false;
+        lastScrollY = window.scrollY;
+      }
+      smoothScrollProgress +=
+        (scrollProgress - smoothScrollProgress) * 0.055;
+      const clusterProgress = smoothScrollProgress;
       const clusterY = height * 0.52;
       const clusterCenters = [
         width * 0.24,
@@ -158,22 +167,36 @@ export default function MindConstellation({
           (targetX - particle.x) * 0.00115 +
           (clusterTargetX - particle.x) *
             0.0026 *
-            scrollProgress *
+            clusterProgress *
             motionScale;
         particle.vy +=
           (targetY - particle.y) * 0.00115 +
           (clusterTargetY - particle.y) *
             0.0026 *
-            scrollProgress *
+            clusterProgress *
             motionScale;
 
         particle.vx *= 0.994;
         particle.vy *= 0.994;
+        particle.vx = clamp(particle.vx, -1.15, 1.15);
+        particle.vy = clamp(particle.vy, -1.15, 1.15);
 
-        if (particle.x < -20) particle.x = width + 20;
-        if (particle.x > width + 20) particle.x = -20;
-        if (particle.y < -20) particle.y = height + 20;
-        if (particle.y > height + 20) particle.y = -20;
+        if (particle.x < -16) {
+          particle.x = -16;
+          particle.vx = Math.abs(particle.vx);
+        }
+        if (particle.x > width + 16) {
+          particle.x = width + 16;
+          particle.vx = -Math.abs(particle.vx);
+        }
+        if (particle.y < -16) {
+          particle.y = -16;
+          particle.vy = Math.abs(particle.vy);
+        }
+        if (particle.y > height + 16) {
+          particle.y = height + 16;
+          particle.vy = -Math.abs(particle.vy);
+        }
       }
 
       for (let index = 0; index < particles.length; index += 1) {
@@ -187,12 +210,13 @@ export default function MindConstellation({
           const dx = next.x - particle.x;
           const dy = next.y - particle.y;
           const distance = Math.hypot(dx, dy);
-          const connectionDistance = scrollProgress > 0.45 ? 118 : 138;
+          const connectionDistance =
+            clusterProgress > 0.45 ? 118 : 138;
           if (distance >= connectionDistance) continue;
 
           const alpha =
             (1 - distance / connectionDistance) *
-            (0.18 + scrollProgress * 0.14) *
+            (0.18 + clusterProgress * 0.14) *
             (0.76 +
               Math.sin(time * 0.0011 + particle.phase + next.phase) * 0.24);
           ctx.beginPath();

@@ -1,0 +1,11 @@
+.variable-proximity {
+  font-family: inherit;
+}
+
+.variable-proximity__brand {
+  font-variation-settings: "wght" 620;
+}
+
+.variable-proximity__brand > span > span {
+  will-change: font-variation-settings;
+}

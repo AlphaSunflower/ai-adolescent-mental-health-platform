@@ -1,7 +1,7 @@
 import OfficialNavbar from "@/components/official/official-navbar";
 import HeroSection from "@/components/official/hero-section";
+import ServicePath from "@/components/official/service-path";
 import FeaturesSection from "@/components/official/features-section";
-import CultureSection from "@/components/official/culture-section";
 import OfficialFooter from "@/components/official/official-footer";
 import "@/components/official/official.css";
 
@@ -16,8 +16,8 @@ export default function OfficialSitePage() {
       <OfficialNavbar />
       <main>
         <HeroSection />
+        <ServicePath />
         <FeaturesSection />
-        <CultureSection />
       </main>
       <OfficialFooter />
     </div>

@@ -1,19 +1,17 @@
-import AnimatedContent from "./animated-content";
-import SpotlightCard from "./spotlight-card";
 import {
   Building2,
   HeartHandshake,
   Sparkles,
   type LucideIcon,
 } from "lucide-react";
+import CultureCard from "./culture-card";
+import ScrollStack, { ScrollStackItem } from "./scroll-stack";
 import {
   ADMIN_MODULES,
   PARENT_MODULES,
   USER_MODULES,
   type FeatureModule,
 } from "./style-data";
-
-// 模块与功能名逐字来自各自的内容源，tagline 为同源功能描述的提炼句。
 
 type FeatureGroup = {
   id: "user" | "parent" | "admin";
@@ -33,99 +31,76 @@ const FEATURE_GROUPS: FeatureGroup[] = [
   { id: "admin", label: "管理端", modules: ADMIN_MODULES, icon: Building2 },
 ];
 
-const CARD_SPANS = [
-  "md:col-span-3",
-  "md:col-span-2",
-  "md:col-span-2",
-  "md:col-span-3",
-  "md:col-span-5",
-];
-
-function ModuleCard({
+function ModuleEntry({
   data,
   index,
-  group,
 }: {
   data: FeatureModule;
   index: number;
-  group: FeatureGroup["id"];
 }) {
   return (
-    <SpotlightCard
-      className={`official-feature-card official-feature-card--${group} h-full p-7`}
-    >
-      <div className="flex items-center gap-4">
-        <span className="official-feature-card__index">
-          {String(index + 1).padStart(2, "0")}
-        </span>
-        <h3 className="text-lg font-bold tracking-tight text-[#4A4266]">
-          {data.module}
-        </h3>
+    <article className="official-stack-module">
+      <div className="official-stack-module__header">
+        <span>{String(index + 1).padStart(2, "0")}</span>
+        <h4>{data.module}</h4>
       </div>
-      <p className="mt-4 text-sm leading-relaxed text-[#8A84A3]">{data.tagline}</p>
-      <ul className="mt-5 flex flex-wrap gap-2">
+      <p>{data.tagline}</p>
+      <ul>
         {data.features.map((feature) => (
-          <li key={feature} className="official-feature-card__tag">
-            {feature}
-          </li>
+          <li key={feature}>{feature}</li>
         ))}
       </ul>
-    </SpotlightCard>
+    </article>
   );
 }
 
 export default function FeaturesSection() {
   return (
-    <section id="features" className="official-features relative scroll-mt-24">
-      <div className="official-features__inner relative mx-auto max-w-5xl px-6 py-28">
-        <AnimatedContent>
-          <h2 className="text-3xl font-extrabold tracking-tight text-[#4A4266]">
-            功能介绍
-          </h2>
-        </AnimatedContent>
+    <section id="features" className="official-features-stack scroll-mt-24">
+      <div className="official-features-stack__inner">
+        <h2 className="official-stack-title">功能介绍</h2>
 
-        <div className="official-feature-groups mt-14 space-y-20">
+        <ScrollStack
+          className="official-scroll-stack"
+          useWindowScroll
+          itemDistance={72}
+          itemScale={0.015}
+          itemStackDistance={24}
+          stackPosition="12%"
+          scaleEndPosition="5%"
+          baseScale={0.94}
+        >
           {FEATURE_GROUPS.map((group) => {
             const Icon = group.icon;
             return (
-              <div
+              <ScrollStackItem
                 key={group.id}
-                className={`official-feature-group official-feature-group--${group.id} grid gap-7 lg:grid-cols-[140px_1fr]`}
+                id={`audience-${group.id}`}
+                itemClassName={`official-stack-card official-stack-card--${group.id}`}
               >
-                <AnimatedContent>
-                  <div className="lg:sticky lg:top-28">
-                    <h3 className="official-feature-group__title">
-                      <span className="official-feature-group__icon">
-                        <Icon aria-hidden="true" />
-                      </span>
-                      {group.label}
-                    </h3>
-                    <span
-                      aria-hidden="true"
-                      className="official-feature-group__line"
-                    />
-                  </div>
-                </AnimatedContent>
+                <div className="official-stack-card__header">
+                  <span className="official-stack-card__icon">
+                    <Icon aria-hidden="true" />
+                  </span>
+                  <h3>{group.label}</h3>
+                </div>
 
-                <div className="official-module-grid grid grid-cols-1 gap-5 md:grid-cols-5">
+                <div className="official-stack-modules">
                   {group.modules.map((data, index) => (
-                    <AnimatedContent
-                      key={data.module}
-                      delay={index * 0.08}
-                      className={`${CARD_SPANS[index]} ${
-                        group.id === "parent" && index === 2
-                          ? "md:col-span-2"
-                          : ""
-                      }`}
-                    >
-                      <ModuleCard data={data} index={index} group={group.id} />
-                    </AnimatedContent>
+                    <ModuleEntry key={data.module} data={data} index={index} />
                   ))}
                 </div>
-              </div>
+              </ScrollStackItem>
             );
           })}
-        </div>
+
+          <ScrollStackItem
+            id="culture"
+            itemClassName="official-stack-card official-stack-card--culture"
+          >
+            <CultureCard />
+          </ScrollStackItem>
+        </ScrollStack>
       </div>
     </section>
   );
