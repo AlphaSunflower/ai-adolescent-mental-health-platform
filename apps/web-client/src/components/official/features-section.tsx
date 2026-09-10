@@ -36,29 +36,6 @@ function ModuleCard({ data, index }: { data: FeatureModule; index: number }) {
   );
 }
 
-function RowCard({ title, modules }: { title: string; modules: string[] }) {
-  return (
-    <article className="flex flex-col gap-4 rounded-[28px] bg-white p-7 shadow-[0_10px_36px_rgba(139,124,200,0.10)] md:flex-row md:items-center">
-      <h3 className="shrink-0 text-lg font-bold tracking-tight text-[#4A4266] md:w-28">
-        {title}
-      </h3>
-      <span className="w-fit shrink-0 rounded-full bg-[#FBF4E8] px-3.5 py-1.5 text-xs font-medium text-[#B08D57]">
-        内容完善中
-      </span>
-      <ul className="flex flex-wrap gap-2">
-        {modules.map((module) => (
-          <li
-            key={module}
-            className="rounded-full bg-[#F1EEFA] px-3.5 py-1.5 text-xs font-medium text-[#6F64A8]"
-          >
-            {module}
-          </li>
-        ))}
-      </ul>
-    </article>
-  );
-}
-
 export default function FeaturesSection() {
   // 错落网格：奇偶行宽度互异（3+2 / 2+3），第 5 卡通栏 —— 拒绝等距机械平铺
   const spans = [
@@ -103,10 +80,17 @@ export default function FeaturesSection() {
         ))}
       </div>
 
-      <div className="mt-8">
-        <AnimatedContent delay={0}>
-          <RowCard title="管理端" modules={ADMIN_MODULES} />
-        </AnimatedContent>
+      <p className="mt-14 text-sm font-bold text-[#8A84A3]">管理端</p>
+      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-5">
+        {ADMIN_MODULES.map((data, index) => (
+          <AnimatedContent
+            key={data.module}
+            delay={index * 0.1}
+            className={spans[index]}
+          >
+            <ModuleCard data={data} index={index} />
+          </AnimatedContent>
+        ))}
       </div>
     </section>
   );

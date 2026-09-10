@@ -62,9 +62,9 @@ export default function HeroSection() {
             </dd>
           </div>
           <div className="flex flex-col items-center">
-            <dt className="order-2 mt-2 text-xs text-[#8A84A3]">用户端核心功能</dt>
+            <dt className="order-2 mt-2 text-xs text-[#8A84A3]">核心功能模块</dt>
             <dd className="order-1 text-4xl font-extrabold tracking-tight text-[#4A4266]">
-              <Counter to={5} className="text-[#8B7CC8]" />
+              <Counter to={13} className="text-[#8B7CC8]" />
               <span className="ml-1 text-2xl">大模块</span>
             </dd>
           </div>
