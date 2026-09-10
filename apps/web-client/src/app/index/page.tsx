@@ -12,7 +12,7 @@ import "@/components/official/official.css";
  */
 export default function OfficialSitePage() {
   return (
-    <div className="relative min-h-dvh bg-[#FBFAFF] text-[#4A4266]">
+    <div className="official-page relative min-h-dvh bg-[#FBFAFF] text-[#4A4266]">
       <OfficialNavbar />
       <main>
         <HeroSection />

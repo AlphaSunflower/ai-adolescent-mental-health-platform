@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Aurora from "./aurora";
 import BlurText from "./blur-text";
 import ClickSpark from "./click-spark";
 import Counter from "./counter";
+import MindConstellation from "./mind-constellation";
 import { HeroIntro } from "./style-data";
 
 // 简介文案逐字来自《官网需呈现内容》第 1 节；统计行三项均出自原文事实
@@ -16,11 +16,10 @@ export default function HeroSection() {
   };
 
   return (
-    <section id="hero" className="relative overflow-hidden pt-16">
-      {/* Aurora 流体光斑背景：低饱和紫蓝、低透明度（ogl，reduced-motion 静态首帧） */}
-      <Aurora />
+    <section id="hero" className="official-hero relative overflow-hidden pt-16">
+      <MindConstellation />
 
-      <div className="relative mx-auto max-w-5xl px-6 pb-24 pt-28 text-center md:pt-36">
+      <div className="official-hero__content relative mx-auto max-w-5xl px-6 pb-24 pt-28 text-center md:pt-36">
         <h1 className="official-brand-font text-5xl font-black leading-tight tracking-tight text-[#4A4266] md:text-[64px]">
           <BlurText text="心愈智联" />
         </h1>
@@ -32,7 +31,7 @@ export default function HeroSection() {
           <ClickSpark>
             <Link
               href="/login"
-              className="block rounded-full bg-[#8B7CC8] px-9 py-3.5 text-sm font-bold text-white shadow-[0_10px_28px_rgba(139,124,200,0.35)] transition-colors hover:bg-[#7A6BBA]"
+              className="official-cta official-cta--primary block rounded-full px-9 py-3.5 text-sm font-bold transition-colors"
             >
               网页版入口
             </Link>
@@ -40,28 +39,28 @@ export default function HeroSection() {
           <button
             type="button"
             onClick={scrollToAppDownload}
-            className="rounded-full border-2 border-[#D8D2EC] bg-white px-9 py-3.5 text-sm font-bold text-[#6F64A8] transition-colors hover:border-[#B9AEE4]"
+            className="official-cta official-cta--secondary rounded-full border-2 px-9 py-3.5 text-sm font-bold transition-colors"
           >
             APP 下载
           </button>
         </div>
 
         {/* 统计行：数字滚动入场（GSAP Counter），三项均出自原文 */}
-        <dl className="mt-16 flex flex-wrap items-start justify-center gap-10 md:gap-20">
-          <div className="flex flex-col items-center">
+        <dl className="official-stats mt-16 flex flex-wrap items-start justify-center gap-10 md:gap-20">
+          <div className="official-stat flex flex-col items-center">
             <dt className="order-2 mt-2 text-xs text-[#8A84A3]">服务青少年年龄（岁）</dt>
             <dd className="order-1 text-4xl font-extrabold tracking-tight text-[#4A4266]">
               6-<Counter to={24} className="text-[#8B7CC8]" />
             </dd>
           </div>
-          <div className="flex flex-col items-center">
+          <div className="official-stat flex flex-col items-center">
             <dt className="order-2 mt-2 text-xs text-[#8A84A3]">用户端 · 家长端 · 管理端</dt>
             <dd className="order-1 text-4xl font-extrabold tracking-tight text-[#4A4266]">
               <Counter to={3} className="text-[#8B7CC8]" />
               <span className="ml-1 text-2xl">端协同</span>
             </dd>
           </div>
-          <div className="flex flex-col items-center">
+          <div className="official-stat flex flex-col items-center">
             <dt className="order-2 mt-2 text-xs text-[#8A84A3]">核心功能模块</dt>
             <dd className="order-1 text-4xl font-extrabold tracking-tight text-[#4A4266]">
               <Counter to={13} className="text-[#8B7CC8]" />
