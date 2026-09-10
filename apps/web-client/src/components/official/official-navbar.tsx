@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import ClickSpark from "./click-spark";
 
 const NAV_LINKS = [
   { label: "首页", href: "#hero" },
@@ -52,12 +53,14 @@ export default function OfficialNavbar() {
               {link.label}
             </a>
           ))}
-          <Link
-            href="/login"
-            className="rounded-full bg-[#8B7CC8] px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-[#7A6BBA]"
-          >
-            进入平台
-          </Link>
+          <ClickSpark>
+            <Link
+              href="/login"
+              className="block rounded-full bg-[#8B7CC8] px-5 py-2 text-sm font-bold text-white transition-colors hover:bg-[#7A6BBA]"
+            >
+              进入平台
+            </Link>
+          </ClickSpark>
         </div>
 
         <button
