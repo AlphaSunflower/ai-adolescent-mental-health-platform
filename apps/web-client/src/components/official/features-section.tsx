@@ -90,11 +90,21 @@ export default function FeaturesSection() {
         ))}
       </div>
 
-      <div className="mt-8 space-y-5">
+      <p className="mt-14 text-sm font-bold text-[#8A84A3]">家长端</p>
+      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+        {PARENT_MODULES.map((data, index) => (
+          <AnimatedContent
+            key={data.module}
+            delay={index * 0.1}
+            className={index === 2 ? "md:col-span-2" : ""}
+          >
+            <ModuleCard data={data} index={index} />
+          </AnimatedContent>
+        ))}
+      </div>
+
+      <div className="mt-8">
         <AnimatedContent delay={0}>
-          <RowCard title="家长端" modules={PARENT_MODULES} />
-        </AnimatedContent>
-        <AnimatedContent delay={0.1}>
           <RowCard title="管理端" modules={ADMIN_MODULES} />
         </AnimatedContent>
       </div>

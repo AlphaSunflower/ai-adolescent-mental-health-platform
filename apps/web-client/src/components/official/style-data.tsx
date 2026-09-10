@@ -46,12 +46,23 @@ export const USER_MODULES: FeatureModule[] = [
   },
 ];
 
-// 家长端 / 管理端：原文功能介绍空缺，合并为一行卡，仅列模块名
-export const PARENT_MODULES = [
-  "孩子状态总览模块",
-  "亲子沟通支持模块",
-  "专业支持模块",
-  "支付模块",
+// 家长端：模块/功能名/介绍逐字来自 agent-brief/02b「3.2 家长端」；tagline 为介绍原文提炼
+export const PARENT_MODULES: FeatureModule[] = [
+  {
+    module: "孩子状态总览模块",
+    tagline: "授权范围内查看情绪变化趋势与风险等级，不读取具体聊天内容，保护孩子隐私",
+    features: ["情绪概览看板", "风险预警推送", "历史报告查看"],
+  },
+  {
+    module: "亲子沟通支持模块",
+    tagline: "结合孩子情绪状态输出沟通建议与话术模板，AI 情景模拟练习共情式沟通",
+    features: ["沟通话术建议", "亲子情景模拟", "分龄育儿指南"],
+  },
+  {
+    module: "专业支持模块",
+    tagline: "在线预约心理咨询师，打通线上预约与线下服务衔接，支持转诊授权",
+    features: ["咨询师预约", "线下机构导航", "转诊授权"],
+  },
 ];
 
 export const ADMIN_MODULES = [
