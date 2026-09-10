@@ -16,26 +16,22 @@ const FOOTER_NAV = [
   "平台合规声明",
 ];
 
-function QrTile({
-  name,
-  src,
-  placeholder,
-}: {
-  name: string;
-  src?: string;
-  placeholder?: boolean;
-}) {
+function QrTile({ name, src }: { name: string; src: string }) {
   return (
     <div className="flex flex-col items-center gap-2.5">
-      <div
-        className={`h-24 w-24 overflow-hidden rounded-[12px] ${
-          placeholder
-            ? "official-qr-placeholder border border-dashed border-[rgba(251,250,255,0.35)]"
-            : ""
-        } bg-white/90`}
+      <a
+        href={src}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={`${name}二维码（点击查看原图）`}
+        className="block h-24 w-24 overflow-hidden rounded-[12px] bg-white/90 transition-transform duration-300 hover:scale-105"
       >
-        {src && <img src={src} alt={`${name}二维码`} className="h-full w-full object-contain p-1" />}
-      </div>
+        <img
+          src={src}
+          alt={`${name}二维码`}
+          className="h-full w-full object-contain p-1"
+        />
+      </a>
       <span className="text-xs text-[#FBFAFF]/70">{name}</span>
     </div>
   );
@@ -91,8 +87,8 @@ export default function OfficialFooter() {
         <div id="app-download" className="scroll-mt-24">
           <div className="flex gap-4">
             <QrTile name="微信公众号" src="/WeChatOfficialAccount.jpg" />
-            <QrTile name="小红书" placeholder />
-            <QrTile name="抖音" placeholder />
+            <QrTile name="小红书" src="/qrcode-xiaohongshu.png" />
+            <QrTile name="抖音" src="/qrcode-douyin.png" />
           </div>
         </div>
       </div>
