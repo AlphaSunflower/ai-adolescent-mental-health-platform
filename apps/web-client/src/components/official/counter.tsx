@@ -27,10 +27,8 @@ export default function Counter({
     () => {
       const el = ref.current;
       if (!el) return;
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        el.textContent = String(to);
-        return;
-      }
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      // SSR/降级呈现最终数字；动效路径水合后从 0 滚动到目标值
       const state = { value: 0 };
       gsap.to(state, {
         value: to,
@@ -51,7 +49,7 @@ export default function Counter({
 
   return (
     <span ref={ref} className={className}>
-      0
+      {to}
     </span>
   );
 }
