@@ -47,9 +47,12 @@ void main() {
 }
 `;
 
+// 默认色提到模块级：引用稳定，避免组件每次渲染触发 WebGL 上下文重建
+const DEFAULT_STOPS = ["#E9E3FA", "#DDE7FA", "#D8D2EC"];
+
 export default function Aurora({
   className = "",
-  colorStops = ["#E9E3FA", "#DDE7FA", "#D8D2EC"],
+  colorStops = DEFAULT_STOPS,
 }: {
   className?: string;
   colorStops?: [string, string, string] | string[];

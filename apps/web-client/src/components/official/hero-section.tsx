@@ -51,7 +51,7 @@ export default function HeroSection() {
           <div className="flex flex-col items-center">
             <dt className="order-2 mt-2 text-xs text-[#8A84A3]">服务青少年年龄（岁）</dt>
             <dd className="order-1 text-4xl font-extrabold tracking-tight text-[#4A4266]">
-              6–<Counter to={24} className="text-[#8B7CC8]" />
+              6-<Counter to={24} className="text-[#8B7CC8]" />
             </dd>
           </div>
           <div className="flex flex-col items-center">
