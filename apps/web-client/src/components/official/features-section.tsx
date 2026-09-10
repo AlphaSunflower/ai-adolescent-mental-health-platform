@@ -7,8 +7,9 @@ import {
   type FeatureModule,
 } from "./style-data";
 
-// 模块与功能名逐字来自《官网需呈现内容》第 3 节；tagline 为同节功能描述的提炼句。
-// 原文空缺的家长端/管理端按约定标注「内容完善中」，禁止编造。
+// 模块与功能名逐字来自各自的内容源：用户端见《官网需呈现内容》第 3 节，
+// 家长端/管理端见 agent-brief/02b-家长端管理端功能.md；tagline 为同源功能描述的提炼句。
+// 文案一律以原文为准，禁止编造。
 
 function ModuleCard({ data, index }: { data: FeatureModule; index: number }) {
   return (
