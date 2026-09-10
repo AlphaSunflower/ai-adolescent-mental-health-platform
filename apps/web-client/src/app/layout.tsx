@@ -8,11 +8,15 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  // 不过早预加载：本 app 正文多走 pouf 的 Nunito，Geist 较少第一时间用到，
+  // preload 会导致 console 报“preloaded but not used within a few seconds”警告。
+  preload: false,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 export const metadata: Metadata = {
