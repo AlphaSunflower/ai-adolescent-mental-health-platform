@@ -1,117 +1,103 @@
+import AnimatedContent from "./animated-content";
 import SpotlightCard from "./spotlight-card";
+import {
+  ADMIN_MODULES,
+  PARENT_MODULES,
+  USER_MODULES,
+  type FeatureModule,
+} from "./style-data";
 
-// 模块与功能名逐字来自《官网需呈现内容》第 3 节三个表格；本板块仅呈现“模块 + 功能”两级。
-// 原文空缺的模块按约定标注「内容完善中」，禁止编造。
-type FeatureModule = {
-  module: string;
-  features: string[];
-  pending?: boolean;
-};
-
-const USER_MODULES: FeatureModule[] = [
-  {
-    module: "AI情绪陪伴模块",
-    features: ["小爱咨询", "情绪日记", "情绪趋势图"],
-  },
-  {
-    module: "心理自助工具模块",
-    features: ["心理科普小课堂", "心理量表测评", "心理咨询"],
-  },
-  {
-    module: "安全与预警模块",
-    features: ["自动风险识别", "危机干预引导", "匿名模式"],
-  },
-  {
-    module: "成长档案模块",
-    features: ["身份验证", "情绪结晶时间线", "阶段性心理报告"],
-  },
-  {
-    module: "每日打卡与智能体养成模块",
-    features: [
-      "智能体形象",
-      "每日打卡",
-      "积分体系",
-      "等级与权益解锁",
-      "装扮系统",
-      "断签保护",
-      "家长端联动与安全保障",
-    ],
-  },
-];
-
-const PARENT_MODULES: FeatureModule[] = [
-  { module: "孩子状态总览模块", features: [], pending: true },
-  { module: "亲子沟通支持模块", features: [], pending: true },
-  { module: "专业支持模块", features: [], pending: true },
-  { module: "支付模块", features: ["绑定小孩用户端"] },
-];
-
-const ADMIN_MODULES: FeatureModule[] = [
-  { module: "用户管理模块", features: [], pending: true },
-  { module: "心理咨询管理模块", features: [], pending: true },
-  { module: "数据与报告模块", features: [], pending: true },
-  { module: "内容管理模块", features: [], pending: true },
-  { module: "危机干预管理模块", features: [], pending: true },
-];
+// 模块与功能名逐字来自《官网需呈现内容》第 3 节；tagline 为同节功能描述的提炼句。
+// 原文空缺的家长端/管理端按约定标注「内容完善中」，禁止编造。
 
 function ModuleCard({ data, index }: { data: FeatureModule; index: number }) {
   return (
-    <SpotlightCard className="group rounded-[20px] border border-[rgba(58,46,92,0.08)] bg-white/85 p-6 md:p-7">
-      <div className="flex items-baseline justify-between gap-4">
-        <div className="flex items-baseline gap-3">
-          <span className="text-sm font-bold text-[var(--purple)]">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <h3 className="text-lg font-bold tracking-tight text-[var(--ink)]">
-            {data.module}
-          </h3>
-        </div>
-        {!data.pending && (
-          <span className="shrink-0 text-sm text-[var(--muted)] transition-colors group-hover:text-[var(--purple)]">
-            了解 <span aria-hidden="true">↗</span>
-          </span>
-        )}
+    <SpotlightCard className="h-full rounded-[28px] bg-white p-7 shadow-[0_10px_36px_rgba(139,124,200,0.12)]">
+      <div className="flex items-center gap-4">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EFEBFA] text-sm font-bold text-[#7A6BBA]">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+        <h3 className="text-lg font-bold tracking-tight text-[#4A4266]">
+          {data.module}
+        </h3>
       </div>
-
-      {data.pending ? (
-        <p className="mt-4 text-sm text-[var(--muted)]">内容完善中</p>
-      ) : (
-        <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-2">
-          {data.features.map((feature) => (
-            <li key={feature} className="text-sm text-[var(--muted)]">
-              {feature}
-            </li>
-          ))}
-        </ul>
-      )}
+      <p className="mt-4 text-sm leading-relaxed text-[#8A84A3]">{data.tagline}</p>
+      <ul className="mt-5 flex flex-wrap gap-2">
+        {data.features.map((feature) => (
+          <li
+            key={feature}
+            className="rounded-full bg-[#F1EEFA] px-3.5 py-1.5 text-xs font-medium text-[#6F64A8]"
+          >
+            {feature}
+          </li>
+        ))}
+      </ul>
     </SpotlightCard>
   );
 }
 
-function ModuleGroup({ title, modules }: { title: string; modules: FeatureModule[] }) {
+function RowCard({ title, modules }: { title: string; modules: string[] }) {
   return (
-    <div className="mt-12">
-      <p className="text-sm font-bold text-[var(--muted)]">{title}</p>
-      <div className="mt-5 space-y-4">
-        {modules.map((data, index) => (
-          <ModuleCard key={data.module} data={data} index={index} />
+    <article className="flex flex-col gap-4 rounded-[28px] bg-white p-7 shadow-[0_10px_36px_rgba(139,124,200,0.10)] md:flex-row md:items-center">
+      <h3 className="shrink-0 text-lg font-bold tracking-tight text-[#4A4266] md:w-28">
+        {title}
+      </h3>
+      <span className="w-fit shrink-0 rounded-full bg-[#FBF4E8] px-3.5 py-1.5 text-xs font-medium text-[#B08D57]">
+        内容完善中
+      </span>
+      <ul className="flex flex-wrap gap-2">
+        {modules.map((module) => (
+          <li
+            key={module}
+            className="rounded-full bg-[#F1EEFA] px-3.5 py-1.5 text-xs font-medium text-[#6F64A8]"
+          >
+            {module}
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </article>
   );
 }
 
 export default function FeaturesSection() {
+  // 错落网格：奇偶行宽度互异（3+2 / 2+3），第 5 卡通栏 —— 拒绝等距机械平铺
+  const spans = [
+    "md:col-span-3",
+    "md:col-span-2",
+    "md:col-span-2",
+    "md:col-span-3",
+    "md:col-span-5",
+  ];
+
   return (
     <section id="features" className="mx-auto max-w-5xl scroll-mt-24 px-6 py-28">
-      <h2 className="text-2xl font-bold tracking-tight text-[var(--ink)] md:text-3xl">
-        功能介绍
-      </h2>
-      <div className="mt-4 h-px w-12 bg-[rgba(58,46,92,0.2)]" />
+      <AnimatedContent>
+        <h2 className="text-3xl font-extrabold tracking-tight text-[#4A4266]">
+          功能介绍
+        </h2>
+      </AnimatedContent>
 
-      <ModuleGroup title="用户端" modules={USER_MODULES} />
-      <ModuleGroup title="家长端" modules={PARENT_MODULES} />
-      <ModuleGroup title="管理端" modules={ADMIN_MODULES} />
+      <p className="mt-14 text-sm font-bold text-[#8A84A3]">用户端</p>
+      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-5">
+        {USER_MODULES.map((data, index) => (
+          <AnimatedContent
+            key={data.module}
+            delay={index * 0.1}
+            className={spans[index]}
+          >
+            <ModuleCard data={data} index={index} />
+          </AnimatedContent>
+        ))}
+      </div>
+
+      <div className="mt-8 space-y-5">
+        <AnimatedContent delay={0}>
+          <RowCard title="家长端" modules={PARENT_MODULES} />
+        </AnimatedContent>
+        <AnimatedContent delay={0.1}>
+          <RowCard title="管理端" modules={ADMIN_MODULES} />
+        </AnimatedContent>
+      </div>
     </section>
   );
 }

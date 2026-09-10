@@ -1,6 +1,6 @@
 /*
- * 官网（/index）专用样式 —— 基于 pouf 变量体系的克制风格（M2.5）。
- * 仅官网组件使用，类名 official-* 命名空间防冲突；不改动 globals.css / pouf.css。
+ * 官网（/index）专用样式 —— 方案 B「浅色柔和」定稿（M2.6）。
+ * 令牌见 .agent/skills/taste-skill/SKILL.md；仅官网组件使用，official-* 命名空间防冲突。
  */
 
 /* 品牌字「心愈智联」：Noto Sans SC Brand 为四字子集，仅用于四字词组 */
@@ -10,44 +10,14 @@
 
 /* 二维码样式化占位块：点阵底纹（非真实二维码，素材待补充） */
 .official-qr-placeholder {
-  background-image: radial-gradient(circle, rgba(58, 46, 92, 0.28) 2.5px, transparent 3px);
+  background-image: radial-gradient(circle, rgba(74, 66, 102, 0.28) 2.5px, transparent 3px);
   background-size: 13px 13px;
   background-position: center;
 }
 
-/* ── React Bits 改编组件样式（reactbits.dev）── */
+/* ── React Bits 改编组件样式（reactbits.dev，技术红线：GSAP / ogl / 纯 CSS）── */
 
-/* ShinyText：微光扫过（适配按钮场景：底色 ink、白色高光带扫过文字） */
-.official-shiny-text {
-  background: linear-gradient(
-    120deg,
-    var(--on-accent) 40%,
-    #ffffff 50%,
-    var(--on-accent) 60%
-  );
-  background-size: 200% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  animation: official-shine 5s linear infinite;
-}
-@keyframes official-shine {
-  0% {
-    background-position: 200% center;
-  }
-  100% {
-    background-position: -200% center;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .official-shiny-text {
-    animation: none;
-    /* 静态定位到高光带扫入前的位置，文字整体呈底色不发白 */
-    background-position: 200% center;
-  }
-}
-
-/* SpotlightCard：鼠标跟随聚光（仅 hover 时显现，无自主运动） */
+/* SpotlightCard：鼠标跟随聚光（仅 hover 时显现，无自主运动；方案 B 柔紫） */
 .official-spotlight-card {
   position: relative;
   overflow: hidden;
@@ -58,7 +28,7 @@
   inset: 0;
   background: radial-gradient(
     360px circle at var(--spotlight-x, 50%) var(--spotlight-y, 50%),
-    var(--spotlight-color, rgba(201, 168, 255, 0.22)),
+    var(--spotlight-color, rgba(139, 124, 200, 0.16)),
     transparent 70%
   );
   opacity: 0;
@@ -67,4 +37,30 @@
 }
 .official-spotlight-card:hover::before {
   opacity: 1;
+}
+
+/* Aurora：ogl 画布铺满 Hero 背景层，低透明度贴合柔和感 */
+.official-aurora {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.official-aurora canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ClickSpark：火花画布覆盖按钮，穿透点击 */
+.official-click-spark {
+  position: relative;
+  display: inline-block;
+}
+.official-click-spark canvas {
+  position: absolute;
+  inset: -24px;
+  width: calc(100% + 48px);
+  height: calc(100% + 48px);
+  pointer-events: none;
 }

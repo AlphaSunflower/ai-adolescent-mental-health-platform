@@ -30,20 +30,20 @@ function QrTile({
       <div
         className={`h-24 w-24 overflow-hidden rounded-[12px] ${
           placeholder
-            ? "official-qr-placeholder border border-dashed border-[rgba(240,233,255,0.35)]"
+            ? "official-qr-placeholder border border-dashed border-[rgba(251,250,255,0.35)]"
             : ""
         } bg-white/90`}
       >
         {src && <img src={src} alt={`${name}二维码`} className="h-full w-full object-contain p-1" />}
       </div>
-      <span className="text-xs text-[var(--bg)]/70">{name}</span>
+      <span className="text-xs text-[#FBFAFF]/70">{name}</span>
     </div>
   );
 }
 
 export default function OfficialFooter() {
   return (
-    <footer className="mt-28 bg-[var(--ink)] text-[var(--bg)]">
+    <footer className="mt-28 bg-[#4A4266] text-[#FBFAFF]">
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-12 px-6 py-16 md:grid-cols-[1.1fr_1fr_auto]">
         <div>
           <div className="flex items-center gap-2">
@@ -54,7 +54,7 @@ export default function OfficialFooter() {
             />
             <span className="official-brand-font text-2xl font-bold">心愈智联</span>
           </div>
-          <p className="mt-4 text-sm text-[var(--bg)]/70">
+          <p className="mt-4 text-sm text-[#FBFAFF]/70">
             心愈智联 — 青少年心理健康 AI 平台
           </p>
         </div>
@@ -62,7 +62,7 @@ export default function OfficialFooter() {
         <div className="flex flex-col gap-10 md:flex-row md:gap-14">
           <div className="min-w-0">
             <h3 className="text-sm font-bold">联系我们</h3>
-            <ul className="mt-5 space-y-3 text-sm text-[var(--bg)]/75">
+            <ul className="mt-5 space-y-3 text-sm text-[#FBFAFF]/75">
               {CONTACTS.map((contact) => (
                 <li key={contact.label} className="whitespace-nowrap">
                   {contact.label}：{contact.value}
@@ -77,7 +77,7 @@ export default function OfficialFooter() {
                 <li key={item} className="whitespace-nowrap">
                   <a
                     href="#"
-                    className="text-[var(--bg)]/75 transition-colors hover:text-white"
+                    className="text-[#FBFAFF]/75 transition-colors hover:text-white"
                   >
                     {item}
                   </a>
@@ -87,7 +87,7 @@ export default function OfficialFooter() {
           </div>
         </div>
 
-        {/* Hero「APP 下载」按钮的滚动落点 */}
+        {/* Hero「APP 下载」按钮的滚动落点：三码位集中于此 */}
         <div id="app-download" className="scroll-mt-24">
           <div className="flex gap-4">
             <QrTile name="微信公众号" src="/WeChatOfficialAccount.jpg" />
@@ -98,7 +98,7 @@ export default function OfficialFooter() {
       </div>
 
       <div className="border-t border-white/10">
-        <p className="mx-auto max-w-5xl px-6 py-5 text-center text-xs text-[var(--bg)]/60">
+        <p className="mx-auto max-w-5xl px-6 py-5 text-center text-xs text-[#FBFAFF]/60">
           心愈智联 — 青少年心理健康 AI 平台
         </p>
       </div>
