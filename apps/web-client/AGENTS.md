@@ -111,7 +111,7 @@ pnpm --filter @ai-adolescent-mental-health/web-client clean      # rimraf .next
 - **字体落系统字体**：字体栈须首列为 `'Nunito Variable'`（`@fontsource-variable/nunito` 注册名），否则静默走系统字体。
 - **登录后跳转异常**：`safe-redirect.ts` 阻止 `://` 与 `:` 开头重定向。
 - **cosmic 死代码**：看到 `cosmic-*`/星空类直接改 pouf 对应项；不要往 `globals.css` 加新 `@theme` 色（进 `pouf.css`）。
-- **官网 3D 模型体积**：`/index` 的陪伴模型位于 `public/models/_baby.glb`，当前约 22 MB；替换模型时同步检查加载态、移动端视口高度与 WebGL 控制台错误。
+- **官网 3D 模型体积**：`/index` 的陪伴模型位于 `public/models/`，当前使用内容哈希文件 `_baby.c4f3e2a2.glb`（约 1.24 MB），通过 Meshopt + 1024 WebP 压缩。替换模型时用 `npx --yes @gltf-transform/cli optimize <源文件> public/models/_baby.<sha8>.glb --compress meshopt --texture-compress webp --texture-size 1024 --simplify true --simplify-ratio 0.35 --simplify-error 0.001` 重新生成，同步更新 `official-mascot.tsx` 的文件名，并检查加载态、移动端视口高度与 WebGL 控制台错误。
 
 ## 六、路由概览
 

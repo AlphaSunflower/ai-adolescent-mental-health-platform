@@ -13,6 +13,8 @@ const ModelViewer = dynamic(() => import("./model-viewer"), {
   ),
 });
 
+const MASCOT_MODEL_URL = "/models/_baby.c4f3e2a2.glb";
+
 export default function OfficialMascot() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
@@ -55,7 +57,7 @@ export default function OfficialMascot() {
       <div className="official-mascot__canvas">
         {shouldLoad ? (
           <ModelViewer
-            url="/models/_baby.glb"
+            url={MASCOT_MODEL_URL}
             width="100%"
             height="100%"
             modelYOffset={0.03}

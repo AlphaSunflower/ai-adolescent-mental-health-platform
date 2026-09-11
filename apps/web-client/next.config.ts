@@ -37,6 +37,20 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // public/models 使用内容哈希文件名，版本变化会得到新 URL，可安全长期缓存。
+  async headers() {
+    return [
+      {
+        source: "/models/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
