@@ -1,4 +1,5 @@
 import OfficialNavbar from "@/components/official/official-navbar";
+import BackToTop from "@/components/official/back-to-top";
 import HeroSection from "@/components/official/hero-section";
 import ServicePath from "@/components/official/service-path";
 import FeaturesSection from "@/components/official/features-section";
@@ -20,6 +21,7 @@ export default function OfficialSitePage() {
         <FeaturesSection />
       </main>
       <OfficialFooter />
+      <BackToTop />
     </div>
   );
 }
