@@ -144,14 +144,14 @@ React 薄包在 `src/components/pouf/`（本体 chrome 在 `pouf.css`）：
 - 深度交给黏土配方：`cushion-control/card/field/row`、`tone-*`；需要「按压」反馈就 `enabled:active:cushion-control-active + translateY(2px)`。
 - 按钮用 `@/components/pouf/Button`，图标 `lucide-react`。
 - 背景复用 `PoufBackground`；沉浸页显式处理，别叠第二层背景。
-- 动画：GSAP（页面/角色动效）+ ogl Particles（背景）；过渡限 `box-shadow/transform`。
+- 动画：GSAP（页面/角色动效）+ ogl Particles（背景）+ React Three Fiber（官网 3D 陪伴模型）；过渡限 `box-shadow/transform`。
 
 **Don't**
 - 不要用 cosmic 残留：`cosmic-*`、`.cosmic-card/.cosmic-btn/…`、`--color-cosmic-*`、星空/星星 keyframe；深蓝夜空、白字、金色渐变。
 - 不要把白字放粉彩填充上；用 `text-[var(--on-accent)]` 或 `--on-accent-muted`。
 - 不要 `bg-${tone}` 动态拼接类名——Tailwind 不生成，须静态映射（见 `pouf Progress` 的 `toneBg`）。
 - 不要用 Tailwind `shadow-*` 组装黏土阴影（破坏快照）；用 `cushion-*` 或原样 ``box-shadow: var(--pouf-*)``。
-- 不要引 Framer/React Spring；`pouf.css` 覆盖到的 overlay 用 `@base-ui/react`。
+- 不要引 Framer/React Spring；3D 仅用 React Three Fiber / drei 并通过客户端动态挂载；`pouf.css` 覆盖到的 overlay 用 `@base-ui/react`。
 - 不要往 `globals.css` 加新 `@theme` 色；进 `pouf.css`。
 
 ## 12. 关键坑（速查）

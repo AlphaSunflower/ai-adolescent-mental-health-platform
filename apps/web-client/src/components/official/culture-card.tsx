@@ -1,3 +1,5 @@
+import OfficialMascot from "./official-mascot";
+
 // 文案逐字来自《官网需呈现内容》第 4 节「团队文化」。
 export default function CultureCard() {
   return (
@@ -19,7 +21,7 @@ export default function CultureCard() {
       </div>
 
       <div className="official-stack-culture__mark">
-        <img src="/logo.png" alt="心愈智联 Logo" />
+        <OfficialMascot />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@
 - 技术栈：Next.js `^16.2.4`、React `^19.2.4`、TypeScript `^5`、Tailwind CSS `^4`（CSS-first，**无 `tailwind.config.ts`**）
 - 模块类型：`"type": "module"`；开发端口：**3300**（Turbopack）
 - 样式方案：Tailwind v4 + **pouf 黏土设计系统**（浅紫底、粉彩、软垫 cushion 控件）。Token 与 chrome 在 `components/pouf/pouf.css`；**cosmic 深色语言已全站废弃**（`globals.css` 残留 `--color-cosmic-*`/`.cosmic-*`/星体 keyframe 为死代码）
-- 动画：GSAP（页面/角色动效）+ `ogl`/React Bits Particles（背景漂移）；**不要引入 Framer Motion / React Spring**
+- 动画：GSAP（页面/角色动效）+ `ogl`/React Bits Particles（背景漂移）+ `@react-three/fiber` / `@react-three/drei`（官网 3D 模型）；**不要引入 Framer Motion / React Spring**
 - UI 原语：`components/pouf/*`（cva + clsx + tailwind-merge），overlay（select/tooltip/dialog/sheet/menu 等）由 `@base-ui/react` 驱动；**`components/ui/` 已删除**
 - 状态管理：无外部状态库（`useState`/`useEffect` + Context），反馈弹窗用 React Context（`components/feedback/feedback-dialog.tsx`）
 - 会话：`localStorage` + `lib/session.ts`；Markdown：`react-markdown` + `remark-gfm`，编辑 `@uiw/react-md-editor`；通知 `sonner`；主题 `next-themes`
@@ -88,7 +88,7 @@ pnpm --filter @ai-adolescent-mental-health/web-client clean      # rimraf .next
 
 10. **用 pouf，不用 cosmic**：颜色只从 pouf 色板取（`bg/ink/muted/surface` + 各粉彩），深度交给 `cushion-*` 配方与 `tone-*` 类；**禁用** `cosmic-*` 残余类、`--color-cosmic-*`、星空/金色渐变、白字压粉彩。详见 [design.md](design.md)。
 11. **不用 CSS Modules**；黏土阴影用 `@utility cushion-*` 原样，**不要**用 Tailwind `shadow-*` 组装（会破坏 computed 串与快照）。
-12. **动画限 GSAP / ogl**，过渡限 `box-shadow/transform`；不用 Framer/React Spring。overlay（select/tooltip/dialog/sheet 等）用 `@base-ui/react` 驱动的 `.pouf-*` chrome。
+12. **动画限 GSAP / ogl / React Three Fiber**，过渡限 `box-shadow/transform`；不用 Framer/React Spring。3D 展示仅使用 `@react-three/fiber` / `@react-three/drei`，且通过 `next/dynamic(..., { ssr: false })` 挂载。overlay（select/tooltip/dialog/sheet 等）用 `@base-ui/react` 驱动的 `.pouf-*` chrome。
 
 ### 4.5 安全
 
@@ -97,7 +97,7 @@ pnpm --filter @ai-adolescent-mental-health/web-client clean      # rimraf .next
 
 ### 4.6 依赖
 
-15. **禁止擅自新增平行库**：已有 GSAP、ogl、react-markdown、@uiw/react-md-editor、sonner、next-themes、@base-ui/react。新增同类库先说明理由。
+15. **禁止擅自新增平行库**：已有 GSAP、ogl、React Three Fiber、drei、react-markdown、@uiw/react-md-editor、sonner、next-themes、@base-ui/react。新增同类库先说明理由。
 16. **monorepo 依赖**：依赖 `api-client`、`config`、`domain`、`ui` 工作区包，经 `transpilePackages` 在 Next.js 编译；不直接引后端 Java 代码。
 
 ## 五、常见坑
@@ -111,6 +111,7 @@ pnpm --filter @ai-adolescent-mental-health/web-client clean      # rimraf .next
 - **字体落系统字体**：字体栈须首列为 `'Nunito Variable'`（`@fontsource-variable/nunito` 注册名），否则静默走系统字体。
 - **登录后跳转异常**：`safe-redirect.ts` 阻止 `://` 与 `:` 开头重定向。
 - **cosmic 死代码**：看到 `cosmic-*`/星空类直接改 pouf 对应项；不要往 `globals.css` 加新 `@theme` 色（进 `pouf.css`）。
+- **官网 3D 模型体积**：`/index` 的陪伴模型位于 `public/models/_baby.glb`，当前约 22 MB；替换模型时同步检查加载态、移动端视口高度与 WebGL 控制台错误。
 
 ## 六、路由概览
 
