@@ -1,3 +1,4 @@
+import Link from "next/link";
 import TextPressure from "@/components/effects/TextPressure";
 import type { ReactNode } from "react";
 
@@ -42,6 +43,11 @@ export default function AuthLayout({
         {children}
       </main>
       <footer className="pb-6 text-center text-xs font-bold text-muted">
+        <p className="mb-2 text-sm">
+          <Link href="/index" className="transition-colors hover:text-ink">
+            访问官网
+          </Link>
+        </p>
         <a
           href="https://beian.miit.gov.cn/"
           target="_blank"

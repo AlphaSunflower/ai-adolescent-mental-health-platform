@@ -4,12 +4,29 @@ import Link from "next/link";
 import { Phone, Mail, MapPin, Clock, FileText } from "lucide-react";
 import { useFeedbackDialog } from "@/components/feedback/feedback-dialog";
 
+function QrTile({ name, src }: { name: string; src: string }) {
+  return (
+    <div className="flex flex-col items-center gap-2.5">
+      <a
+        href={src}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={`${name}二维码（点击查看原图）`}
+        className="block h-24 w-24 overflow-hidden rounded-[12px] bg-white/90 transition-transform duration-300 hover:scale-105"
+      >
+        <img src={src} alt={`${name}二维码`} className="h-full w-full object-contain p-1" />
+      </a>
+      <span className="text-xs font-bold text-muted">{name}</span>
+    </div>
+  );
+}
+
 export function PoufFooter() {
   const { open: openFeedback } = useFeedbackDialog();
   return (
     <footer className="relative z-10 mt-[120px] border-t border-ink/10">
       <div className="mx-auto max-w-6xl px-6 py-10">
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1fr_auto]">
           {/* Contact */}
           <div>
             <h4 className="mb-4 text-base font-black text-ink">联系我们</h4>
@@ -44,7 +61,7 @@ export function PoufFooter() {
               </li>
               <li>
                 <Link href="/legal?tab=terms" className="text-muted transition-colors hover:text-ink">
-                  用户服务协议
+                  心愈智联用户服务协议
                 </Link>
               </li>
               <li>
@@ -87,6 +104,15 @@ export function PoufFooter() {
             </ul>
           </div>
 
+          {/* Follow Us — 三码位（公众号 / 小红书 / 抖音） */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <h4 className="mb-4 text-base font-black text-ink">关注我们</h4>
+            <div className="flex flex-wrap gap-4">
+              <QrTile name="微信公众号" src="/WeChatOfficialAccount.jpg" />
+              <QrTile name="小红书" src="/qrcode-xiaohongshu.png" />
+              <QrTile name="抖音" src="/qrcode-douyin.png" />
+            </div>
+          </div>
         </div>
 
         {/* Copyright */}
