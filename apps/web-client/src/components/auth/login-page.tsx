@@ -101,7 +101,7 @@ export function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="w-full max-w-md rounded-card bg-surface/75 p-7 sm:p-8 backdrop-blur-md cushion-card [animation:pouf-fade_360ms_ease]">
+      <div className="w-full max-w-lg rounded-card bg-surface/75 p-7 sm:p-8 backdrop-blur-md cushion-card [animation:pouf-fade_360ms_ease]">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 inline-grid size-14 place-items-center rounded-full bg-mint tone-mint cushion-control">
             <Leaf className="size-6 text-ink" />
@@ -198,6 +198,12 @@ export function LoginPage() {
           <p>
             <Link href="/forgot-password" className="transition-colors hover:text-ink">
               忘记密码？
+            </Link>
+          </p>
+          <p className="text-xs font-bold text-muted">
+            登录即代表您已阅读并同意
+            <Link href="/legal?tab=terms" className="ml-1 transition-colors hover:text-ink">
+              《心愈智联用户服务协议》
             </Link>
           </p>
         </div>

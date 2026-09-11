@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/assessment", label: "心理测评" },
   { href: "/xiaoai", label: "小爱心理倾诉" },
   { href: "/consultation", label: "心理咨询" },
+  { href: "/index", label: "官网" },
 ];
 
 const XIAOAI_CHILDREN = [

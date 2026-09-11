@@ -69,7 +69,7 @@ export function RegisterPage() {
       return;
     }
     if (!agreed) {
-      toast.warning("请阅读并同意隐私政策");
+      toast.warning("请阅读并同意相关协议");
       return;
     }
     setLoading(true);
@@ -86,7 +86,7 @@ export function RegisterPage() {
 
   return (
     <AuthShell>
-      <div className="w-full max-w-md rounded-card bg-surface/75 p-7 sm:p-8 backdrop-blur-md cushion-card [animation:pouf-fade_360ms_ease]">
+      <div className="w-full max-w-lg rounded-card bg-surface/75 p-7 sm:p-8 backdrop-blur-md cushion-card [animation:pouf-fade_360ms_ease]">
         <div className="mb-6 text-center">
           <div className="mx-auto mb-3 inline-grid size-14 place-items-center rounded-full bg-mint tone-mint cushion-control">
             <Leaf className="size-6 text-ink" />
@@ -149,7 +149,11 @@ export function RegisterPage() {
           <label className="flex items-center gap-2 rounded-control bg-bg px-4 py-3 text-sm font-bold text-ink">
             <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="size-5 accent-mint" />
             我已阅读并同意
-            <Link href="/privacy" className="transition-colors hover:text-ink">
+            <Link href="/legal?tab=terms" className="transition-colors hover:text-ink">
+              《心愈智联用户服务协议》
+            </Link>
+            和
+            <Link href="/legal?tab=privacy" className="transition-colors hover:text-ink">
               《隐私政策》
             </Link>
           </label>
